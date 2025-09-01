@@ -1,14 +1,16 @@
-use std::time::Duration;
+#[cfg(target_os = "windows")]
+use crate::afterburner;
+use crate::{nvml, Models::NvmlStatus};
 use log::info;
-use crate::{afterburner, nvml, Models::NvmlStatus};
+use std::time::Duration;
 
 use super::oyasumi_elevated_sidecar::{
     oyasumi_elevated_sidecar_server::OyasumiElevatedSidecar, Empty, NvmlDevicesResponse,
     NvmlPowerManagementLimitRequest, NvmlPowerManagementLimitResponse, NvmlStatusResponse,
     SetMsiAfterburnerProfileRequest, SetMsiAfterburnerProfileResponse,
 };
-use tonic::{Request, Response, Status};
 use crate::Models::PingResponse;
+use tonic::{Request, Response, Status};
 
 #[derive(Debug, Default)]
 pub struct OyasumiElevatedSidecarServerImpl {}
@@ -71,15 +73,25 @@ impl OyasumiElevatedSidecar for OyasumiElevatedSidecarServerImpl {
         request: Request<SetMsiAfterburnerProfileRequest>,
     ) -> Result<Response<SetMsiAfterburnerProfileResponse>, Status> {
         let request = request.into_inner();
-        let result = afterburner::set_afterburner_profile(request.executable_path, request.profile);
-        let success = result.is_ok();
-        let error = match result {
-            Ok(_) => None,
-            Err(e) => Some(e),
-        };
+        #[cfg(target_os = "windows")]
+        {
+            let result =
+                afterburner::set_afterburner_profile(request.executable_path, request.profile);
+            let success = result.is_ok();
+
+            let error = match result {
+                Ok(_) => None,
+                Err(e) => Some(e),
+            };
+            Ok(Response::new(SetMsiAfterburnerProfileResponse {
+                success,
+                error: error.map(|e| e.into()),
+            }))
+        }
+        #[cfg(target_os = "linux")]
         Ok(Response::new(SetMsiAfterburnerProfileResponse {
-            success,
-            error: error.map(|e| e.into()),
+            success:false,
+            error: Some(9),
         }))
     }
 }

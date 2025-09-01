@@ -1,5 +1,5 @@
+#![cfg(target_os="windows")]
 use std::{path::Path, process::Command};
-
 use codesigned::CodeSigned;
 use log::{error, info, warn};
 
