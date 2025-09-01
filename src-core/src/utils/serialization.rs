@@ -1,3 +1,4 @@
+#![cfg(target_os="windows")]
 use windows::core::GUID;
 
 // Converts a GUID to a String
