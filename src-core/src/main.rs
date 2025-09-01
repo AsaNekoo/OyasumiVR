@@ -36,6 +36,7 @@ use serde_json::json;
 use tauri::{plugin::TauriPlugin, Manager, Wry};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::RotationStrategy;
+#[cfg(disabled)]
 use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings6;
 
 use crate::globals::APTABASE_HOST;
@@ -227,8 +228,11 @@ async fn app_setup(app_handle: tauri::AppHandle) {
                 .unwrap()
                 .Settings()
                 .unwrap();
+            #[cfg(disabled)]
+            {
             let settings: ICoreWebView2Settings6 = mem::transmute(settings);
             settings.SetIsSwipeNavigationEnabled(false).unwrap();
+            }
         })
         .unwrap();
     // Get dependencies
