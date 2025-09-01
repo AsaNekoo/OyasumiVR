@@ -3,7 +3,7 @@ pub mod commands;
 mod models;
 mod sounds_gen;
 pub mod elevation;
-
+#[cfg(target_os="windows")]
 use self::audio_devices::manager::AudioDeviceManager;
 use std::sync::LazyLock;
 use log::{error, info, warn};
@@ -29,10 +29,13 @@ use windows::Win32::System::Power::{
 type PlaySoundSender = LazyLock<Mutex<Option<Sender<(String, f32)>>>>;
 
 static PLAY_SOUND_TX: PlaySoundSender = LazyLock::new(Mutex::default);
+#[cfg(target_os="windows")]
 static AUDIO_DEVICE_MANAGER: LazyLock<Mutex<Option<AudioDeviceManager>>> = LazyLock::new(Mutex::default);
 static VRCHAT_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 
 pub async fn init_audio_device_manager() {
+    #[cfg(target_os="windows")]
+    {
     let mut manager = AUDIO_DEVICE_MANAGER.lock().await;
     if manager.is_some() {
         return;
@@ -49,6 +52,7 @@ pub async fn init_audio_device_manager() {
         error!("[Core] Failed to refresh audio devices: {}", e);
     }
     tokio::task::spawn(watch_processes());
+}
 }
 
 async fn watch_processes() {

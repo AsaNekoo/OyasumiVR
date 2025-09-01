@@ -1,11 +1,13 @@
-use crate::globals::TAURI_APP_HANDLE;
-
+#[cfg(target_os = "windows")]
+use super::audio_devices::device::AudioDeviceDto;
+#[cfg(target_os="linux")]
+use super::audio_devices::linux_hack::AudioDeviceDto;
 use super::{
-    audio_devices::device::AudioDeviceDto,
     get_friendly_name_for_windows_power_policy,
     models::{Output, WindowsPowerPolicy},
     VRCHAT_ACTIVE,
 };
+use crate::globals::TAURI_APP_HANDLE;
 use log::{debug, error, info};
 use oyasumivr_shared::is_elevated;
 use std::process::Command;
@@ -292,31 +294,37 @@ pub async fn windows_hibernate() {
 pub async fn windows_logout() {
     let _ = system_shutdown::logout();
 }
-
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
-            error!(
+    #[cfg(target_os = "windows")]
+    {
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
                 "[Core] Could not get audio devices, as audio device manager was not initialized"
             );
-            return vec![];
+                return vec![];
+            }
+        };
+        if refresh {
+            if let Err(e) = manager.refresh_audio_devices().await {
+                error!("[Core] Failed to refresh audio devices: {}", e);
+            }
         }
-    };
-    if refresh {
-        if let Err(e) = manager.refresh_audio_devices().await {
-            error!("[Core] Failed to refresh audio devices: {}", e);
-        }
+        manager.get_devices().await
     }
-    manager.get_devices().await
+    #[cfg(target_os = "linux")]
+    Vec::new()
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_audio_device_volume(device_id: String, volume: f32) {
+    #[cfg(target_os="windows")]
+    {
     let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
     let manager = match manager_guard.as_ref() {
         Some(m) => m,
@@ -329,10 +337,13 @@ pub async fn set_audio_device_volume(device_id: String, volume: f32) {
     };
     manager.set_volume(device_id, volume).await;
 }
+}
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_audio_device_mute(device_id: String, mute: bool) {
+    #[cfg(target_os="windows")]
+    {
     let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
     let manager = match manager_guard.as_ref() {
         Some(m) => m,
@@ -345,10 +356,13 @@ pub async fn set_audio_device_mute(device_id: String, mute: bool) {
     };
     manager.set_mute(device_id, mute).await;
 }
+}
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
+    #[cfg(target_os="windows")]
+    {
     let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
     let manager = match manager_guard.as_ref() {
         Some(m) => m,
@@ -361,10 +375,13 @@ pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
     };
     manager.set_mic_activity_enabled(enabled).await;
 }
+}
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
+    #[cfg(target_os="windows")]
+    {
     let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
     let manager = match manager_guard.as_ref() {
         Some(m) => m,
@@ -377,10 +394,13 @@ pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
     };
     manager.set_mic_activation_threshold(threshold).await;
 }
+}
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_mic_activity_device_id(device_id: Option<String>) {
+    #[cfg(target_os="windows")]
+    {
     let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
     let manager = match manager_guard.as_ref() {
         Some(m) => m,
@@ -392,6 +412,7 @@ pub async fn set_mic_activity_device_id(device_id: Option<String>) {
         }
     };
     manager.set_mic_activity_device_id(device_id).await;
+}
 }
 
 #[tauri::command]
