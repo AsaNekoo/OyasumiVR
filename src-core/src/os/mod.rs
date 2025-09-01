@@ -3,7 +3,7 @@ pub mod commands;
 mod models;
 mod sounds_gen;
 pub mod elevation;
-#[cfg(target_os="windows")]
+#[cfg(disabled)]
 use self::audio_devices::manager::AudioDeviceManager;
 use std::sync::LazyLock;
 use log::{error, info, warn};
@@ -19,8 +19,11 @@ use std::env;
 use std::time::Duration;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;
+#[cfg(disabled)]
 use windows::core::GUID;
+#[cfg(disabled)]
 use windows::Win32::Foundation::ERROR_SUCCESS;
+#[cfg(disabled)]
 use windows::Win32::System::Power::{
     PowerEnumerate, PowerGetActiveScheme, PowerReadFriendlyName, PowerSetActiveScheme,
     ACCESS_SCHEME,
@@ -29,12 +32,12 @@ use windows::Win32::System::Power::{
 type PlaySoundSender = LazyLock<Mutex<Option<Sender<(String, f32)>>>>;
 
 static PLAY_SOUND_TX: PlaySoundSender = LazyLock::new(Mutex::default);
-#[cfg(target_os="windows")]
+#[cfg(disabled)]
 static AUDIO_DEVICE_MANAGER: LazyLock<Mutex<Option<AudioDeviceManager>>> = LazyLock::new(Mutex::default);
 static VRCHAT_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 
 pub async fn init_audio_device_manager() {
-    #[cfg(target_os="windows")]
+    #[cfg(disabled)]
     {
     let mut manager = AUDIO_DEVICE_MANAGER.lock().await;
     if manager.is_some() {
@@ -190,7 +193,7 @@ pub async fn cleanup_batch_files() {
         }
     }
 }
-
+#[cfg(disabled)]
 fn get_windows_power_policies() -> Vec<GUID> {
     let mut power_schemes = Vec::new();
     let mut index: u32 = 0;
@@ -220,7 +223,7 @@ fn get_windows_power_policies() -> Vec<GUID> {
 
     power_schemes
 }
-
+#[cfg(disabled)]
 fn active_windows_power_policy() -> Option<GUID> {
     unsafe {
         let mut guid: *mut GUID = std::ptr::null_mut();
@@ -231,7 +234,7 @@ fn active_windows_power_policy() -> Option<GUID> {
         }
     }
 }
-
+#[cfg(disabled)]
 fn set_windows_power_policy(guid: &GUID) -> bool {
     let result = unsafe { PowerSetActiveScheme(None, Some(guid)) };
     if result.is_err() {
@@ -242,7 +245,7 @@ fn set_windows_power_policy(guid: &GUID) -> bool {
     };
     result.is_ok()
 }
-
+#[cfg(disabled)]
 fn get_friendly_name_for_windows_power_policy(scheme_guid: &GUID) -> Option<String> {
     let mut buffer_size: u32 = 0;
 

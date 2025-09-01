@@ -1,4 +1,4 @@
-#![cfg(target_os = "windows")]
+#![cfg(disabled)]
 use std::io::Error;
 use windows::Win32::Foundation::{CloseHandle, HANDLE};
 use windows::Win32::Security::{GetTokenInformation, TokenElevation, TOKEN_ELEVATION, TOKEN_QUERY};

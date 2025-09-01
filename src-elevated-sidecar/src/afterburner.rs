@@ -1,4 +1,4 @@
-#![cfg(target_os="windows")]
+#![cfg(disabled)]
 use std::{path::Path, process::Command};
 use codesigned::CodeSigned;
 use log::{error, info, warn};

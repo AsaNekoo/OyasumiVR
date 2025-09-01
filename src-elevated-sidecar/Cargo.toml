@@ -24,10 +24,8 @@ tonic = "0.13.1"
 tonic-web = "0.13.1"
 prost = "0.13"
 tokio-stream = { version = "0.1.17", features = ["full"] }
-
-[dependencies.windows-sys]
-version = "0.36.1"
-features = ["Win32_UI_Shell", "Win32_Foundation"]
+[target.'cfg(disabled)'.dependencies]
+windows-sys= {version = "0.36.1",features = ["Win32_UI_Shell", "Win32_Foundation"]}
 
 [dependencies.tokio]
 version = "1.44.2"

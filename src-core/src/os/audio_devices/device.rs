@@ -1,4 +1,4 @@
-#![cfg(target_os="windows")]
+#![cfg(disabled)]
 use std::ptr::null_mut;
 use std::sync::Arc;
 

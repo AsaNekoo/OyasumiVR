@@ -1,4 +1,4 @@
-#![cfg(target_os="windows")]
+#![cfg(disabled)]
 use std::{ffi::OsStr, os::windows::prelude::OsStrExt, ptr};
 use windows_sys::Win32::UI::Shell::ShellExecuteW;
 

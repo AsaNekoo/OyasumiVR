@@ -43,7 +43,7 @@ use crate::globals::APTABASE_HOST;
 #[tokio::main]
 async fn main() {
     // Attach to parent console if we're running from a command line
-    #[cfg(windows)]
+    #[cfg(disabled)]
     {
         use windows::Win32::System::Console::{AttachConsole, ATTACH_PARENT_PROCESS};
         let _ = unsafe { AttachConsole(ATTACH_PARENT_PROCESS) };
@@ -190,7 +190,7 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
 
 async fn app_setup(app_handle: tauri::AppHandle) {
     // Process elevation security args
-    #[cfg(target_os="windows")]
+    #[cfg(disabled)]
     os::elevation::process_elevation_cli_args().await;
 
     info!(

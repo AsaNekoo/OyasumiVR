@@ -1,11 +1,12 @@
-#[cfg(target_os = "windows")]
+#[cfg(any(disabled))]
 use super::audio_devices::device::AudioDeviceDto;
-#[cfg(target_os="linux")]
+#[cfg(any(windows,linux))]
 use super::audio_devices::linux_hack::AudioDeviceDto;
+#[cfg(disabled)]
+use super::get_friendly_name_for_windows_power_policy;
 use super::{
-    get_friendly_name_for_windows_power_policy,
-    models::{Output, WindowsPowerPolicy},
     VRCHAT_ACTIVE,
+    models::{Output,WindowsPowerPolicy},
 };
 use crate::globals::TAURI_APP_HANDLE;
 use log::{debug, error, info};
@@ -216,47 +217,64 @@ pub async fn show_in_folder(path: String) {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_windows_power_policy(guid: String) {
-    let guid = guid.to_uppercase();
-    let parsed_guid = match crate::utils::serialization::string_to_guid(&guid) {
-        Ok(g) => g,
-        Err(e) => {
-            error!(
-                "[Core] Could not parse GUID in set_windows_power_policy \"{}\": {}",
-                guid, e
-            );
-            return;
-        }
-    };
-    info!("[Core] Setting Windows power policy to \"{}\" plan", guid);
-    super::set_windows_power_policy(&parsed_guid);
+    #[cfg(disabled)]
+    {
+        let guid = guid.to_uppercase();
+        let parsed_guid = match crate::utils::serialization::string_to_guid(&guid) {
+            Ok(g) => g,
+            Err(e) => {
+                error!(
+                    "[Core] Could not parse GUID in set_windows_power_policy \"{}\": {}",
+                    guid, e
+                );
+                return;
+            }
+        };
+        info!("[Core] Setting Windows power policy to \"{}\" plan", guid);
+        super::set_windows_power_policy(&parsed_guid);
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn active_windows_power_policy() -> Option<WindowsPowerPolicy> {
-    let guid = super::active_windows_power_policy();
-    guid?;
-    let guid = guid.unwrap();
-    let name = get_friendly_name_for_windows_power_policy(&guid);
-    Some(WindowsPowerPolicy {
-        guid: crate::utils::serialization::guid_to_string(&guid),
-        name: name.unwrap_or(String::from("Unknown Policy")),
-    })
+    #[cfg(disabled)]
+    {
+        let guid = super::active_windows_power_policy();
+        guid?;
+        let guid = guid.unwrap();
+        let name = get_friendly_name_for_windows_power_policy(&guid);
+        Some(WindowsPowerPolicy {
+            guid: crate::utils::serialization::guid_to_string(&guid),
+            name: name.unwrap_or(String::from("Unknown Policy")),
+        })
+    }
+    #[cfg(any(windows,linux))]
+    {
+        None
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn get_windows_power_policies() -> Vec<WindowsPowerPolicy> {
-    let mut policies = Vec::new();
-    let schemes = super::get_windows_power_policies();
-    for scheme in schemes {
-        let name = get_friendly_name_for_windows_power_policy(&scheme);
-        policies.push(WindowsPowerPolicy {
-            guid: crate::utils::serialization::guid_to_string(&scheme),
-            name: name.unwrap_or(String::from("Unknown Policy")),
-        });
+    #[cfg(disabled)]
+    {
+        let mut policies = Vec::new();
+        let schemes = super::get_windows_power_policies();
+        for scheme in schemes {
+            let name = get_friendly_name_for_windows_power_policy(&scheme);
+            policies.push(WindowsPowerPolicy {
+                guid: crate::utils::serialization::guid_to_string(&scheme),
+                name: name.unwrap_or(String::from("Unknown Policy")),
+            });
+        }
+        policies
     }
-    policies
+    #[cfg(any(windows,linux))]
+    {
+        Vec::new()
+    }
 }
 
 #[tauri::command]
@@ -297,7 +315,7 @@ pub async fn windows_logout() {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
-    #[cfg(target_os = "windows")]
+    #[cfg(disabled)]
     {
         let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
         let manager = match manager_guard.as_ref() {
@@ -316,107 +334,114 @@ pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
         }
         manager.get_devices().await
     }
-    #[cfg(target_os = "linux")]
+    #[cfg(any(windows,linux))]
     Vec::new()
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_audio_device_volume(device_id: String, volume: f32) {
-    #[cfg(target_os="windows")]
+    #[cfg(disabled)]
     {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
-            error!(
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
               "[Core] Could not set audio device volume, as audio device manager was not initialized"
           );
-            return;
-        }
-    };
-    manager.set_volume(device_id, volume).await;
-}
+                return;
+            }
+        };
+        manager.set_volume(device_id, volume).await;
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_audio_device_mute(device_id: String, mute: bool) {
-    #[cfg(target_os="windows")]
+    #[cfg(disabled)]
     {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
-            error!(
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
               "[Core] Could not set audio device mute state, as audio device manager was not initialized"
           );
-            return;
-        }
-    };
-    manager.set_mute(device_id, mute).await;
-}
+                return;
+            }
+        };
+        manager.set_mute(device_id, mute).await;
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
-    #[cfg(target_os="windows")]
+    #[cfg(disabled)]
     {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
-            error!(
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
               "[Core] Could not enable/disable hardware mic activation, as audio device manager was not initialized"
           );
-            return;
-        }
-    };
-    manager.set_mic_activity_enabled(enabled).await;
-}
+                return;
+            }
+        };
+        manager.set_mic_activity_enabled(enabled).await;
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
-    #[cfg(target_os="windows")]
+    #[cfg(disabled)]
     {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
-            error!(
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
               "[Core] Could not set the hardware mic activation threshold, as audio device manager was not initialized"
           );
-            return;
-        }
-    };
-    manager.set_mic_activation_threshold(threshold).await;
-}
+                return;
+            }
+        };
+        manager.set_mic_activation_threshold(threshold).await;
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_mic_activity_device_id(device_id: Option<String>) {
-    #[cfg(target_os="windows")]
+    #[cfg(disabled)]
     {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
-            error!(
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
               "[Core] Could not set active capture device ID, as audio device manager was not initialized"
           );
-            return;
-        }
-    };
-    manager.set_mic_activity_device_id(device_id).await;
-}
+                return;
+            }
+        };
+        manager.set_mic_activity_device_id(device_id).await;
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn is_elevation_security_disabled() -> bool {
-    crate::os::elevation::is_elevation_security_disabled()
+    #[cfg(disabled)]
+    {
+        crate::os::elevation::is_elevation_security_disabled()
+    }
+    #[cfg(any(windows,linux))]
+    {
+        true
+    }
 }

@@ -1,3 +1,4 @@
+#![cfg(disabled)]
 use hidapi::HidApi;
 use log::error;
 use std::ffi::OsStr;

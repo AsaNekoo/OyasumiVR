@@ -1,4 +1,4 @@
-#![cfg(target_os="windows")]
+#![cfg(target_os="win")]
 use log::{info, warn};
 use winreg::enums::*;
 use winreg::RegKey;

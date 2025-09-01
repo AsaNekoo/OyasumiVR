@@ -16,6 +16,7 @@ static BSB_CONNECTED: LazyLock<AtomicBool> = LazyLock::new(|| AtomicBool::new(fa
 static BSB_DEVICE: LazyLock<Mutex<Option<HidDevice>>> = LazyLock::new(|| Mutex::new(None));
 
 pub async fn init() {
+    #[cfg(disabled)]
     tokio::spawn(async move {
         let mut api = match HidApi::new() {
             Ok(a) => a,

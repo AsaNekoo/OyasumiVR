@@ -18,13 +18,13 @@ use std::fs::File;
 use std::path::Path;
 use std::time::Duration;
 use sysinfo::{Pid, System, ProcessesToUpdate};
-#[cfg(target_os="windows")]
+#[cfg(disabled)]
 use windows::relaunch_with_elevation;
 
 mod afterburner;
 mod grpc;
 mod nvml;
-#[cfg(target_os="windows")]
+#[cfg(disabled)]
 mod windows;
 
 #[tokio::main]
@@ -86,7 +86,7 @@ async fn main() {
         None
     };
     // Relaunch as admin if not elevated
-    #[cfg(target_os="windows")]
+    #[cfg(disabled)]
     if !is_elevated() {
         relaunch_with_elevation(host_port, main_pid, true);
         return;

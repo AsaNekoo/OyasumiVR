@@ -1,4 +1,4 @@
-#[cfg(target_os = "windows")]
+#[cfg(disabled)]
 use crate::afterburner;
 use crate::{nvml, Models::NvmlStatus};
 use log::info;
@@ -73,7 +73,7 @@ impl OyasumiElevatedSidecar for OyasumiElevatedSidecarServerImpl {
         request: Request<SetMsiAfterburnerProfileRequest>,
     ) -> Result<Response<SetMsiAfterburnerProfileResponse>, Status> {
         let request = request.into_inner();
-        #[cfg(target_os = "windows")]
+        #[cfg(disabled)]
         {
             let result =
                 afterburner::set_afterburner_profile(request.executable_path, request.profile);
@@ -88,7 +88,7 @@ impl OyasumiElevatedSidecar for OyasumiElevatedSidecarServerImpl {
                 error: error.map(|e| e.into()),
             }))
         }
-        #[cfg(target_os = "linux")]
+        #[cfg(any(windows,linux))]
         Ok(Response::new(SetMsiAfterburnerProfileResponse {
             success:false,
             error: Some(9),
