@@ -88,7 +88,7 @@ impl OyasumiElevatedSidecar for OyasumiElevatedSidecarServerImpl {
                 error: error.map(|e| e.into()),
             }))
         }
-        #[cfg(any(windows,linux))]
+        #[cfg(any(windows,target_os = "linux"))]
         Ok(Response::new(SetMsiAfterburnerProfileResponse {
             success:false,
             error: Some(9),

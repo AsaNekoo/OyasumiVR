@@ -7,5 +7,5 @@ pub mod manager;
 #[allow(dead_code, unused_variables, non_upper_case_globals)]
 #[cfg(disabled)]
 mod wrappers;
-#[cfg(any(windows,linux))]
+#[cfg(any(windows,target_os = "linux"))]
 pub mod linux_hack;

@@ -35,9 +35,9 @@ pub fn init() {
 }
 
 pub async fn is_process_active(process_name: &str, refresh_processes: bool) -> bool {
-    #[cfg(any(windows,linux))]
+    #[cfg(any(windows,target_os = "linux"))]
     let process_name_=process_name.replacen(".exe", "", 1).to_string();
-    #[cfg(any(windows,linux))]
+    #[cfg(any(windows,target_os = "linux"))]
     let process_name=process_name_.as_str();
     let mut sysinfo_guard = SYSINFO.lock().await;
     let sysinfo = &mut *sysinfo_guard;
@@ -49,9 +49,9 @@ pub async fn is_process_active(process_name: &str, refresh_processes: bool) -> b
 }
 
 pub async fn stop_process(process_name: &str, kill: bool) {
-    #[cfg(any(windows,linux))]
+    #[cfg(any(windows,target_os = "linux"))]
     let process_name_=process_name.replacen(".exe", "", 1).to_string();
-    #[cfg(any(windows,linux))]
+    #[cfg(any(windows,target_os = "linux"))]
     let process_name=process_name_.as_str();
     let mut sysinfo_guard = SYSINFO.lock().await;
     let sysinfo = &mut *sysinfo_guard;

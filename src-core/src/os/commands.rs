@@ -1,6 +1,6 @@
 #[cfg(any(disabled))]
 use super::audio_devices::device::AudioDeviceDto;
-#[cfg(any(windows,linux))]
+#[cfg(any(windows,target_os = "linux"))]
 use super::audio_devices::linux_hack::AudioDeviceDto;
 #[cfg(disabled)]
 use super::get_friendly_name_for_windows_power_policy;
@@ -249,7 +249,7 @@ pub async fn active_windows_power_policy() -> Option<WindowsPowerPolicy> {
             name: name.unwrap_or(String::from("Unknown Policy")),
         })
     }
-    #[cfg(any(windows,linux))]
+    #[cfg(any(windows,target_os = "linux"))]
     {
         None
     }
@@ -271,7 +271,7 @@ pub async fn get_windows_power_policies() -> Vec<WindowsPowerPolicy> {
         }
         policies
     }
-    #[cfg(any(windows,linux))]
+    #[cfg(any(windows,target_os = "linux"))]
     {
         Vec::new()
     }
@@ -334,7 +334,7 @@ pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
         }
         manager.get_devices().await
     }
-    #[cfg(any(windows,linux))]
+    #[cfg(any(windows,target_os = "linux"))]
     Vec::new()
 }
 
@@ -440,7 +440,7 @@ pub async fn is_elevation_security_disabled() -> bool {
     {
         crate::os::elevation::is_elevation_security_disabled()
     }
-    #[cfg(any(windows,linux))]
+    #[cfg(any(windows,target_os = "linux"))]
     {
         true
     }
