@@ -9,7 +9,7 @@ use directories::BaseDirs;
 use grpc::oyasumi_core::{oyasumi_core_client::OyasumiCoreClient, ElevatedSidecarStartArgs};
 pub use grpc::oyasumi_elevated_sidecar as Models;
 use log::{error, info};
-use oyasumivr_shared::windows::is_elevated;
+use oyasumivr_shared::is_elevated;
 use simplelog::{
     ColorChoice, CombinedLogger, Config, LevelFilter, TermLogger, TerminalMode, WriteLogger,
 };

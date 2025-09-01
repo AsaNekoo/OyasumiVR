@@ -1,9 +1,11 @@
-use oyasumivr_shared::windows::is_elevated;
+use oyasumivr_shared::is_elevated;
+#[cfg(target_os="windows")]
 use winreg::enums::*;
+#[cfg(target_os="windows")]
 use winreg::RegKey;
 
 use crate::globals::TAURI_CLI_MATCHES;
-
+#[cfg(target_os="windows")]
 pub async fn process_elevation_cli_args() {
     let match_guard = TAURI_CLI_MATCHES.lock().await;
     fn is_flag_present(matches: &tauri_plugin_cli::Matches, flag_name: &str) -> bool {
@@ -22,7 +24,7 @@ pub async fn process_elevation_cli_args() {
         }
     }
 }
-
+#[cfg(target_os="windows")]
 async fn reset_elevation_security() {
     if !is_elevated() {
         eprintln!("In order to reset elevation security, OyasumiVR.exe must be run with administrative privileges.");
@@ -40,7 +42,7 @@ async fn reset_elevation_security() {
     }
     std::process::exit(0);
 }
-
+#[cfg(target_os="windows")]
 async fn disable_elevation_security() {
     if !is_elevated() {
         eprintln!("In order to disable elevation security, OyasumiVR.exe must be run with administrative privileges.");
@@ -58,14 +60,14 @@ async fn disable_elevation_security() {
     }
     std::process::exit(0);
 }
-
+#[cfg(target_os="windows")]
 fn set_elevation_security_override_registry_flag() -> Result<(), std::io::Error> {
     let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
     let (key, _) = hklm.create_subkey("SOFTWARE\\OyasumiVR")?;
     key.set_value("ElevationSecurityOverride", &1u32)?;
     Ok(())
 }
-
+#[cfg(target_os="windows")]
 fn clear_elevation_security_override_registry_flag() -> Result<(), std::io::Error> {
     let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
 
@@ -95,7 +97,7 @@ fn clear_elevation_security_override_registry_flag() -> Result<(), std::io::Erro
         }
     }
 }
-
+#[cfg(target_os="windows")]
 pub fn is_elevation_security_disabled() -> bool {
     let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
 

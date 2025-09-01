@@ -5,17 +5,12 @@ authors = ["Raphiiko"]
 edition = "2021"
 license = "MIT"
 
-[dependencies.windows]
-version = "0.61.3"
-features = [
-  "Win32_Foundation",
-  "Win32_Security",
-  "Win32_System_Threading",
-]
-
 [profile.release]
 panic = "abort"   # Strip expensive panic clean-up logic
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
 lto = true        # Enables link to optimizations
 opt-level = "s"   # Optimize for binary size
 strip = true      # Remove debug symbols
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61.3", features = ["Win32_Foundation","Win32_Security","Win32_System_Threading"] }

@@ -31,7 +31,7 @@ pub use grpc::models as Models;
 use cronjob::CronJob;
 use globals::{APTABASE_APP_KEY, FLAGS, TAURI_APP_HANDLE};
 use log::{error, info, warn, LevelFilter};
-use oyasumivr_shared::windows::is_elevated;
+use oyasumivr_shared::is_elevated;
 use serde_json::json;
 use tauri::{plugin::TauriPlugin, Manager, Wry};
 use tauri_plugin_cli::CliExt;
@@ -190,6 +190,7 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
 
 async fn app_setup(app_handle: tauri::AppHandle) {
     // Process elevation security args
+    #[cfg(target_os="windows")]
     os::elevation::process_elevation_cli_args().await;
 
     info!(
