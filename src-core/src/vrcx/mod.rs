@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+#![cfg(disabled)]
 pub mod commands;
 pub mod models;
 use models::*;

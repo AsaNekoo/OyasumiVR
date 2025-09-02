@@ -426,6 +426,7 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         grpc::commands::get_core_grpc_port,
         grpc::commands::get_core_grpc_web_port,
         telemetry::commands::set_telemetry_enabled,
+        #[cfg(disabled)]
         vrcx::commands::vrcx_log,
     ]
 }
