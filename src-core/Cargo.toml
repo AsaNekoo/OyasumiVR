@@ -122,8 +122,8 @@ rev = "a2afdea5fa9171b0151f8da271fcdd7cdc2beb41"
 features = ["ovr_system", "ovr_settings"]
 
 [dependencies.oyasumivr_oscquery]
-git = "https://github.com/Raphiiko/oyasumivr_oscquery.git"
-rev = "47c00b5fab8d7a45ba3254873ca7886f84483560"
+git = "https://github.com/sofoxe1/oyasumivr_oscquery"
+rev = "826f76ef5e75e02612105664893ee0712f2e0d49"
 # path = "../../oyasumivr_oscquery"
 
 [dependencies.tauri]

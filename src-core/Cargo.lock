@@ -4809,12 +4809,11 @@ dependencies = [
 [[package]]
 name = "oyasumivr_oscquery"
 version = "0.3.0"
-source = "git+https://github.com/Raphiiko/oyasumivr_oscquery.git?rev=47c00b5fab8d7a45ba3254873ca7886f84483560#47c00b5fab8d7a45ba3254873ca7886f84483560"
+source = "git+https://github.com/sofoxe1/oyasumivr_oscquery?rev=826f76ef5e75e02612105664893ee0712f2e0d49#826f76ef5e75e02612105664893ee0712f2e0d49"
 dependencies = [
  "http-body-util",
  "hyper 1.6.0",
  "hyper-util",
- "lazy_static",
  "log",
  "serde",
  "serde_json",
