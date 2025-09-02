@@ -13,6 +13,7 @@ use std::collections::HashMap;
 use std::ffi::OsString;
 use std::fs::File;
 use std::io::BufReader;
+#[cfg(disabled)]
 use std::os::windows::ffi::OsStringExt;
 use std::slice;
 use std::env;

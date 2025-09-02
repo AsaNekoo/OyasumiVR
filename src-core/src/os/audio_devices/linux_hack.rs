@@ -1,4 +1,4 @@
-#![cfg(any(windows,linux))]
+#![cfg(any(windows, target_os = "linux"))]
 use serde::Serialize;
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

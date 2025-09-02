@@ -8,7 +8,6 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::{
     fs::{read_dir, File},
     io::{BufRead, BufReader},
-    os::windows::prelude::MetadataExt,
     sync::Arc,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
@@ -70,12 +69,13 @@ fn get_latest_log_path() -> Option<String> {
                 .ok().map(|metadata| metadata.len() > 0)
                 .unwrap_or(false)
         })
+        
         // Find most recent log file
         .max_by_key(|entry| {
             entry
                 .path()
                 .metadata()
-                .ok().map(|m| m.creation_time())
+                .ok().map(|m| m.created().unwrap_or(UNIX_EPOCH).elapsed().unwrap_or(Duration::ZERO).as_millis())
         })
         // Get the path for it
         .and_then(|entry| entry.path().to_str().map(String::from))

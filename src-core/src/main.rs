@@ -220,6 +220,8 @@ async fn app_setup(app_handle: tauri::AppHandle) {
         window.open_devtools();
     }
     // Disable swipe navigation in main window
+    #[cfg(disabled)]
+    {
     window
         .with_webview(|webview| unsafe {
             let settings = webview
@@ -228,13 +230,11 @@ async fn app_setup(app_handle: tauri::AppHandle) {
                 .unwrap()
                 .Settings()
                 .unwrap();
-            #[cfg(disabled)]
-            {
             let settings: ICoreWebView2Settings6 = mem::transmute(settings);
             settings.SetIsSwipeNavigationEnabled(false).unwrap();
-            }
         })
         .unwrap();
+}
     // Get dependencies
     let cache_dir = app_handle.path().app_cache_dir().unwrap();
     // Register deep link schemas if needed
