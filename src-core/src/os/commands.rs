@@ -286,7 +286,10 @@ pub async fn windows_is_elevated() -> bool {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn windows_shutdown(message: String, timeout: u32, force_close_apps: bool) {
+    #[cfg(windows)]
     let _ = system_shutdown::shutdown_with_message(&message, timeout, force_close_apps);
+    #[cfg(target_os = "linux")]
+    let _ = system_shutdown::shutdown();
 }
 
 #[tauri::command]
