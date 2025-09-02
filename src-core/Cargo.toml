@@ -53,7 +53,7 @@ rosc = "0.11.4"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 steamlocate = "2.0.1"
-steamworks = { version = "0.11.0" }
+
 strum = "0.27.1"
 strum_macros = "0.27.1"
 substring = "1.4.5"
@@ -111,6 +111,7 @@ windows-sys = { version = "0.52", features = [
 winreg = "0.55.0"
 webview2-com = "0.38.0"
 named_pipe = "0.4.1"
+steamworks = { version = "0.11.0" }
 [dependencies.ipgeolocate]
 git = "https://github.com/Raphiiko/ipgeolocate_oyasumi.git"
 rev = "5f24925"

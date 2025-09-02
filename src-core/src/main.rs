@@ -247,6 +247,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     // Initialize utility module
     utils::init();
     // Initialize Steam module
+    #[cfg(disabled)]
     steam::init().await;
     // Initialize HTTP server
     http::init().await;
@@ -410,8 +411,11 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         lighthouse::commands::lighthouse_get_status,
         lighthouse::commands::lighthouse_get_scanning_status,
         lighthouse::commands::lighthouse_reset,
+        #[cfg(disabled)]
         steam::commands::steam_active,
+        #[cfg(disabled)]
         steam::commands::steam_achievement_get,
+        #[cfg(disabled)]
         steam::commands::steam_achievement_set,
         commands::log_utils::clear_log_files,
         commands::afterburner::msi_afterburner_set_profile,

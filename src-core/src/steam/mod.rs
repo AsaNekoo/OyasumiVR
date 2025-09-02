@@ -1,3 +1,4 @@
+#![cfg(disabled)]
 use log::error;
 use std::sync::LazyLock;
 use steamworks::{AppId, CallbackHandle, Client, SingleClient, UserStatsReceived};
