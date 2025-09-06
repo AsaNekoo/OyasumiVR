@@ -4387,7 +4387,7 @@ dependencies = [
 [[package]]
 name = "openvr"
 version = "0.9.0"
-source = "git+https://github.com/sofoxe1/rust-openvr?rev=951de5e24e4b741aa88dd12808d44a7a7a96efd9#951de5e24e4b741aa88dd12808d44a7a7a96efd9"
+source = "git+https://github.com/sofoxe1/rust-openvr?rev=661b8a5c3576588586b07162cd2e69f3ebb3383b#661b8a5c3576588586b07162cd2e69f3ebb3383b"
 dependencies = [
  "enumset",
  "lazy_static",
