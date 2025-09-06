@@ -14,7 +14,6 @@ use crate::globals::{TAURI_APP_HANDLE, TAURI_CLI_MATCHES};
 
 static SYSINFO: LazyLock<Mutex<System>> = LazyLock::new(|| Mutex::new(System::new_all()));
 
-
 pub mod models;
 pub mod profiling;
 pub mod serialization;

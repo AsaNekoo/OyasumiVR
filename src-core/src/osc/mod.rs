@@ -18,9 +18,11 @@ use crate::utils::send_event;
 
 pub static OSC_SEND_SOCKET: LazyLock<Mutex<Option<UdpSocket>>> = LazyLock::new(Default::default);
 pub static OSC_RECEIVE_SOCKET: LazyLock<Mutex<Option<UdpSocket>>> = LazyLock::new(Default::default);
-pub static OSC_RECEIVE_ADDRESS_WHITELIST: LazyLock<Mutex<Vec<String>>> = LazyLock::new(Default::default);
+pub static OSC_RECEIVE_ADDRESS_WHITELIST: LazyLock<Mutex<Vec<String>>> =
+    LazyLock::new(Default::default);
 pub static VRC_OSC_ADDRESS: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
-pub static VRC_OSCQUERY_ADDRESS: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
+pub static VRC_OSCQUERY_ADDRESS: LazyLock<Mutex<Option<String>>> =
+    LazyLock::new(|| Mutex::new(None));
 
 pub async fn init() {
     // Setup sending socket

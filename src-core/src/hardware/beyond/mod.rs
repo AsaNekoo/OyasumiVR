@@ -1,4 +1,7 @@
-use std::sync::{atomic::{AtomicBool, Ordering}, LazyLock};
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    LazyLock,
+};
 
 use hidapi::{HidApi, HidDevice};
 use log::{error, info, warn};

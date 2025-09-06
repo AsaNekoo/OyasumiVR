@@ -19,7 +19,6 @@ pub struct NotificationSender {
 }
 
 impl NotificationSender {
-
     pub fn connect(&mut self) -> Result<(), VrcxNotificationSenderError> {
         let mut sender = PipeClient::connect_ms(
             get_pipe_path(),
@@ -58,7 +57,6 @@ impl NotificationSender {
             Err(VrcxNotificationSenderError::NotConnected)
         }
     }
-
 }
 pub fn init() {
     //try to connect

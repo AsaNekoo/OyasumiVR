@@ -1,21 +1,21 @@
 mod audio_devices;
 pub mod commands;
+pub mod elevation;
 mod models;
 mod sounds_gen;
-pub mod elevation;
 
 use self::audio_devices::manager::AudioDeviceManager;
-use std::sync::LazyLock;
 use log::{error, info, warn};
 use rodio::{source::Source, Decoder};
 use rodio::{OutputStream, Sink};
 use std::collections::HashMap;
+use std::env;
 use std::ffi::OsString;
 use std::fs::File;
 use std::io::BufReader;
 use std::os::windows::ffi::OsStringExt;
 use std::slice;
-use std::env;
+use std::sync::LazyLock;
 use std::time::Duration;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;
@@ -29,7 +29,8 @@ use windows::Win32::System::Power::{
 type PlaySoundSender = LazyLock<Mutex<Option<Sender<(String, f32)>>>>;
 
 static PLAY_SOUND_TX: PlaySoundSender = LazyLock::new(Mutex::default);
-static AUDIO_DEVICE_MANAGER: LazyLock<Mutex<Option<AudioDeviceManager>>> = LazyLock::new(Mutex::default);
+static AUDIO_DEVICE_MANAGER: LazyLock<Mutex<Option<AudioDeviceManager>>> =
+    LazyLock::new(Mutex::default);
 static VRCHAT_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 
 pub async fn init_audio_device_manager() {

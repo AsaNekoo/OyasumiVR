@@ -13,7 +13,8 @@ use tokio::sync::Mutex;
 use windows::core::PCWSTR;
 use windows::Win32::Media::Audio::{
     eAll, eCapture, eCommunications, eMultimedia, eRender, EDataFlow, ERole, IMMDeviceEnumerator,
-    IMMNotificationClient, IMMNotificationClient_Impl, MMDeviceEnumerator, DEVICE_STATE, DEVICE_STATE_ACTIVE,
+    IMMNotificationClient, IMMNotificationClient_Impl, MMDeviceEnumerator, DEVICE_STATE,
+    DEVICE_STATE_ACTIVE,
 };
 use windows::Win32::System::Com::{
     CoCreateInstance, CoInitializeEx, CLSCTX_ALL, COINIT_MULTITHREADED,

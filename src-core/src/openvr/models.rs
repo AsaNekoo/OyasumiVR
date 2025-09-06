@@ -1,15 +1,15 @@
-use ovr_overlay::input::{ActionHandle, ActionSetHandle};
+use openvr::input::{VRActionHandle, VRActionSetHandle};
 use serde::{Deserialize, Serialize};
 use strum_macros::{EnumIter, IntoStaticStr};
 
 pub struct OpenVRAction {
     pub name: String,
-    pub handle: ActionHandle,
+    pub handle: VRActionHandle,
 }
 
 pub struct OpenVRActionSet {
     pub name: String,
-    pub handle: ActionSetHandle,
+    pub handle: VRActionSetHandle,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -51,28 +51,40 @@ pub enum TrackedControllerRole {
     Treadmill,
     Stylus,
 }
-
-impl From<ovr_overlay::sys::ETrackedControllerRole> for TrackedControllerRole {
-    fn from(item: ovr_overlay::sys::ETrackedControllerRole) -> Self {
+impl From<openvr::TrackedControllerRole> for TrackedControllerRole {
+    fn from(value: openvr::TrackedControllerRole) -> Self {
+        match value {
+            openvr::TrackedControllerRole::LeftHand => Self::LeftHand,
+            openvr::TrackedControllerRole::RightHand => Self::RightHand,
+            openvr::TrackedControllerRole::Invalid => Self::Invalid,
+            openvr::TrackedControllerRole::OptOut => Self::OptOut,
+            openvr::TrackedControllerRole::Treadmill => Self::Treadmill,
+            openvr::TrackedControllerRole::Stylus => Self::Stylus,
+        }
+    }
+}
+impl From<openvr_sys::ETrackedControllerRole> for TrackedControllerRole {
+    fn from(item: openvr_sys::ETrackedControllerRole) -> Self {
         match item {
-            ovr_overlay::sys::ETrackedControllerRole::TrackedControllerRole_Invalid => {
+            openvr_sys::ETrackedControllerRole_TrackedControllerRole_Invalid => {
                 TrackedControllerRole::Invalid
             }
-            ovr_overlay::sys::ETrackedControllerRole::TrackedControllerRole_LeftHand => {
+            openvr_sys::ETrackedControllerRole_TrackedControllerRole_LeftHand => {
                 TrackedControllerRole::LeftHand
             }
-            ovr_overlay::sys::ETrackedControllerRole::TrackedControllerRole_RightHand => {
+            openvr_sys::ETrackedControllerRole_TrackedControllerRole_RightHand => {
                 TrackedControllerRole::RightHand
             }
-            ovr_overlay::sys::ETrackedControllerRole::TrackedControllerRole_OptOut => {
+            openvr_sys::ETrackedControllerRole_TrackedControllerRole_OptOut => {
                 TrackedControllerRole::OptOut
             }
-            ovr_overlay::sys::ETrackedControllerRole::TrackedControllerRole_Treadmill => {
+            openvr_sys::ETrackedControllerRole_TrackedControllerRole_Treadmill => {
                 TrackedControllerRole::Treadmill
             }
-            ovr_overlay::sys::ETrackedControllerRole::TrackedControllerRole_Stylus => {
+            openvr_sys::ETrackedControllerRole_TrackedControllerRole_Stylus => {
                 TrackedControllerRole::Stylus
             }
+            _ => unreachable!(),
         }
     }
 }
@@ -87,26 +99,36 @@ pub enum TrackedDeviceClass {
     TrackingReference,
     DisplayRedirect,
 }
+impl From<openvr::TrackedDeviceClass> for TrackedDeviceClass {
+    fn from(value: openvr::TrackedDeviceClass) -> Self {
+        match value {
+            openvr::TrackedDeviceClass::Invalid => Self::Invalid,
+            openvr::TrackedDeviceClass::HMD => Self::HMD,
+            openvr::TrackedDeviceClass::Controller => Self::Controller,
+            openvr::TrackedDeviceClass::GenericTracker => Self::GenericTracker,
+            openvr::TrackedDeviceClass::TrackingReference => Self::TrackingReference,
+            openvr::TrackedDeviceClass::DisplayRedirect => Self::DisplayRedirect,
+        }
+    }
+}
 
-impl From<ovr_overlay::sys::ETrackedDeviceClass> for TrackedDeviceClass {
-    fn from(item: ovr_overlay::sys::ETrackedDeviceClass) -> Self {
+impl From<openvr_sys::ETrackedDeviceClass> for TrackedDeviceClass {
+    fn from(item: openvr_sys::ETrackedDeviceClass) -> Self {
         match item {
-            ovr_overlay::sys::ETrackedDeviceClass::TrackedDeviceClass_Invalid => {
+            openvr_sys::ETrackedDeviceClass_TrackedDeviceClass_Invalid => {
                 TrackedDeviceClass::Invalid
             }
-            ovr_overlay::sys::ETrackedDeviceClass::TrackedDeviceClass_HMD => {
-                TrackedDeviceClass::HMD
-            }
-            ovr_overlay::sys::ETrackedDeviceClass::TrackedDeviceClass_Controller => {
+            openvr_sys::ETrackedDeviceClass_TrackedDeviceClass_HMD => TrackedDeviceClass::HMD,
+            openvr_sys::ETrackedDeviceClass_TrackedDeviceClass_Controller => {
                 TrackedDeviceClass::Controller
             }
-            ovr_overlay::sys::ETrackedDeviceClass::TrackedDeviceClass_GenericTracker => {
+            openvr_sys::ETrackedDeviceClass_TrackedDeviceClass_GenericTracker => {
                 TrackedDeviceClass::GenericTracker
             }
-            ovr_overlay::sys::ETrackedDeviceClass::TrackedDeviceClass_TrackingReference => {
+            openvr_sys::ETrackedDeviceClass_TrackedDeviceClass_TrackingReference => {
                 TrackedDeviceClass::TrackingReference
             }
-            ovr_overlay::sys::ETrackedDeviceClass::TrackedDeviceClass_DisplayRedirect => {
+            openvr_sys::ETrackedDeviceClass_TrackedDeviceClass_DisplayRedirect => {
                 TrackedDeviceClass::DisplayRedirect
             }
             _ => TrackedDeviceClass::Invalid,

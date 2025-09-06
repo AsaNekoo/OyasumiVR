@@ -4,11 +4,11 @@ mod chaperone;
 mod colortemp_analog;
 pub mod commands;
 mod devices;
+mod framelimiter;
 mod gesture_detector;
 mod models;
 mod sleep_detector;
 mod supersampling;
-mod framelimiter;
 
 use crate::{
     globals::STEAM_APP_KEY,
@@ -19,10 +19,12 @@ use chrono::{DateTime, Utc};
 use gesture_detector::GestureDetector;
 use log::{error, info};
 use models::OpenVRStatus;
-use ovr::input::ActiveActionSet;
-use ovr_overlay as ovr;
+use openvr::input::VRActiveActionSet;
 use sleep_detector::SleepDetector;
-use std::{sync::LazyLock, time::Duration};
+use std::{
+    sync::LazyLock,
+    time::Duration,
+};
 use substring::Substring;
 use tokio::sync::Mutex;
 
@@ -30,12 +32,12 @@ use tokio::sync::Mutex;
 pub struct OpenVRInputContext {
     pub actions: Vec<OpenVRAction>,
     pub action_sets: Vec<OpenVRActionSet>,
-    pub active_sets: Vec<ActiveActionSet>,
+    pub active_sets: Vec<VRActiveActionSet>,
 }
 
-
-pub static OVR_CONTEXT: LazyLock<Mutex<Option<ovr::Context>>> = LazyLock::new(Default::default);
-static OVR_STATUS: LazyLock<Mutex<OpenVRStatus>> = LazyLock::new(|| Mutex::new(OpenVRStatus::Inactive));
+pub static OVR_CONTEXT: LazyLock<Mutex<Option<openvr::Context>>> = LazyLock::new(Default::default);
+static OVR_STATUS: LazyLock<Mutex<OpenVRStatus>> =
+    LazyLock::new(|| Mutex::new(OpenVRStatus::Inactive));
 static OVR_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 pub static OVR_INPUT_CONTEXT: LazyLock<Mutex<OpenVRInputContext>> = LazyLock::new(Mutex::default);
 static OVR_INIT_DELAY_FIX: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
@@ -45,7 +47,7 @@ pub async fn init() {
     tokio::spawn(task());
 }
 
-pub async fn task() {
+pub async fn task() -> ! {
     // Task state
     let mut ovr_active = false;
     let mut ovr_next_init = DateTime::from_timestamp_millis(0).unwrap();
@@ -76,9 +78,7 @@ pub async fn task() {
                     tokio::time::sleep(Duration::from_secs(1)).await;
                 }
                 // Try to initialize OpenVR
-                let ctx = match ovr::Context::init(
-                    ovr::sys::EVRApplicationType::VRApplication_Background,
-                ) {
+                let ctx = match unsafe { openvr::init(openvr::ApplicationType::Background) } {
                     Ok(ctx) => Some(ctx),
                     Err(_) => None,
                 };
@@ -88,15 +88,13 @@ pub async fn task() {
                     continue;
                 }
                 // Set the context on the module state
-                *OVR_CONTEXT.lock().await = ctx.clone();
+                *OVR_CONTEXT.lock().await = ctx;
                 // Initialize submodules
-                if brightness_overlay::on_ovr_init(&ctx.unwrap())
-                    .await
-                    .is_err()
-                {
+                if brightness_overlay::on_ovr_init().await.is_err() {
                     *OVR_CONTEXT.lock().await = None;
                     continue;
                 }
+
                 // We've successfully initialized OpenVR
                 info!("[Core] OpenVR Initialized");
                 ovr_active = true;
@@ -104,7 +102,7 @@ pub async fn task() {
                 // (Un)register manifest if needed
                 {
                     let ctx = OVR_CONTEXT.lock().await;
-                    let mut applications = ctx.as_ref().unwrap().applications_mngr();
+                    let mut applications = ctx.as_ref().unwrap().application().unwrap();
 
                     let manifest_path_buf =
                         std::fs::canonicalize("resources/manifest.vrmanifest").unwrap();
@@ -115,13 +113,15 @@ pub async fn task() {
                         Err(e) => {
                             error!(
                                 "[Core] Failed to check if VR manifest is registered: {:#?}",
-                                e.description()
+                                e
                             );
                             None
                         }
                     };
-                    let install_for_flavours = [crate::flavour::BuildFlavour::Standalone,
-                        crate::flavour::BuildFlavour::Dev];
+                    let install_for_flavours = [
+                        crate::flavour::BuildFlavour::Standalone,
+                        crate::flavour::BuildFlavour::Dev,
+                    ];
                     let should_install_for_flavour =
                         install_for_flavours.contains(&crate::flavour::BUILD_FLAVOUR);
 
@@ -136,10 +136,7 @@ pub async fn task() {
                                 );
                             }
                             Err(e) => {
-                                error!(
-                                    "[Core] Failed to unregister VR manifest: {:#?}",
-                                    e.description()
-                                );
+                                error!("[Core] Failed to unregister VR manifest: {:#?}", e);
                             }
                         };
                     };
@@ -148,10 +145,7 @@ pub async fn task() {
                     if is_installed.is_some_and(|v| !v) && should_install_for_flavour {
                         if let Err(e) = applications.add_application_manifest(manifest_path, false)
                         {
-                            error!(
-                                "[Core] Failed to register VR manifest: {:#?}",
-                                e.description()
-                            );
+                            error!("[Core] Failed to register VR manifest: {:#?}", e);
                         } else {
                             info!("[Core] Steam app manifest registered ({})", STEAM_APP_KEY)
                         }
@@ -163,17 +157,14 @@ pub async fn task() {
                 let mut active_sets = vec![];
                 {
                     let ctx = OVR_CONTEXT.lock().await;
-                    let mut input = ctx.as_ref().unwrap().input_mngr();
+                    let mut input = ctx.as_ref().unwrap().input().unwrap();
                     // Register action manifest
                     info!("[Core] Registering Action Manifest");
                     let manifest_path_buf =
                         std::fs::canonicalize("resources/input/action_manifest.json").unwrap();
                     let manifest_path: &std::path::Path = manifest_path_buf.as_ref();
                     if let Err(e) = input.set_action_manifest(manifest_path) {
-                        error!(
-                            "[Core] Failed to register action manifest: {:#?}",
-                            e.description()
-                        );
+                        error!("[Core] Failed to register action manifest: {:#?}", e);
                     } else {
                         // Get action handles
                         for action in vec![
@@ -187,10 +178,7 @@ pub async fn task() {
                             let handle = match input.get_action_handle(action) {
                                 Ok(value) => value,
                                 Err(error) => {
-                                    error!(
-                                        "[Core] Failed get action handle: {:?}",
-                                        error.description()
-                                    );
+                                    error!("[Core] Failed get action handle: {:?}", error);
                                     continue;
                                 }
                             };
@@ -204,16 +192,13 @@ pub async fn task() {
                             let handle = match input.get_action_set_handle(action_set) {
                                 Ok(value) => value,
                                 Err(error) => {
-                                    error!(
-                                        "[Core] Failed get action set handle: {:?}",
-                                        error.description()
-                                    );
+                                    error!("[Core] Failed get action set handle: {:?}", error);
                                     continue;
                                 }
                             };
-                            active_sets.push(ActiveActionSet(ovr::sys::VRActiveActionSet_t {
+                            active_sets.push(VRActiveActionSet(openvr_sys::VRActiveActionSet_t {
                                 ulActionSet: handle.0,
-                                ulRestrictedToDevice: ovr::sys::k_ulInvalidInputValueHandle,
+                                ulRestrictedToDevice: openvr_sys::k_ulInvalidInputValueHandle,
                                 ulSecondaryActionSet: 0,
                                 unPadding: 0,
                                 nPriority: 0,
@@ -247,7 +232,7 @@ pub async fn task() {
             loop {
                 let event = {
                     let ctx = OVR_CONTEXT.lock().await;
-                    let mut system = ctx.as_ref().unwrap().system_mngr();
+                    let system = ctx.as_ref().unwrap().system().unwrap();
                     let event = system.poll_next_event();
                     if event.is_none() {
                         break;
@@ -255,7 +240,7 @@ pub async fn task() {
                     event.unwrap()
                 };
                 // Handle Quit event
-                if event.event_type == ovr::sys::EVREventType::VREvent_Quit {
+                if matches!(event.event, openvr::system::Event::Quit(_)) {
                     info!("[Core] OpenVR is Quitting. Shutting down OpenVR module");
                     ovr_active = false;
                     update_status(OpenVRStatus::Inactive).await;
@@ -263,7 +248,7 @@ pub async fn task() {
                     brightness_overlay::on_ovr_quit().await;
                     // Shutdown OpenVR
                     unsafe {
-                        ovr::sys::VR_Shutdown();
+                        openvr_sys::VR_ShutdownInternal();
                     }
                     *OVR_CONTEXT.lock().await = None;
                     // Schedule next initialization attempt
@@ -284,7 +269,7 @@ pub async fn task() {
                 brightness_overlay::on_ovr_quit().await;
                 // Shutdown OpenVR
                 unsafe {
-                    ovr::sys::VR_Shutdown();
+                    openvr_sys::VR_ShutdownInternal();
                 }
                 *OVR_CONTEXT.lock().await = None;
             }

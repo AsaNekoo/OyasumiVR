@@ -21,7 +21,8 @@ pub enum SupportedOscType {
     String,
 }
 
-static CANCELLATION_TOKEN: LazyLock<Mutex<Option<CancellationToken>>> = LazyLock::new(Default::default);
+static CANCELLATION_TOKEN: LazyLock<Mutex<Option<CancellationToken>>> =
+    LazyLock::new(Default::default);
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
