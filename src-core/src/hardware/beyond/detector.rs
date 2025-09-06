@@ -10,7 +10,7 @@ use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, GetWindowLongPtrW,
     PostQuitMessage, RegisterClassW, SetWindowLongPtrW, TranslateMessage, GWLP_USERDATA, MSG,
-    WNDCLASSW, WM_CREATE, WM_DESTROY, WM_DEVICECHANGE,
+    WM_CREATE, WM_DESTROY, WM_DEVICECHANGE, WNDCLASSW,
 };
 
 pub enum PnPDetectorEvent {
@@ -164,7 +164,7 @@ impl PnPDetector {
             .encode_wide()
             .chain(once(0))
             .collect();
-        
+
         let hinstance = unsafe { GetModuleHandleW(None) }.unwrap_or_default();
 
         let wc = WNDCLASSW {

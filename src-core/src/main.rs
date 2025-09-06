@@ -240,7 +240,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     // Register deep link schemas if needed
     {
         use tauri_plugin_deep_link::DeepLinkExt;
-        if let Err(e) =  app_handle.deep_link().register_all()  {
+        if let Err(e) = app_handle.deep_link().register_all() {
             error!("[Core] Failed to register deep link schemas: {}", e);
         }
     }

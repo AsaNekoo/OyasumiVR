@@ -1,22 +1,22 @@
 mod audio_devices;
 pub mod commands;
+pub mod elevation;
 mod models;
 mod sounds_gen;
-pub mod elevation;
 #[cfg(disabled)]
 use self::audio_devices::manager::AudioDeviceManager;
-use std::sync::LazyLock;
 use log::{error, info, warn};
 use rodio::{source::Source, Decoder};
 use rodio::{OutputStream, Sink};
 use std::collections::HashMap;
+use std::env;
 use std::ffi::OsString;
 use std::fs::File;
 use std::io::BufReader;
 #[cfg(disabled)]
 use std::os::windows::ffi::OsStringExt;
 use std::slice;
-use std::env;
+use std::sync::LazyLock;
 use std::time::Duration;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;

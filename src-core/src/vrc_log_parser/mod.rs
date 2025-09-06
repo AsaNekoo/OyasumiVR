@@ -66,7 +66,8 @@ fn get_latest_log_path() -> Option<String> {
             entry
                 .path()
                 .metadata()
-                .ok().map(|metadata| metadata.len() > 0)
+                .ok()
+                .map(|metadata| metadata.len() > 0)
                 .unwrap_or(false)
         })
         
