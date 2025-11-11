@@ -4,5 +4,8 @@
     "options": [
       "--proto_path=proto"
     ],
-  }
+  },
+  "i18n-ally.localesPaths": [
+    "src-ui/assets/i18n"
+  ]
 }
