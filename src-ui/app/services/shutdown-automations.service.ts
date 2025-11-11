@@ -384,7 +384,7 @@ export class ShutdownAutomationsService {
     // Power down windows
     switch (this.config.powerDownWindowsMode) {
       case 'SHUTDOWN':
-        await invoke('windows_shutdown', {
+        await invoke('system_shutdown', {
           message: this.translate.instant(
             'shutdown-automations.sequence.powerDownWindows.shutdownMessage'
           ),
@@ -394,7 +394,7 @@ export class ShutdownAutomationsService {
         await firstValueFrom(merge(of(null).pipe(delay(30000)), this.cancelEvent));
         break;
       case 'REBOOT':
-        await invoke('windows_reboot', {
+        await invoke('system_reboot', {
           message: this.translate.instant(
             'shutdown-automations.sequence.powerDownWindows.rebootMessage'
           ),
@@ -404,13 +404,13 @@ export class ShutdownAutomationsService {
         await firstValueFrom(merge(of(null).pipe(delay(30000)), this.cancelEvent));
         break;
       case 'SLEEP':
-        setTimeout(() => invoke('windows_sleep'), 500);
+        setTimeout(() => invoke('system_sleep'), 500);
         break;
       case 'HIBERNATE':
-        setTimeout(() => invoke('windows_hibernate'), 500);
+        setTimeout(() => invoke('system_hibernate'), 500);
         break;
       case 'LOGOUT':
-        setTimeout(() => invoke('windows_logout'), 500);
+        setTimeout(() => invoke('system_logout'), 500);
         break;
     }
     return true;

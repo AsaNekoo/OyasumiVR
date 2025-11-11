@@ -270,31 +270,39 @@ pub async fn windows_is_elevated() -> bool {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn windows_shutdown(message: String, timeout: u32, force_close_apps: bool) {
+#[cfg_attr(unix, expect(unused_variables))]
+pub async fn system_shutdown(message: String, timeout: u32, force_close_apps: bool) {
+    #[cfg(windows)]
     let _ = system_shutdown::shutdown_with_message(&message, timeout, force_close_apps);
+    #[cfg(unix)]
+    let _ = system_shutdown::shutdown();
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn windows_reboot(message: String, timeout: u32, force_close_apps: bool) {
+#[cfg_attr(unix, expect(unused_variables))]
+pub async fn system_reboot(message: String, timeout: u32, force_close_apps: bool) {
+    #[cfg(windows)]
     let _ = system_shutdown::reboot_with_message(&message, timeout, force_close_apps);
+    #[cfg(unix)]
+    let _ = system_shutdown::reboot();
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn windows_sleep() {
+pub async fn system_sleep() {
     let _ = system_shutdown::sleep();
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn windows_hibernate() {
+pub async fn system_hibernate() {
     let _ = system_shutdown::hibernate();
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn windows_logout() {
+pub async fn system_logout() {
     let _ = system_shutdown::logout();
 }
 
