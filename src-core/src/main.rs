@@ -387,11 +387,11 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         os::commands::show_in_folder,
         os::commands::quit_steamvr,
         #[cfg(windows)]
-        os::commands::get_windows_power_policies,
+        os::commands::get_system_power_policies,
         #[cfg(windows)]
-        os::commands::set_windows_power_policy,
+        os::commands::set_system_power_policy,
         #[cfg(windows)]
-        os::commands::active_windows_power_policy,
+        os::commands::active_system_power_policy,
         os::commands::system_shutdown,
         os::commands::system_reboot,
         os::commands::system_sleep,
@@ -416,7 +416,7 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         #[cfg(windows)]
         os::commands::is_elevation_security_disabled,
         #[cfg(windows)]
-        osc::commands::osc_send_command,q
+        osc::commands::osc_send_command,
         #[cfg(windows)]
         osc::commands::osc_valid_addr,
         #[cfg(windows)]

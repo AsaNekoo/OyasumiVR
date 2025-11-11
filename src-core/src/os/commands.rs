@@ -215,27 +215,27 @@ pub async fn show_in_folder(path: String) {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 #[cfg(windows)]
-pub async fn set_windows_power_policy(guid: String) {
+pub async fn set_system_power_policy(guid: String) {
     let guid = guid.to_uppercase();
     let parsed_guid = match crate::utils::serialization::string_to_guid(&guid) {
         Ok(g) => g,
         Err(e) => {
             error!(
-                "[Core] Could not parse GUID in set_windows_power_policy \"{}\": {}",
+                "[Core] Could not parse GUID in set_system_power_policy \"{}\": {}",
                 guid, e
             );
             return;
         }
     };
     info!("[Core] Setting Windows power policy to \"{}\" plan", guid);
-    super::set_windows_power_policy(&parsed_guid);
+    super::set_system_power_policy(&parsed_guid);
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 #[cfg(windows)]
-pub async fn active_windows_power_policy() -> Option<WindowsPowerPolicy> {
-    let guid = super::active_windows_power_policy();
+pub async fn active_system_power_policy() -> Option<WindowsPowerPolicy> {
+    let guid = super::active_system_power_policy();
     guid?;
     let guid = guid.unwrap();
     let name = get_friendly_name_for_windows_power_policy(&guid);
@@ -248,9 +248,9 @@ pub async fn active_windows_power_policy() -> Option<WindowsPowerPolicy> {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 #[cfg(windows)]
-pub async fn get_windows_power_policies() -> Vec<WindowsPowerPolicy> {
+pub async fn get_system_power_policies() -> Vec<WindowsPowerPolicy> {
     let mut policies = Vec::new();
-    let schemes = super::get_windows_power_policies();
+    let schemes = super::get_system_power_policies();
     for scheme in schemes {
         let name = get_friendly_name_for_windows_power_policy(&scheme);
         policies.push(WindowsPowerPolicy {

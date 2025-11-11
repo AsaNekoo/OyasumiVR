@@ -24,7 +24,7 @@ export class WindowsService {
   }
 
   public async getWindowsPowerPolicies() {
-    this._policies.next(await invoke<WindowsPowerPolicy[]>('get_windows_power_policies'));
+    this._policies.next(await invoke<WindowsPowerPolicy[]>('get_system_power_policies'));
     return this._policies.value;
   }
 
@@ -33,7 +33,7 @@ export class WindowsService {
     reason: 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED'
   ): Promise<void> {
     guid = guid.toUpperCase();
-    await invoke<void>('set_windows_power_policy', { guid });
+    await invoke<void>('set_system_power_policy', { guid });
     const currentPolicy = await this.getWindowsPowerPolicy();
     if (currentPolicy?.guid !== guid) {
       error(
@@ -50,7 +50,7 @@ export class WindowsService {
 
   public async getWindowsPowerPolicy(): Promise<WindowsPowerPolicy | undefined> {
     const policy =
-      (await invoke<WindowsPowerPolicy | null>('active_windows_power_policy')) ?? undefined;
+      (await invoke<WindowsPowerPolicy | null>('active_system_power_policy')) ?? undefined;
     // Update local policy cache
     if (policy) {
       const knownPolicy = this._policies.value.find((p) => p.guid === policy.guid);

@@ -197,7 +197,7 @@ pub async fn cleanup_batch_files() {
     }
 }
 #[cfg(windows)]
-fn get_windows_power_policies() -> Vec<GUID> {
+fn get_system_power_policies() -> Vec<GUID> {
     let mut power_schemes = Vec::new();
     let mut index: u32 = 0;
     let mut buffer_size: u32 = std::mem::size_of::<GUID>() as u32;
@@ -227,7 +227,7 @@ fn get_windows_power_policies() -> Vec<GUID> {
     power_schemes
 }
 #[cfg(windows)]
-fn active_windows_power_policy() -> Option<GUID> {
+fn active_system_power_policy() -> Option<GUID> {
     unsafe {
         let mut guid: *mut GUID = std::ptr::null_mut();
         if PowerGetActiveScheme(None, &mut guid).is_ok() && !guid.is_null() {
@@ -238,7 +238,7 @@ fn active_windows_power_policy() -> Option<GUID> {
     }
 }
 #[cfg(windows)]
-fn set_windows_power_policy(guid: &GUID) -> bool {
+fn set_system_power_policy(guid: &GUID) -> bool {
     let result = unsafe { PowerSetActiveScheme(None, Some(guid)) };
     if result.is_err() {
         error!(
