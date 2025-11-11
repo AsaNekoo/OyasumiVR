@@ -1,3 +1,4 @@
+#![cfg(windows)]
 use oyasumivr_shared::windows::is_elevated;
 use winreg::enums::*;
 use winreg::RegKey;

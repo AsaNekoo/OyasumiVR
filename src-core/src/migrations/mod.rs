@@ -1,3 +1,4 @@
+#![cfg(windows)]
 mod old_wix_uninstall;
 
 pub async fn run_migrations() {
