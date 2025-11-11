@@ -3,6 +3,8 @@ pub mod commands;
 pub mod elevation;
 mod models;
 mod sounds_gen;
+#[cfg(unix)]
+mod linux;
 #[cfg(windows)]
 use self::audio_devices::manager::AudioDeviceManager;
 use log::{error, info, warn};

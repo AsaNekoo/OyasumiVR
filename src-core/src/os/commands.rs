@@ -2,7 +2,6 @@
 use super::audio_devices::device::AudioDeviceDto;
 #[cfg(windows)]
 use super::get_friendly_name_for_windows_power_policy;
-#[cfg(windows)]
 use super::models::WindowsPowerPolicy;
 use super::{models::Output, VRCHAT_ACTIVE};
 use crate::globals::TAURI_APP_HANDLE;
@@ -214,51 +213,81 @@ pub async fn show_in_folder(path: String) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-#[cfg(windows)]
 pub async fn set_system_power_policy(guid: String) {
-    let guid = guid.to_uppercase();
-    let parsed_guid = match crate::utils::serialization::string_to_guid(&guid) {
-        Ok(g) => g,
-        Err(e) => {
-            error!(
-                "[Core] Could not parse GUID in set_system_power_policy \"{}\": {}",
-                guid, e
-            );
-            return;
-        }
-    };
-    info!("[Core] Setting Windows power policy to \"{}\" plan", guid);
-    super::set_system_power_policy(&parsed_guid);
-}
-
-#[tauri::command]
-#[oyasumivr_macros::command_profiling]
-#[cfg(windows)]
-pub async fn active_system_power_policy() -> Option<WindowsPowerPolicy> {
-    let guid = super::active_system_power_policy();
-    guid?;
-    let guid = guid.unwrap();
-    let name = get_friendly_name_for_windows_power_policy(&guid);
-    Some(WindowsPowerPolicy {
-        guid: crate::utils::serialization::guid_to_string(&guid),
-        name: name.unwrap_or(String::from("Unknown Policy")),
-    })
-}
-
-#[tauri::command]
-#[oyasumivr_macros::command_profiling]
-#[cfg(windows)]
-pub async fn get_system_power_policies() -> Vec<WindowsPowerPolicy> {
-    let mut policies = Vec::new();
-    let schemes = super::get_system_power_policies();
-    for scheme in schemes {
-        let name = get_friendly_name_for_windows_power_policy(&scheme);
-        policies.push(WindowsPowerPolicy {
-            guid: crate::utils::serialization::guid_to_string(&scheme),
-            name: name.unwrap_or(String::from("Unknown Policy")),
-        });
+    #[cfg(windows)]
+    {
+        let guid = guid.to_uppercase();
+        let parsed_guid = match crate::utils::serialization::string_to_guid(&guid) {
+            Ok(g) => g,
+            Err(e) => {
+                error!(
+                    "[Core] Could not parse GUID in set_system_power_policy \"{}\": {}",
+                    guid, e
+                );
+                return;
+            }
+        };
+        info!("[Core] Setting Windows power policy to \"{}\" plan", guid);
+        super::set_system_power_policy(&parsed_guid);
     }
-    policies
+    #[cfg(unix)]
+    {
+        use crate::os::linux::power_managment::{PowerProfile, LINUX_POWER_POLICY_MANAGER};
+
+        LINUX_POWER_POLICY_MANAGER
+            .lock()
+            .await
+            .set_policy(PowerProfile::from(guid));
+    }
+}
+
+#[tauri::command]
+#[oyasumivr_macros::command_profiling]
+pub async fn active_system_power_policy() -> Option<WindowsPowerPolicy> {
+    #[cfg(windows)]
+    {
+        let guid = super::active_system_power_policy();
+        guid?;
+        let guid = guid.unwrap();
+        let name = get_friendly_name_for_windows_power_policy(&guid);
+        Some(WindowsPowerPolicy {
+            guid: crate::utils::serialization::guid_to_string(&guid),
+            name: name.unwrap_or(String::from("Unknown Policy")),
+        })
+    }
+    #[cfg(unix)]
+    {
+        use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
+        let current = LINUX_POWER_POLICY_MANAGER.lock().await.get_current();
+        Some(current.into())
+    }
+}
+
+#[tauri::command]
+#[oyasumivr_macros::command_profiling]
+pub async fn get_system_power_policies() -> Vec<WindowsPowerPolicy> {
+    #[cfg(windows)]
+    {
+        let mut policies = Vec::new();
+        let schemes = super::get_system_power_policies();
+        for scheme in schemes {
+            let name = get_friendly_name_for_windows_power_policy(&scheme);
+            policies.push(WindowsPowerPolicy {
+                guid: crate::utils::serialization::guid_to_string(&scheme),
+                name: name.unwrap_or(String::from("Unknown Policy")),
+            });
+        }
+        policies
+    }
+    #[cfg(unix)]
+    {
+        use crate::os::linux::power_managment::PowerProfile;
+        PowerProfile::all()
+            .to_vec()
+            .into_iter()
+            .map(|policy| policy.into())
+            .collect()
+    }
 }
 
 #[tauri::command]
@@ -306,7 +335,7 @@ pub async fn system_logout() {
     let _ = system_shutdown::logout();
 }
 #[tauri::command]
-pub async fn is_windows()->bool{
+pub async fn is_windows() -> bool {
     cfg!(windows)
 }
 #[tauri::command]

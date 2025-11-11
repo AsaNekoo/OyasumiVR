@@ -386,11 +386,8 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         os::commands::play_sound,
         os::commands::show_in_folder,
         os::commands::quit_steamvr,
-        #[cfg(windows)]
         os::commands::get_system_power_policies,
-        #[cfg(windows)]
         os::commands::set_system_power_policy,
-        #[cfg(windows)]
         os::commands::active_system_power_policy,
         os::commands::system_shutdown,
         os::commands::system_reboot,
