@@ -2,29 +2,49 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
+#[cfg(unix)]
+#[tokio::main]
+async fn main(){
+
+}
+
 #[macro_use(lazy_static)]
 extern crate lazy_static;
-
+#[cfg(windows)]
 use directories::BaseDirs;
+#[cfg(windows)]
 use grpc::oyasumi_core::{oyasumi_core_client::OyasumiCoreClient, ElevatedSidecarStartArgs};
+#[cfg(windows)]
 pub use grpc::oyasumi_elevated_sidecar as Models;
+#[cfg(windows)]
 use log::{error, info};
+#[cfg(windows)]
 use oyasumivr_shared::windows::is_elevated;
+#[cfg(windows)]
 use simplelog::{
     ColorChoice, CombinedLogger, Config, LevelFilter, TermLogger, TerminalMode, WriteLogger,
 };
+#[cfg(windows)]
 use std::env;
+#[cfg(windows)]
 use std::fs::File;
+#[cfg(windows)]
 use std::path::Path;
+#[cfg(windows)]
 use std::time::Duration;
+#[cfg(windows)]
 use sysinfo::{Pid, System, ProcessesToUpdate};
+#[cfg(windows)]
 use windows::relaunch_with_elevation;
-
+#[cfg(windows)]
 mod afterburner;
+#[cfg(windows)]
 mod grpc;
+#[cfg(windows)]
 mod nvml;
+#[cfg(windows)]
 mod windows;
-
+#[cfg(windows)]
 #[tokio::main]
 async fn main() {
     // Initialize logging
@@ -116,7 +136,7 @@ async fn main() {
     // Keep an eye on the main process and quit alongside it
     watch_main_process(main_pid).await;
 }
-
+#[cfg(windows)]
 async fn watch_main_process(main_pid: u32) {
     let pid = Pid::from(main_pid as usize);
     let mut s = System::new_all();
