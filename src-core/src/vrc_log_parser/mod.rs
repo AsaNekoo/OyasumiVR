@@ -5,10 +5,11 @@ use chrono::{Local, NaiveDateTime, TimeZone};
 use log::{debug, info, trace, warn};
 use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicBool, Ordering};
+#[cfg(windows)]
+use std::os::windows::prelude::MetadataExt,
 use std::{
     fs::{read_dir, File},
     io::{BufRead, BufReader},
-    os::windows::prelude::MetadataExt,
     sync::Arc,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };

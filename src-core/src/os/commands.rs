@@ -7,6 +7,7 @@ use super::{
     VRCHAT_ACTIVE,
 };
 use log::{debug, error, info};
+#[cfg(windows)]
 use oyasumivr_shared::windows::is_elevated;
 use std::process::Command;
 use std::{env, path::PathBuf};

@@ -1,3 +1,4 @@
+#[cfg(windows)]
 use windows::core::GUID;
 
 // Converts a GUID to a String

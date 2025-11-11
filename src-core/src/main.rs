@@ -256,6 +256,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     grpc::init_server().await;
     grpc::init_web_server().await;
     // Initialize OSC
+    #[cfg(windows)]
     osc::init().await;
     // Initialize OpenVR Manager
     #[cfg(windows)]
@@ -402,14 +403,23 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         os::commands::set_hardware_mic_activivation_threshold,
         os::commands::is_vrchat_active,
         os::commands::is_elevation_security_disabled,
+        #[cfg(windows)]
         osc::commands::osc_send_command,
+        #[cfg(windows)]
         osc::commands::osc_valid_addr,
+        #[cfg(windows)]
         osc::commands::start_osc_server,
+        #[cfg(windows)]
         osc::commands::stop_osc_server,
+        #[cfg(windows)]
         osc::commands::get_vrchat_osc_address,
+        #[cfg(windows)]
         osc::commands::get_vrchat_oscquery_address,
+        #[cfg(windows)]
         osc::commands::add_osc_method,
+        #[cfg(windows)]
         osc::commands::set_osc_method_value,
+        #[cfg(windows)]
         osc::commands::set_osc_receive_address_whitelist,
         elevated_sidecar::commands::elevated_sidecar_started,
         elevated_sidecar::commands::start_elevated_sidecar,

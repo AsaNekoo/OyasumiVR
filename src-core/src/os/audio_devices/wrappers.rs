@@ -1,7 +1,10 @@
+#[cfg(windows)]
 use windows::core::PCWSTR;
+#[cfg(windows)]
 use windows::Win32::Media::Audio::Endpoints::{
     IAudioEndpointVolumeCallback, IAudioMeterInformation,
 };
+#[cfg(windows)]
 use windows::Win32::Media::Audio::{
     Endpoints::IAudioEndpointVolume, IMMDevice, IMMDeviceEnumerator, IMMNotificationClient,
 };

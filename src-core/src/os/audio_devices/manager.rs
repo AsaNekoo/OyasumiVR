@@ -10,11 +10,14 @@ use std::sync::Arc;
 use tokio::runtime::Handle;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
 use tokio::sync::Mutex;
+#[cfg(windows)]
 use windows::core::PCWSTR;
+#[cfg(windows)]
 use windows::Win32::Media::Audio::{
     eAll, eCapture, eCommunications, eMultimedia, eRender, EDataFlow, ERole, IMMDeviceEnumerator,
     IMMNotificationClient, IMMNotificationClient_Impl, MMDeviceEnumerator, DEVICE_STATE, DEVICE_STATE_ACTIVE,
 };
+#[cfg(windows)]
 use windows::Win32::System::Com::{
     CoCreateInstance, CoInitializeEx, CLSCTX_ALL, COINIT_MULTITHREADED,
 };

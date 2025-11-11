@@ -13,14 +13,18 @@ use std::collections::HashMap;
 use std::ffi::OsString;
 use std::fs::File;
 use std::io::BufReader;
+#[cfg(windows)]
 use std::os::windows::ffi::OsStringExt;
 use std::slice;
 use std::env;
 use std::time::Duration;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;
+#[cfg(windows)]
 use windows::core::GUID;
+#[cfg(windows)]
 use windows::Win32::Foundation::ERROR_SUCCESS;
+#[cfg(windows)]
 use windows::Win32::System::Power::{
     PowerEnumerate, PowerGetActiveScheme, PowerReadFriendlyName, PowerSetActiveScheme,
     ACCESS_SCHEME,
