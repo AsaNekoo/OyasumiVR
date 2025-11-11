@@ -31,11 +31,13 @@ pub use grpc::models as Models;
 use cronjob::CronJob;
 use globals::{APTABASE_APP_KEY, FLAGS, TAURI_APP_HANDLE};
 use log::{error, info, warn, LevelFilter};
+#[cfg(windows)]
 use oyasumivr_shared::windows::is_elevated;
 use serde_json::json;
 use tauri::{plugin::TauriPlugin, Manager, Wry};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::RotationStrategy;
+#[cfg(windows)]
 use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings6;
 
 use crate::globals::APTABASE_HOST;
@@ -190,6 +192,7 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
 
 async fn app_setup(app_handle: tauri::AppHandle) {
     // Process elevation security args
+    #[cfg(windows)]
     os::elevation::process_elevation_cli_args().await;
 
     info!(
@@ -206,6 +209,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     // Clean up old batch files from previous runs
     os::cleanup_batch_files().await;
     // Run any migrations first
+    #[cfg(windows)]
     migrations::run_migrations().await;
     // Load configs
     load_configs().await;
@@ -218,6 +222,8 @@ async fn app_setup(app_handle: tauri::AppHandle) {
         window.open_devtools();
     }
     // Disable swipe navigation in main window
+    #[cfg(windows)]
+    {
     window
         .with_webview(|webview| unsafe {
             let settings = webview
@@ -230,6 +236,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
             settings.SetIsSwipeNavigationEnabled(false).unwrap();
         })
         .unwrap();
+    }
     // Get dependencies
     let cache_dir = app_handle.path().app_cache_dir().unwrap();
     // Register deep link schemas if needed
@@ -277,6 +284,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     cron.seconds("0");
     CronJob::start_job_threaded(cron);
     // If we have admin privileges, prelaunch the elevation sidecar
+    #[cfg(windows)]
     if is_elevated() {
         info!("[Core] Main process is running with elevation. Pre-launching elevated sidecar...");
         // Wait for grpc server to start so we can pass the port
@@ -421,6 +429,7 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         grpc::commands::get_core_grpc_port,
         grpc::commands::get_core_grpc_web_port,
         telemetry::commands::set_telemetry_enabled,
+        #[cfg(windows)]
         vrcx::commands::vrcx_log,
     ]
 }
