@@ -224,25 +224,25 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     // Disable swipe navigation in main window
     #[cfg(windows)]
     {
-    window
-        .with_webview(|webview| unsafe {
-            let settings = webview
-                .controller()
-                .CoreWebView2()
-                .unwrap()
-                .Settings()
-                .unwrap();
-            let settings: ICoreWebView2Settings6 = mem::transmute(settings);
-            settings.SetIsSwipeNavigationEnabled(false).unwrap();
-        })
-        .unwrap();
+        window
+            .with_webview(|webview| unsafe {
+                let settings = webview
+                    .controller()
+                    .CoreWebView2()
+                    .unwrap()
+                    .Settings()
+                    .unwrap();
+                let settings: ICoreWebView2Settings6 = mem::transmute(settings);
+                settings.SetIsSwipeNavigationEnabled(false).unwrap();
+            })
+            .unwrap();
     }
     // Get dependencies
     let cache_dir = app_handle.path().app_cache_dir().unwrap();
     // Register deep link schemas if needed
     {
         use tauri_plugin_deep_link::DeepLinkExt;
-        if let Err(e) =  app_handle.deep_link().register_all()  {
+        if let Err(e) = app_handle.deep_link().register_all() {
             error!("[Core] Failed to register deep link schemas: {}", e);
         }
     }
@@ -388,9 +388,9 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         os::commands::quit_steamvr,
         #[cfg(windows)]
         os::commands::get_windows_power_policies,
-         #[cfg(windows)]
+        #[cfg(windows)]
         os::commands::set_windows_power_policy,
-         #[cfg(windows)]
+        #[cfg(windows)]
         os::commands::active_windows_power_policy,
         os::commands::system_shutdown,
         os::commands::system_reboot,
@@ -399,13 +399,20 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         os::commands::system_hibernate,
         #[cfg(windows)]
         os::commands::windows_is_elevated,
+        #[cfg(windows)]
         os::commands::get_audio_devices,
+        #[cfg(windows)]
         os::commands::set_audio_device_volume,
+        #[cfg(windows)]
         os::commands::set_audio_device_mute,
+        #[cfg(windows)]
         os::commands::set_mic_activity_device_id,
+        #[cfg(windows)]
         os::commands::set_hardware_mic_activity_enabled,
+        #[cfg(windows)]
         os::commands::set_hardware_mic_activivation_threshold,
         os::commands::is_vrchat_active,
+        #[cfg(windows)]
         os::commands::is_elevation_security_disabled,
         #[cfg(windows)]
         osc::commands::osc_send_command,

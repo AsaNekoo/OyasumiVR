@@ -1,11 +1,11 @@
-use crate::globals::TAURI_APP_HANDLE;
+#[cfg(windows)]
+use super::audio_devices::device::AudioDeviceDto;
 #[cfg(windows)]
 use super::get_friendly_name_for_windows_power_policy;
-use super::{
-    audio_devices::device::AudioDeviceDto,
-    models::{Output, WindowsPowerPolicy},
-    VRCHAT_ACTIVE,
-};
+#[cfg(windows)]
+use super::models::WindowsPowerPolicy;
+use super::{models::Output, VRCHAT_ACTIVE};
+use crate::globals::TAURI_APP_HANDLE;
 use log::{debug, error, info};
 #[cfg(windows)]
 use oyasumivr_shared::windows::is_elevated;
@@ -214,7 +214,7 @@ pub async fn show_in_folder(path: String) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
- #[cfg(windows)]
+#[cfg(windows)]
 pub async fn set_windows_power_policy(guid: String) {
     let guid = guid.to_uppercase();
     let parsed_guid = match crate::utils::serialization::string_to_guid(&guid) {
@@ -233,7 +233,7 @@ pub async fn set_windows_power_policy(guid: String) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
- #[cfg(windows)]
+#[cfg(windows)]
 pub async fn active_windows_power_policy() -> Option<WindowsPowerPolicy> {
     let guid = super::active_windows_power_policy();
     guid?;
@@ -247,7 +247,7 @@ pub async fn active_windows_power_policy() -> Option<WindowsPowerPolicy> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
- #[cfg(windows)]
+#[cfg(windows)]
 pub async fn get_windows_power_policies() -> Vec<WindowsPowerPolicy> {
     let mut policies = Vec::new();
     let schemes = super::get_windows_power_policies();
@@ -263,7 +263,7 @@ pub async fn get_windows_power_policies() -> Vec<WindowsPowerPolicy> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
- #[cfg(windows)]
+#[cfg(windows)]
 pub async fn windows_is_elevated() -> bool {
     is_elevated()
 }
@@ -308,6 +308,7 @@ pub async fn system_logout() {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg(windows)]
 pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
     let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
     let manager = match manager_guard.as_ref() {
@@ -329,6 +330,8 @@ pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg(windows)]
+
 pub async fn set_audio_device_volume(device_id: String, volume: f32) {
     let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
     let manager = match manager_guard.as_ref() {
@@ -345,6 +348,8 @@ pub async fn set_audio_device_volume(device_id: String, volume: f32) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg(windows)]
+
 pub async fn set_audio_device_mute(device_id: String, mute: bool) {
     let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
     let manager = match manager_guard.as_ref() {
@@ -361,6 +366,8 @@ pub async fn set_audio_device_mute(device_id: String, mute: bool) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg(windows)]
+
 pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
     let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
     let manager = match manager_guard.as_ref() {
@@ -377,6 +384,8 @@ pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg(windows)]
+
 pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
     let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
     let manager = match manager_guard.as_ref() {
@@ -393,6 +402,8 @@ pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg(windows)]
+
 pub async fn set_mic_activity_device_id(device_id: Option<String>) {
     let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
     let manager = match manager_guard.as_ref() {
@@ -409,6 +420,7 @@ pub async fn set_mic_activity_device_id(device_id: Option<String>) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg(windows)]
 pub async fn is_elevation_security_disabled() -> bool {
     crate::os::elevation::is_elevation_security_disabled()
 }

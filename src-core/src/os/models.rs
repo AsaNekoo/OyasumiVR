@@ -6,7 +6,7 @@ pub struct Output {
     pub stderr: String,
     pub status: i32,
 }
-
+#[cfg(windows)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct WindowsPowerPolicy {
     pub guid: String,

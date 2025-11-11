@@ -1,15 +1,15 @@
 mod audio_devices;
 pub mod commands;
+pub mod elevation;
 mod models;
 mod sounds_gen;
-pub mod elevation;
-
+#[cfg(windows)]
 use self::audio_devices::manager::AudioDeviceManager;
-use std::sync::LazyLock;
 use log::{error, info, warn};
 use rodio::{source::Source, Decoder};
 use rodio::{OutputStream, Sink};
 use std::collections::HashMap;
+use std::env;
 #[cfg(windows)]
 use std::ffi::OsString;
 use std::fs::File;
@@ -18,7 +18,7 @@ use std::io::BufReader;
 use std::os::windows::ffi::OsStringExt;
 #[cfg(windows)]
 use std::slice;
-use std::env;
+use std::sync::LazyLock;
 use std::time::Duration;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;
@@ -35,26 +35,30 @@ use windows::Win32::System::Power::{
 type PlaySoundSender = LazyLock<Mutex<Option<Sender<(String, f32)>>>>;
 
 static PLAY_SOUND_TX: PlaySoundSender = LazyLock::new(Mutex::default);
-static AUDIO_DEVICE_MANAGER: LazyLock<Mutex<Option<AudioDeviceManager>>> = LazyLock::new(Mutex::default);
+#[cfg(windows)]
+static AUDIO_DEVICE_MANAGER: LazyLock<Mutex<Option<AudioDeviceManager>>> =
+    LazyLock::new(Mutex::default);
 static VRCHAT_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
-
 pub async fn init_audio_device_manager() {
-    let mut manager = AUDIO_DEVICE_MANAGER.lock().await;
-    if manager.is_some() {
-        return;
-    }
-    let m = match AudioDeviceManager::create().await {
-        Ok(m) => m,
-        Err(e) => {
-            error!("[Core] Failed to create audio device manager: {}", e);
+    #[cfg(windows)]
+    {
+        let mut manager = AUDIO_DEVICE_MANAGER.lock().await;
+        if manager.is_some() {
             return;
         }
-    };
-    *manager = Some(m);
-    if let Err(e) = manager.as_ref().unwrap().refresh_audio_devices().await {
-        error!("[Core] Failed to refresh audio devices: {}", e);
+        let m = match AudioDeviceManager::create().await {
+            Ok(m) => m,
+            Err(e) => {
+                error!("[Core] Failed to create audio device manager: {}", e);
+                return;
+            }
+        };
+        *manager = Some(m);
+        if let Err(e) = manager.as_ref().unwrap().refresh_audio_devices().await {
+            error!("[Core] Failed to refresh audio devices: {}", e);
+        }
+        tokio::task::spawn(watch_processes());
     }
-    tokio::task::spawn(watch_processes());
 }
 
 async fn watch_processes() {
