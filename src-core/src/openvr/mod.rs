@@ -1,3 +1,4 @@
+#![cfg(windows)]
 mod brightness_analog;
 mod brightness_overlay;
 mod chaperone;

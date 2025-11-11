@@ -258,6 +258,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     // Initialize OSC
     osc::init().await;
     // Initialize OpenVR Manager
+    #[cfg(windows)]
     openvr::init().await;
     // Initialize Image Cache
     image_cache::init(cache_dir).await;
@@ -340,22 +341,39 @@ fn on_cron_minute_start(_: &str) {
 
 fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
     tauri::generate_handler![
+        #[cfg(windows)]
         openvr::commands::openvr_get_devices,
+        #[cfg(windows)]
         openvr::commands::openvr_status,
+        #[cfg(windows)]
         openvr::commands::openvr_get_analog_gain,
+        #[cfg(windows)]
         openvr::commands::openvr_set_analog_gain,
+        #[cfg(windows)]
         openvr::commands::openvr_get_supersample_scale,
+        #[cfg(windows)]
         openvr::commands::openvr_set_supersample_scale,
+        #[cfg(windows)]
         openvr::commands::openvr_get_fade_distance,
+        #[cfg(windows)]
         openvr::commands::openvr_set_fade_distance,
+        #[cfg(windows)]
         openvr::commands::openvr_set_image_brightness,
+        #[cfg(windows)]
         openvr::commands::openvr_launch_binding_configuration,
+        #[cfg(windows)]
         openvr::commands::openvr_get_binding_origins,
+        #[cfg(windows)]
         openvr::commands::openvr_is_dashboard_visible,
+        #[cfg(windows)]
         openvr::commands::openvr_reregister_manifest,
+        #[cfg(windows)]
         openvr::commands::openvr_set_init_delay_fix,
+        #[cfg(windows)]
         openvr::commands::openvr_set_analog_color_temp,
+        #[cfg(windows)]
         openvr::commands::openvr_set_app_framelimit,
+        #[cfg(windows)]
         openvr::commands::openvr_get_app_framelimit,
         hardware::beyond::commands::bigscreen_beyond_is_connected,
         hardware::beyond::commands::bigscreen_beyond_set_brightness,
