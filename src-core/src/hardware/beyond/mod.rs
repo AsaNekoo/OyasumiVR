@@ -7,6 +7,7 @@ use tokio::sync::Mutex;
 use crate::utils::send_event;
 
 pub mod commands;
+#[cfg(windows)]
 mod detector;
 
 const BIGSCREEN_VID: u16 = 0x35bd;
@@ -40,7 +41,9 @@ pub async fn init() {
             }
         }
         // Detect USB plug/unplug events
+        #[cfg(windows)]
         let mut detector = detector::PnPDetector::start();
+        #[cfg(windows)]
         loop {
             let event = match detector.recv().await {
                 Some(e) => e,
