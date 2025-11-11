@@ -40,7 +40,6 @@ md5 = "0.8.0"
 mime = "0.3.17"
 mime_guess = "2.0.5"
 nalgebra = "0.33.2"
-named_pipe = "0.4.1"
 oyasumivr-shared = { path = "../src-shared-rust", version = '*' }
 oyasumivr_macros = { path = "./macros" }
 prost = "0.13.5"
@@ -90,6 +89,7 @@ uuid = { version = "1.17.0", features = [
 widestring = "1.2.0"
 
 [target.'cfg(target_os = "windows")'.dependencies]
+named_pipe = "0.4.1"
 webview2-com = "0.38.0"
 ovr_overlay={git = "https://github.com/Raphiiko/ovr_overlay_oyasumi",rev = "a2afdea5fa9171b0151f8da271fcdd7cdc2beb41",features = ["ovr_system", "ovr_settings"]}
 oyasumivr_oscquery={git="https://github.com/Raphiiko/oyasumivr_oscquery.git",rev = "47c00b5fab8d7a45ba3254873ca7886f84483560"}
