@@ -1,8 +1,8 @@
 use crate::globals::TAURI_APP_HANDLE;
-
+#[cfg(windows)]
+use super::get_friendly_name_for_windows_power_policy;
 use super::{
     audio_devices::device::AudioDeviceDto,
-    get_friendly_name_for_windows_power_policy,
     models::{Output, WindowsPowerPolicy},
     VRCHAT_ACTIVE,
 };
@@ -214,6 +214,7 @@ pub async fn show_in_folder(path: String) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+ #[cfg(windows)]
 pub async fn set_windows_power_policy(guid: String) {
     let guid = guid.to_uppercase();
     let parsed_guid = match crate::utils::serialization::string_to_guid(&guid) {
@@ -232,6 +233,7 @@ pub async fn set_windows_power_policy(guid: String) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+ #[cfg(windows)]
 pub async fn active_windows_power_policy() -> Option<WindowsPowerPolicy> {
     let guid = super::active_windows_power_policy();
     guid?;
@@ -245,6 +247,7 @@ pub async fn active_windows_power_policy() -> Option<WindowsPowerPolicy> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+ #[cfg(windows)]
 pub async fn get_windows_power_policies() -> Vec<WindowsPowerPolicy> {
     let mut policies = Vec::new();
     let schemes = super::get_windows_power_policies();
@@ -260,6 +263,7 @@ pub async fn get_windows_power_policies() -> Vec<WindowsPowerPolicy> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+ #[cfg(windows)]
 pub async fn windows_is_elevated() -> bool {
     is_elevated()
 }

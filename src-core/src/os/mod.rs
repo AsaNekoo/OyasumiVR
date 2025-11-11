@@ -10,11 +10,13 @@ use log::{error, info, warn};
 use rodio::{source::Source, Decoder};
 use rodio::{OutputStream, Sink};
 use std::collections::HashMap;
+#[cfg(windows)]
 use std::ffi::OsString;
 use std::fs::File;
 use std::io::BufReader;
 #[cfg(windows)]
 use std::os::windows::ffi::OsStringExt;
+#[cfg(windows)]
 use std::slice;
 use std::env;
 use std::time::Duration;
@@ -190,7 +192,7 @@ pub async fn cleanup_batch_files() {
         }
     }
 }
-
+#[cfg(windows)]
 fn get_windows_power_policies() -> Vec<GUID> {
     let mut power_schemes = Vec::new();
     let mut index: u32 = 0;
@@ -220,7 +222,7 @@ fn get_windows_power_policies() -> Vec<GUID> {
 
     power_schemes
 }
-
+#[cfg(windows)]
 fn active_windows_power_policy() -> Option<GUID> {
     unsafe {
         let mut guid: *mut GUID = std::ptr::null_mut();
@@ -231,7 +233,7 @@ fn active_windows_power_policy() -> Option<GUID> {
         }
     }
 }
-
+#[cfg(windows)]
 fn set_windows_power_policy(guid: &GUID) -> bool {
     let result = unsafe { PowerSetActiveScheme(None, Some(guid)) };
     if result.is_err() {
@@ -242,7 +244,7 @@ fn set_windows_power_policy(guid: &GUID) -> bool {
     };
     result.is_ok()
 }
-
+#[cfg(windows)]
 fn get_friendly_name_for_windows_power_policy(scheme_guid: &GUID) -> Option<String> {
     let mut buffer_size: u32 = 0;
 
