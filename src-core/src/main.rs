@@ -409,7 +409,6 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         #[cfg(windows)]
         os::commands::set_hardware_mic_activivation_threshold,
         os::commands::is_vrchat_active,
-        os::commands::is_windows,
         #[cfg(windows)]
         os::commands::is_elevation_security_disabled,
         #[cfg(windows)]
@@ -468,6 +467,5 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         telemetry::commands::set_telemetry_enabled,
         #[cfg(windows)]
         vrcx::commands::vrcx_log,
-        
     ]
 }

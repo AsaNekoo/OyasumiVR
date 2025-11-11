@@ -335,10 +335,6 @@ pub async fn system_logout() {
     let _ = system_shutdown::logout();
 }
 #[tauri::command]
-pub async fn is_windows() -> bool {
-    cfg!(windows)
-}
-#[tauri::command]
 #[oyasumivr_macros::command_profiling]
 #[cfg(windows)]
 pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
