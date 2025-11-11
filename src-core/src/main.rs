@@ -416,7 +416,7 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         #[cfg(windows)]
         os::commands::is_elevation_security_disabled,
         #[cfg(windows)]
-        osc::commands::osc_send_command,
+        osc::commands::osc_send_command,q
         #[cfg(windows)]
         osc::commands::osc_valid_addr,
         #[cfg(windows)]
