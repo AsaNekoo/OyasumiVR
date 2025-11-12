@@ -38,7 +38,7 @@ impl PowerProfile {
 impl From<PowerProfile> for WindowsPowerPolicy {
     fn from(value: PowerProfile) -> Self {
         WindowsPowerPolicy {
-            guid: value.to_string(),
+            guid: value.to_string().to_uppercase(),
             name: value.to_string(),
         }
     }
