@@ -91,6 +91,7 @@ impl LinuxPowerPolicyManager {
         self.state
     }
     pub fn set_policy<T: Into<PowerProfile> + Copy>(&mut self, value: T) {
+        self.state=value.into();
         for provider in &mut self.providers {
             provider.set_power_profile(value.into()).ok();
         }
