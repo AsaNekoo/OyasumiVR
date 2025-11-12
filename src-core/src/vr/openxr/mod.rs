@@ -1,9 +1,11 @@
 use std::{
+    fs,
+    io::Write,
     sync::{Arc, OnceLock},
     time::Duration,
 };
 
-use log::{debug, info};
+use log::{debug, error, info};
 use tokio::{sync::Mutex, task::spawn_blocking};
 use xr_overlay::{
     openxr::Vector3f,
@@ -73,18 +75,16 @@ pub async fn init() {
     });
 }
 fn openxr_callback(event: AppEvent) {
-    spawn_blocking(move || {
-        match event {
-            AppEvent::SessionEnded | AppEvent::Killed => {
-                log::debug!("[core] openxr disconnected");
-                *OXR_STATE.blocking_lock() = VRStatus::Inactive;
-            }
-            AppEvent::Started => {
-                log::debug!("[core] openxr ready");
-                *OXR_STATE.blocking_lock() = VRStatus::Initialized;
-            }
-            _ => (),
+    spawn_blocking(move || match event {
+        AppEvent::SessionEnded | AppEvent::Killed => {
+            log::debug!("[core] openxr disconnected");
+            *OXR_STATE.blocking_lock() = VRStatus::Inactive;
         }
+        AppEvent::Started => {
+            log::debug!("[core] openxr ready");
+            *OXR_STATE.blocking_lock() = VRStatus::Initialized;
+        }
+        _ => (),
     });
 }
 pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gamma: Option<f64>) {

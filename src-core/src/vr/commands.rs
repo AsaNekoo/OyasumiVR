@@ -28,6 +28,7 @@ pub async fn openvr_set_app_framelimit(
     #[cfg(windows)]
     return super::framelimiter::set_app_framelimits(app_id, limits).await;
     #[cfg(unix)]
+    crate::os::linux::mangohud::limit_frame_rate(app_id, limits).await;
     Ok(())
 }
 
@@ -37,7 +38,7 @@ pub async fn openvr_get_app_framelimit(app_id: u32) -> Result<Option<OVRFrameLim
     #[cfg(windows)]
     return super::framelimiter::get_app_framelimits(app_id).await;
     #[cfg(unix)]
-    Ok(None)
+    Ok(crate::os::linux::mangohud::get_app_framelimit(app_id).await)
 }
 
 #[tauri::command]
