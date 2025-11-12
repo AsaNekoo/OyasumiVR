@@ -1,10 +1,5 @@
 import { LazyStore } from '@tauri-apps/plugin-store';
 import { FLAVOUR } from '../build';
-import { invoke } from '@tauri-apps/api/core';
-export var IS_WINDOWS=true;
-export async function windows_check(){
-  IS_WINDOWS=await invoke<boolean>("is_windows");
-}
 export const SPLASH_MIN_DURATION = 3000;
 export const SETTINGS_KEY_AUTOMATION_CONFIGS = 'AUTOMATION_CONFIGS';
 export const SETTINGS_KEY_VRCHAT_API = 'VRCHAT_API';

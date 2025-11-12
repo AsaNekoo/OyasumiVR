@@ -92,7 +92,6 @@ import { ChaperoneFadeDistanceAutomationService } from './services/fade-distance
 import { OscGeneralAutomationsService } from './services/osc-automations/osc-general-automations.service';
 import { SystemTrayService } from './services/system-tray.service';
 import pMinDelay from 'p-min-delay';
-import { IS_WINDOWS, SPLASH_MIN_DURATION, windows_check } from './globals';
 import { ModalService } from './services/modal.service';
 import { BaseModalComponent } from './components/base-modal/base-modal.component';
 import { SleepAnimationsViewComponent } from './views/dashboard-view/views/sleep-animations-view/sleep-animations-view.component';
@@ -262,6 +261,7 @@ import { SleepDevicePowerAutomationsService } from './services/power-automations
 import { TurnOffDevicesWhenChargingAutomationService } from './services/power-automations/turn-off-devices-when-charging-automation.service';
 import { VRCXService } from './services/vrcx.service';
 import { StoreSnapshotService } from './services/store-snapshot.service';
+import { SPLASH_MIN_DURATION } from './globals';
 
 [
   localeEN,
@@ -584,13 +584,10 @@ export class AppModule {
   }
 
   async init() {
-    await windows_check();
     try {
       await pMinDelay(
         (async () => {
-          if (IS_WINDOWS){
           if (!(await this.elevationCheck())) return;
-          }
           const initStartTime = Date.now();
           await this.logInit('Initializing dev debug services', this.developerDebugService.init());
           // Set up store snapshots (and restore them if needed)
