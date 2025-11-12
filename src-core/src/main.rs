@@ -341,39 +341,22 @@ fn on_cron_minute_start(_: &str) {
 
 fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
     tauri::generate_handler![
-        #[cfg(windows)]
         vr::commands::openvr_get_devices,
-        #[cfg(windows)]
         vr::commands::openvr_status,
-        #[cfg(windows)]
         vr::commands::openvr_get_analog_gain,
-        #[cfg(windows)]
         vr::commands::openvr_set_analog_gain,
-        #[cfg(windows)]
         vr::commands::openvr_get_supersample_scale,
-        #[cfg(windows)]
         vr::commands::openvr_set_supersample_scale,
-        #[cfg(windows)]
         vr::commands::openvr_get_fade_distance,
-        #[cfg(windows)]
         vr::commands::openvr_set_fade_distance,
-        #[cfg(windows)]
         vr::commands::openvr_set_image_brightness,
-        #[cfg(windows)]
         vr::commands::openvr_launch_binding_configuration,
-        #[cfg(windows)]
         vr::commands::openvr_get_binding_origins,
-        #[cfg(windows)]
         vr::commands::openvr_is_dashboard_visible,
-        #[cfg(windows)]
         vr::commands::openvr_reregister_manifest,
-        #[cfg(windows)]
         vr::commands::openvr_set_init_delay_fix,
-        #[cfg(windows)]
         vr::commands::openvr_set_analog_color_temp,
-        #[cfg(windows)]
         vr::commands::openvr_set_app_framelimit,
-        #[cfg(windows)]
         vr::commands::openvr_get_app_framelimit,
         hardware::beyond::commands::bigscreen_beyond_is_connected,
         hardware::beyond::commands::bigscreen_beyond_set_brightness,
