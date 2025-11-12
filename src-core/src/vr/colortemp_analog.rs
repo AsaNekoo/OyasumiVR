@@ -1,7 +1,7 @@
 use ovr_overlay as ovr;
 use std::ffi::CStr;
 
-use crate::openvr::{devices::get_devices, models::TrackedDeviceClass, OVR_CONTEXT};
+use crate::vr::{devices::get_devices, models::TrackedDeviceClass, OVR_CONTEXT};
 
 pub async fn set_color_temp(mut temperature: Option<u32>) -> Result<(f64, f64, f64), String> {
     let devices = get_devices().await;

@@ -13,7 +13,7 @@ mod framelimiter;
 
 use crate::{
     globals::STEAM_APP_KEY,
-    openvr::models::{OpenVRAction, OpenVRActionSet},
+    vr::models::{OpenVRAction, OpenVRActionSet},
     utils::send_event,
 };
 use chrono::{DateTime, Utc};
