@@ -46,7 +46,7 @@ export class SoftwareBrightnessControlService {
   }
 
   private async setSoftwareBrightness(brightness: number) {
-    await invoke('openvr_set_image_brightness', {
+    await invoke('vr_set_image_brightness', {
       brightness: brightness / 100,
       perceivedBrightnessAdjustmentGamma: this._perceivedBrightnessAdjustmentGamma ?? null,
     });

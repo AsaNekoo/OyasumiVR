@@ -101,7 +101,7 @@ export class FrameLimiterService {
             appId
           )
         );
-        await invoke('openvr_set_app_framelimit', {
+        await invoke('vr_set_app_framelimit', {
           appId,
           limits: null,
         });
@@ -112,7 +112,7 @@ export class FrameLimiterService {
           ...this._activeFrameLimits.value,
           [appId]: value,
         });
-        await invoke('openvr_set_app_framelimit', {
+        await invoke('vr_set_app_framelimit', {
           appId,
           limits: {
             additionalFramesToPredict: value,
@@ -130,7 +130,7 @@ export class FrameLimiterService {
       const result = await invoke<{
         additionalFramesToPredict: number;
         framesToThrottle: number;
-      } | null>('openvr_get_app_framelimit', {
+      } | null>('vr_get_app_framelimit', {
         appId,
       });
       if (result === null) return 'AUTO';

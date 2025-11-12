@@ -124,7 +124,7 @@ export class CCTControlService {
     if (opt.cancelActiveTransition) this.cancelActiveTransition();
     if (cct === this.cct && !force) return;
     this._cct.next(cct);
-    if (this.hardwareReady) invoke('openvr_set_analog_color_temp', { temperature: cct });
+    if (this.hardwareReady) invoke('vr_set_analog_color_temp', { temperature: cct });
     if (opt.logReason) {
       await info(`[CCTControl] Set CCT to ${cct}K (Reason: ${opt.logReason})`);
     }

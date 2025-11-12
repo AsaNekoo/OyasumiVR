@@ -5,23 +5,21 @@ use super::openvr::{
 };
 #[cfg(windows)]
 use crate::globals::STEAM_APP_KEY;
-#[cfg(unix)]
-use crate::vr::model::VRStatus;
 use crate::vr::model::{BindingOriginData, OVRDevice, OVRFrameLimits};
 #[cfg(windows)]
 use enumset::EnumSet;
-use log::error;
 #[cfg(windows)]
 use log::error;
 #[cfg(windows)]
 use ovr::input::{InputString, InputValueHandle};
 #[cfg(windows)]
 use ovr_overlay as ovr;
+#[cfg(windows)]
 use substring::Substring;
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn openvr_set_app_framelimit(
+pub async fn vr_set_app_framelimit(
     app_id: u32,
     limits: Option<OVRFrameLimits>,
 ) -> Result<(), String> {
@@ -34,7 +32,7 @@ pub async fn openvr_set_app_framelimit(
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn openvr_get_app_framelimit(app_id: u32) -> Result<Option<OVRFrameLimits>, String> {
+pub async fn vr_get_app_framelimit(app_id: u32) -> Result<Option<OVRFrameLimits>, String> {
     #[cfg(windows)]
     return super::framelimiter::get_app_framelimits(app_id).await;
     #[cfg(unix)]
@@ -53,16 +51,17 @@ pub async fn openvr_set_init_delay_fix(enabled: bool) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn openvr_get_devices() -> Vec<OVRDevice> {
+pub async fn vr_get_devices() -> Vec<OVRDevice> {
     #[cfg(windows)]
     return super::devices::get_devices().await;
     #[cfg(unix)]
+    //fixme
     Vec::new()
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn openvr_status() -> String {
+pub async fn vr_status() -> String {
     #[cfg(windows)]
     {
        super::openvr::OVR_STATUS.lock().await.to_string().to_uppercase()
@@ -82,7 +81,7 @@ pub async fn openvr_set_analog_gain(analog_gain: f32) -> Result<(), String> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn openvr_get_analog_gain() -> Result<f32, String> {
+pub async fn vr_get_analog_gain() -> Result<f32, String> {
     #[cfg(windows)]
     return super::brightness_analog::get_analog_gain().await;
     #[cfg(unix)]
@@ -91,24 +90,28 @@ pub async fn openvr_get_analog_gain() -> Result<f32, String> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn openvr_set_supersample_scale(supersample_scale: Option<f32>) -> Result<(), String> {
+#[cfg_attr(unix, expect(unused_variables))]
+pub async fn vr_set_supersample_scale(supersample_scale: Option<f32>) -> Result<(), String> {
     #[cfg(windows)]
     return super::supersampling::set_supersample_scale(supersample_scale).await;
     #[cfg(unix)]
+    //fixme: add this feature to libmonado
     Ok(())
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn openvr_get_supersample_scale() -> Result<Option<f32>, String> {
+pub async fn vr_get_supersample_scale() -> Result<Option<f32>, String> {
     #[cfg(windows)]
     return super::supersampling::get_supersample_scale().await;
     #[cfg(unix)]
+     //fixme: add this feature to libmonado
     Ok(None)
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg_attr(unix, expect(unused_variables))]
 pub async fn openvr_set_fade_distance(fade_distance: f32) -> Result<(), String> {
     #[cfg(windows)]
     return super::chaperone::set_fade_distance(fade_distance).await;
@@ -128,7 +131,7 @@ pub async fn openvr_get_fade_distance() -> Result<f32, String> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn openvr_set_analog_color_temp(
+pub async fn vr_set_analog_color_temp(
     temperature: Option<u32>,
 ) -> Result<(f64, f64, f64), String> {
     #[cfg(windows)]
@@ -139,7 +142,7 @@ pub async fn openvr_set_analog_color_temp(
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn openvr_set_image_brightness(
+pub async fn vr_set_image_brightness(
     brightness: f64,
     perceived_brightness_adjustment_gamma: Option<f64>,
 ) {
@@ -152,7 +155,7 @@ pub async fn openvr_set_image_brightness(
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn openvr_launch_binding_configuration(show_on_desktop: bool) {
+pub async fn vr_launch_binding_configuration(show_on_desktop: bool) {
     #[cfg(windows)]
     {
         let context = OVR_CONTEXT.lock().await;
@@ -171,6 +174,7 @@ pub async fn openvr_launch_binding_configuration(show_on_desktop: bool) {
             error!("[Core] Failed to open SteamVR binding UI: {}", e);
         }
     }
+    //fixme: figure this out
 }
 
 #[tauri::command]
@@ -188,7 +192,7 @@ pub async fn openvr_is_dashboard_visible() -> bool {
         #[cfg(unix)]
         {
             //there is no one dashboard on openxr
-            true
+            false
         }
     
 }
@@ -253,7 +257,7 @@ pub async fn openvr_reregister_manifest() -> Result<(), String> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn openvr_get_binding_origins(
+pub async fn vr_get_binding_origins(
     action_set_key: String,
     action_key: String,
 ) -> Option<Vec<BindingOriginData>> {
@@ -402,7 +406,7 @@ pub async fn openvr_get_binding_origins(
         Some(datas)
     }
     #[cfg(unix)]{
-        //not used
+        //fixme: look at it and see wha it does
         None
     }
 }

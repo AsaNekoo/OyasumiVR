@@ -41,7 +41,7 @@ export class OpenVRService {
   ) {}
 
   async init() {
-    this._status.next(await invoke<OpenVRStatus>('openvr_status'));
+    this._status.next(await invoke<OpenVRStatus>('vr_status'));
     this.appSettings.settings
       .pipe(
         map((settings) => settings.openVrInitDelayFix),
@@ -105,15 +105,15 @@ export class OpenVRService {
   }
 
   public getAnalogGain(): Promise<number> {
-    return invoke<number>('openvr_get_analog_gain');
+    return invoke<number>('vr_get_analog_gain');
   }
 
   public setSupersampleScale(supersampleScale: number | null): Promise<void> {
-    return invoke('openvr_set_supersample_scale', { supersampleScale });
+    return invoke('vr_set_supersample_scale', { supersampleScale });
   }
 
   public getSupersampleScale(): Promise<number | null> {
-    return invoke<number | null>('openvr_get_supersample_scale');
+    return invoke<number | null>('vr_get_supersample_scale');
   }
 
   public setFadeDistance(fadeDistance: number): Promise<void> {
@@ -143,7 +143,7 @@ export class OpenVRService {
 
   private async getDevices(): Promise<Array<OVRDevice>> {
     // Get devices
-    let devices = await invoke<OVRDevice[]>('openvr_get_devices');
+    let devices = await invoke<OVRDevice[]>('vr_get_devices');
     // Carry over current local state
     devices = devices.map((device) => {
       device.isTurningOff =

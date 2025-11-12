@@ -46,13 +46,13 @@ export class OpenVRInputService {
   }
 
   async launchBindingConfiguration(showOnDesktop: boolean) {
-    await invoke('openvr_launch_binding_configuration', { showOnDesktop });
+    await invoke('vr_launch_binding_configuration', { showOnDesktop });
   }
 
   async getActionBindings(actionSet: OVRInputEventActionSet, action: OVRInputEventAction) {
     const status = await firstValueFrom(this.openvr.status);
     if (status !== 'INITIALIZED') return [];
-    let bindings = await invoke<OVRActionBinding[]>('openvr_get_binding_origins', {
+    let bindings = await invoke<OVRActionBinding[]>('vr_get_binding_origins', {
       actionSetKey: actionSet,
       actionKey: action,
     });
