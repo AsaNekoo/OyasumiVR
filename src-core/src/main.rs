@@ -259,7 +259,6 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     #[cfg(windows)]
     osc::init().await;
     // Initialize OpenVR Manager
-    #[cfg(windows)]
     vr::init().await;
     // Initialize Image Cache
     image_cache::init(cache_dir).await;

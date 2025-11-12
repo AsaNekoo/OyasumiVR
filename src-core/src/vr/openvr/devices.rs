@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-
 use super::models::{
     DeviceUpdateEvent, OVRDevice, OVRDevicePose, OVRHandleType, OpenVRInputEvent,
     TrackedDeviceClass,
