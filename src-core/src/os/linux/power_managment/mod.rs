@@ -45,12 +45,12 @@ impl From<PowerProfile> for WindowsPowerPolicy {
 }
 impl From<String> for PowerProfile {
     fn from(value: String) -> Self {
-        match value {
-            val if val == PowerProfile::UltraPowerSave.to_string() => PowerProfile::UltraPowerSave,
-            val if val == PowerProfile::PowerSave.to_string() => PowerProfile::PowerSave,
-            val if val == PowerProfile::Balanced.to_string() => PowerProfile::Balanced,
-            val if val == PowerProfile::Pefromance.to_string() => PowerProfile::Pefromance,
-            val if val == PowerProfile::UltraPerformance.to_string() => {
+        match value.to_uppercase() {
+            val if val == PowerProfile::UltraPowerSave.to_string().to_uppercase() => PowerProfile::UltraPowerSave,
+            val if val == PowerProfile::PowerSave.to_string().to_uppercase() => PowerProfile::PowerSave,
+            val if val == PowerProfile::Balanced.to_string().to_uppercase() => PowerProfile::Balanced,
+            val if val == PowerProfile::Pefromance.to_string().to_uppercase() => PowerProfile::Pefromance,
+            val if val == PowerProfile::UltraPerformance.to_string().to_uppercase() => {
                 PowerProfile::UltraPerformance
             }
             _ => panic!("bad policy name:{}", value),
