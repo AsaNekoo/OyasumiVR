@@ -1,4 +1,3 @@
-#![cfg(windows)]
 pub mod commands;
 mod models;
 mod vrchat;
@@ -36,9 +35,10 @@ pub async fn init() {
         }
     };
     // Spawn OSCQuery client task
+    #[cfg(windows)]
     spawn_oscquery_client_task().await;
 }
-
+#[cfg(windows)]
 async fn spawn_oscquery_client_task() {
     tokio::spawn(async {
         loop {
