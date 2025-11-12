@@ -22,7 +22,9 @@ mod utils;
 mod vrc_log_parser;
 mod vrcx;
 
-use std::{mem, sync::atomic::Ordering};
+use std::sync::atomic::Ordering;
+#[cfg(windows)]
+use std::mem;
 
 use config::Config;
 pub use flavour::BUILD_FLAVOUR;

@@ -66,7 +66,7 @@ pub async fn openvr_status() -> String {
        super::openvr::OVR_STATUS.lock().await.to_string().to_uppercase()
     }
     #[cfg(unix)]
-    VRStatus::Initialized.to_string().to_uppercase()
+    super::openxr::OXR_STATE.lock().await.to_string().to_uppercase()
 }
 
 #[tauri::command]
@@ -75,7 +75,7 @@ pub async fn openvr_set_analog_gain(analog_gain: f32) -> Result<(), String> {
     #[cfg(windows)]
     return super::brightness_analog::set_analog_gain(analog_gain).await;
     #[cfg(unix)]
-    Ok(())
+    unimplemented!()
 }
 
 #[tauri::command]
@@ -84,7 +84,7 @@ pub async fn openvr_get_analog_gain() -> Result<f32, String> {
     #[cfg(windows)]
     return super::brightness_analog::get_analog_gain().await;
     #[cfg(unix)]
-    Ok(1.)
+    unimplemented!()
 }
 
 #[tauri::command]
@@ -93,7 +93,7 @@ pub async fn openvr_set_supersample_scale(supersample_scale: Option<f32>) -> Res
     #[cfg(windows)]
     return super::supersampling::set_supersample_scale(supersample_scale).await;
     #[cfg(unix)]
-    Ok(())
+    unimplemented!()
 }
 
 #[tauri::command]
@@ -102,7 +102,7 @@ pub async fn openvr_get_supersample_scale() -> Result<Option<f32>, String> {
     #[cfg(windows)]
     return super::supersampling::get_supersample_scale().await;
     #[cfg(unix)]
-    Ok(None)
+    unimplemented!()
 }
 
 #[tauri::command]
@@ -142,8 +142,10 @@ pub async fn openvr_set_image_brightness(
     perceived_brightness_adjustment_gamma: Option<f64>,
 ) {
     #[cfg(windows)]
-    super::brightness_overlay::set_brightness(brightness, perceived_brightness_adjustment_gamma)
+    super::openvr::brightness_overlay::set_brightness(brightness, perceived_brightness_adjustment_gamma)
         .await;
+    #[cfg(unix)]
+    super::openxr::set_brightness(brightness, perceived_brightness_adjustment_gamma).await;
 }
 
 #[tauri::command]
