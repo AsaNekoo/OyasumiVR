@@ -463,7 +463,7 @@ pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
         manager.set_mic_activity_enabled(enabled).await;
     }
     #[cfg(unix)]
-    unimplemented!("what does this do?");
+    error!("what does this do?");
 }
 
 #[tauri::command]
@@ -484,7 +484,7 @@ pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
         manager.set_mic_activation_threshold(threshold).await;
     }
     #[cfg(unix)]
-    unimplemented!("what does this do?");
+    error!("what does this do?");
 }
 
 #[tauri::command]
@@ -505,7 +505,7 @@ pub async fn set_mic_activity_device_id(device_id: Option<String>) {
         manager.set_mic_activity_device_id(device_id).await;
     }
     #[cfg(unix)]
-    unimplemented!("what does this do?");
+    error!("what does this do?");
 }
 
 #[tauri::command]

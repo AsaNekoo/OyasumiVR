@@ -10,6 +10,7 @@ use crate::vr::model::VRStatus;
 use crate::vr::model::{BindingOriginData, OVRDevice, OVRFrameLimits};
 #[cfg(windows)]
 use enumset::EnumSet;
+use log::error;
 #[cfg(windows)]
 use log::error;
 #[cfg(windows)]
@@ -75,7 +76,7 @@ pub async fn openvr_set_analog_gain(analog_gain: f32) -> Result<(), String> {
     #[cfg(windows)]
     return super::brightness_analog::set_analog_gain(analog_gain).await;
     #[cfg(unix)]
-    unimplemented!()
+    Ok(())
 }
 
 #[tauri::command]
@@ -84,7 +85,7 @@ pub async fn openvr_get_analog_gain() -> Result<f32, String> {
     #[cfg(windows)]
     return super::brightness_analog::get_analog_gain().await;
     #[cfg(unix)]
-    unimplemented!()
+    Ok(1.)
 }
 
 #[tauri::command]
@@ -93,7 +94,7 @@ pub async fn openvr_set_supersample_scale(supersample_scale: Option<f32>) -> Res
     #[cfg(windows)]
     return super::supersampling::set_supersample_scale(supersample_scale).await;
     #[cfg(unix)]
-    unimplemented!()
+    Ok(())
 }
 
 #[tauri::command]
@@ -102,7 +103,7 @@ pub async fn openvr_get_supersample_scale() -> Result<Option<f32>, String> {
     #[cfg(windows)]
     return super::supersampling::get_supersample_scale().await;
     #[cfg(unix)]
-    unimplemented!()
+    Ok(None)
 }
 
 #[tauri::command]
