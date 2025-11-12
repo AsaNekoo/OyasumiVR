@@ -295,9 +295,12 @@ pub async fn get_system_power_policies() -> Vec<WindowsPowerPolicy> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-#[cfg(windows)]
 pub async fn windows_is_elevated() -> bool {
-    is_elevated()
+    #[cfg(windows)]
+    return is_elevated();
+    //fixme: figure how to do permissions on linux
+    #[cfg(unix)]
+    false
 }
 
 #[tauri::command]
@@ -507,7 +510,9 @@ pub async fn set_mic_activity_device_id(device_id: Option<String>) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-#[cfg(windows)]
 pub async fn is_elevation_security_disabled() -> bool {
-    crate::os::elevation::is_elevation_security_disabled()
+    #[cfg(windows)]
+    return crate::os::elevation::is_elevation_security_disabled();
+    #[cfg(unix)]
+    true
 }
