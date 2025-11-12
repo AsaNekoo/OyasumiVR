@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use strum_macros::{EnumIter, IntoStaticStr};
+use strum_macros::{Display, EnumIter, IntoStaticStr};
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OVRFrameLimits {
@@ -82,4 +82,11 @@ pub struct BindingOriginData {
     pub mode_name: String,
     pub slot_name: String,
     pub input_source_type: String,
+}
+#[derive(Serialize, Clone,Display)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum VRStatus {
+    Inactive,
+    Initializing,
+    Initialized,
 }

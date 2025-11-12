@@ -5,6 +5,8 @@ use super::openvr::{
 };
 #[cfg(windows)]
 use crate::globals::STEAM_APP_KEY;
+#[cfg(unix)]
+use crate::vr::model::VRStatus;
 use crate::vr::model::{BindingOriginData, OVRDevice, OVRFrameLimits};
 #[cfg(windows)]
 use enumset::EnumSet;
@@ -61,12 +63,10 @@ pub async fn openvr_get_devices() -> Vec<OVRDevice> {
 pub async fn openvr_status() -> String {
     #[cfg(windows)]
     {
-        let status = super::openvr::OVR_STATUS.lock().await;
-        let status_str = serde_json::to_string(&*status).unwrap();
-        status_str.substring(1, status_str.len() - 1).to_string()
+       super::openvr::OVR_STATUS.lock().await.to_string().to_uppercase()
     }
     #[cfg(unix)]
-    "READY".to_string()
+    VRStatus::Initialized.to_string().to_uppercase()
 }
 
 #[tauri::command]
