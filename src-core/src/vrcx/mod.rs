@@ -1,23 +1,27 @@
-#![cfg(windows)]
-#![allow(dead_code)]
 pub mod commands;
 pub mod models;
+#[cfg(windows)]
 use models::*;
+#[cfg(windows)]
 use std::{
     env,
     io::Write,
     sync::{LazyLock, Mutex},
     time::Duration,
 };
-
+#[cfg(windows)]
 use log::warn;
+#[cfg(windows)]
 use named_pipe::PipeClient;
+#[cfg(windows)]
 pub static VRCX_NORITICATION_SENDER: LazyLock<Mutex<NotificationSender>> =
     LazyLock::new(Mutex::default);
 #[derive(Default)]
+#[cfg(windows)]
 pub struct NotificationSender {
     sender: Option<PipeClient>,
 }
+#[cfg(windows)]
 
 impl NotificationSender {
 
@@ -61,11 +65,12 @@ impl NotificationSender {
     }
 
 }
+#[cfg(windows)]
 pub fn init() {
     //try to connect
     VRCX_NORITICATION_SENDER.lock().unwrap().connect().ok();
 }
-
+#[cfg(windows)]
 fn get_pipe_path() -> String {
     let username_env_name = {
         if cfg!(target_os = "windows") {
