@@ -396,17 +396,11 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         os::commands::system_hibernate,
         #[cfg(windows)]
         os::commands::windows_is_elevated,
-        #[cfg(windows)]
         os::commands::get_audio_devices,
-        #[cfg(windows)]
         os::commands::set_audio_device_volume,
-        #[cfg(windows)]
         os::commands::set_audio_device_mute,
-        #[cfg(windows)]
         os::commands::set_mic_activity_device_id,
-        #[cfg(windows)]
         os::commands::set_hardware_mic_activity_enabled,
-        #[cfg(windows)]
         os::commands::set_hardware_mic_activivation_threshold,
         os::commands::is_vrchat_active,
         #[cfg(windows)]

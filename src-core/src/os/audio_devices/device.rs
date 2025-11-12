@@ -8,24 +8,19 @@ use tokio::runtime::Handle;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
 use tokio::sync::Mutex;
 use widestring::U16Str;
-#[cfg(windows)]
 use windows::core::{Interface, PCWSTR, PWSTR};
-#[cfg(windows)]
 use windows::Win32::Devices::FunctionDiscovery::PKEY_Device_FriendlyName;
-#[cfg(windows)]
 use windows::Win32::Media::Audio::Endpoints::{
     IAudioEndpointVolume, IAudioEndpointVolumeCallback, IAudioEndpointVolumeCallback_Impl,
     IAudioMeterInformation,
 };
-#[cfg(windows)]
 use windows::Win32::Media::Audio::{
     eCapture, eRender, EDataFlow, IMMDevice, IMMEndpoint, AUDIO_VOLUME_NOTIFICATION_DATA,
 };
-#[cfg(windows)]
 use windows::Win32::System::Com::StructuredStorage::PropVariantToBSTR;
-#[cfg(windows)]
 use windows::Win32::System::Com::{CLSCTX_ALL, STGM_READ};
 
+use crate::os::audio_devices::{AudioDeviceDto, AudioDeviceType};
 use crate::utils::send_event;
 use crate::Models::overlay_sidecar::MicrophoneActivityMode;
 
@@ -33,18 +28,6 @@ use super::wrappers::{
     AudioDeviceIAudioEndpointVolume, AudioDeviceIAudioEndpointVolumeCallback,
     AudioDeviceIAudioMeterInformation, AudioDeviceIMMDevice,
 };
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AudioDeviceDto {
-    pub id: String,
-    pub name: String,
-    pub device_type: AudioDeviceType,
-    pub volume: f32,
-    pub mute: bool,
-    pub default: bool,
-    pub default_communications: bool,
-}
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -94,11 +77,7 @@ impl AudioDeviceState {
     }
 }
 
-#[derive(PartialEq, Eq, Clone, Copy, Serialize)]
-pub enum AudioDeviceType {
-    Capture,
-    Render,
-}
+
 
 impl From<EDataFlow> for AudioDeviceType {
     fn from(value: EDataFlow) -> Self {

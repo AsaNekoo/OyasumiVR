@@ -88,6 +88,8 @@ uuid = { version = "1.17.0", features = [
 
 widestring = "1.2.0"
 
+[target.'cfg(target_os = "linux")'.dependencies]
+pulseaudio = "0.3.0"
 [target.'cfg(target_os = "windows")'.dependencies]
 named_pipe = "0.4.1"
 webview2-com = "0.38.0"
@@ -119,7 +121,6 @@ rev = "5f24925"
 
 
 
-# path = "../../oyasumivr_oscquery"
 
 [dependencies.tauri]
 version = "2.6.2"

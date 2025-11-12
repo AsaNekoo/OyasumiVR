@@ -5,6 +5,9 @@ use super::get_friendly_name_for_windows_power_policy;
 use super::models::WindowsPowerPolicy;
 use super::{models::Output, VRCHAT_ACTIVE};
 use crate::globals::TAURI_APP_HANDLE;
+use crate::os::audio_devices::AudioDeviceDto;
+#[cfg(unix)]
+use crate::os::linux::audio::LINUX_AUDIO_DEVICE_MANAGER;
 use log::{debug, error, info};
 #[cfg(windows)]
 use oyasumivr_shared::windows::is_elevated;
@@ -336,114 +339,170 @@ pub async fn system_logout() {
 }
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-#[cfg(windows)]
 pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
+    #[cfg(windows)]
+    {
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
+                "[Core] Could not get audio devices, as audio device manager was not initialized"
+            );
+                return vec![];
+            }
+        };
+        if refresh {
+            if let Err(e) = manager.refresh_audio_devices().await {
+                error!("[Core] Failed to refresh audio devices: {}", e);
+            }
+        }
+        manager.get_devices().await
+    }
+    #[cfg(unix)]
+    {
+        let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
+        if let Some(manager) = manager_guard.as_mut() {
+            if refresh {
+                if let Err(err) = manager.refresh_devices() {
+                    error!("[Core] Failed to refresh audio devices: {:?}", err);
+                }
+            }
+            manager
+                .devices()
+                .iter()
+                .map(|device| AudioDeviceDto::from(device.clone()))
+                .collect::<Vec<AudioDeviceDto>>()
+        } else {
             error!(
                 "[Core] Could not get audio devices, as audio device manager was not initialized"
             );
-            return vec![];
-        }
-    };
-    if refresh {
-        if let Err(e) = manager.refresh_audio_devices().await {
-            error!("[Core] Failed to refresh audio devices: {}", e);
+            Vec::new()
         }
     }
-    manager.get_devices().await
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-#[cfg(windows)]
-
 pub async fn set_audio_device_volume(device_id: String, volume: f32) {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
-            error!(
+    #[cfg(windows)]
+    {
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
               "[Core] Could not set audio device volume, as audio device manager was not initialized"
           );
-            return;
+                return;
+            }
+        };
+        manager.set_volume(device_id, volume).await;
+    }
+    #[cfg(unix)]
+    {
+        let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
+        if let Some(manager) = manager_guard.as_mut() {
+            if let Err(error) = manager.set_audio_device_volume(device_id, volume) {
+                error!("[Core] Could not set audio device volume, {:?}", error);
+            }
+        } else {
+            error!("[Core] Could not set audio device volume, as audio device manager was not initialized");
         }
-    };
-    manager.set_volume(device_id, volume).await;
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-#[cfg(windows)]
-
 pub async fn set_audio_device_mute(device_id: String, mute: bool) {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
-            error!(
-              "[Core] Could not set audio device mute state, as audio device manager was not initialized"
+    #[cfg(windows)]
+    {
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
+                    "[Core] Could not set audio device mute state, as audio device manager was not initialized"
           );
-            return;
+                return;
+            }
+        };
+        manager.set_mute(device_id, mute).await;
+    }
+    #[cfg(unix)]
+    {
+        let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
+        if let Some(manager) = manager_guard.as_mut() {
+            if let Err(error) = manager.set_audio_device_mute(device_id, mute) {
+                error!("[Core] Could not set audio device mute state, {:?}", error);
+            }
+        } else {
+            error!("[Core] Could not set audio device mute state, as audio device manager was not initialized");
         }
-    };
-    manager.set_mute(device_id, mute).await;
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-#[cfg(windows)]
-
 pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
-            error!(
+    #[cfg(windows)]
+    {
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
               "[Core] Could not enable/disable hardware mic activation, as audio device manager was not initialized"
           );
-            return;
-        }
-    };
-    manager.set_mic_activity_enabled(enabled).await;
+                return;
+            }
+        };
+        manager.set_mic_activity_enabled(enabled).await;
+    }
+    #[cfg(unix)]
+    unimplemented!("what does this do?");
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-#[cfg(windows)]
-
 pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
-            error!(
+    #[cfg(windows)]
+    {
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
               "[Core] Could not set the hardware mic activation threshold, as audio device manager was not initialized"
           );
-            return;
-        }
-    };
-    manager.set_mic_activation_threshold(threshold).await;
+                return;
+            }
+        };
+        manager.set_mic_activation_threshold(threshold).await;
+    }
+    #[cfg(unix)]
+    unimplemented!("what does this do?");
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-#[cfg(windows)]
-
 pub async fn set_mic_activity_device_id(device_id: Option<String>) {
-    let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
-    let manager = match manager_guard.as_ref() {
-        Some(m) => m,
-        None => {
-            error!(
+    #[cfg(windows)]
+    {
+        let manager_guard = super::AUDIO_DEVICE_MANAGER.lock().await;
+        let manager = match manager_guard.as_ref() {
+            Some(m) => m,
+            None => {
+                error!(
               "[Core] Could not set active capture device ID, as audio device manager was not initialized"
           );
-            return;
-        }
-    };
-    manager.set_mic_activity_device_id(device_id).await;
+                return;
+            }
+        };
+        manager.set_mic_activity_device_id(device_id).await;
+    }
+    #[cfg(unix)]
+    unimplemented!("what does this do?");
 }
 
 #[tauri::command]

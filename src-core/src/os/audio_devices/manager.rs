@@ -1,4 +1,5 @@
-use super::device::{AudioDevice, AudioDeviceDto, AudioDeviceType};
+use super::device::AudioDevice;
+use crate::os::audio_devices::{AudioDeviceDto, AudioDeviceType};
 use super::wrappers::{
     AudioDeviceManagerIMMDeviceEnumerator, AudioDeviceManagerIMMNotificationClient,
     AudioDevicePCWSTR,
