@@ -93,7 +93,7 @@ widestring = "1.2.0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 pulseaudio = "0.3.0"
-xr_overlay = { version = "0.1.0", path = "../../xr_overlay/core" }
+xr_overlay = { version = "0.1.0", path = "../../xr_overlay/core",default-features = false }
 [target.'cfg(target_os = "windows")'.dependencies]
 named_pipe = "0.4.1"
 webview2-com = "0.38.0"

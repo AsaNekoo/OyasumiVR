@@ -22,13 +22,21 @@ pub async fn init() {
     let _ = tokio::task::spawn(async {
         info!("[Init] initializing openxr");
         *OXR_STATE.lock().await = VRStatus::Initializing;
-        let ctx = xr_overlay::xr::Init::default()
-            .enable_drm_support()
-            .sort_order(u16::MAX as u32)
-            .user_presence_support(false)
-            .with_app_name("Oyasumi VR")
-            .init_overlay(Duration::MAX.into())
-            .unwrap();
+        let ctx = loop {
+            let ctx = xr_overlay::xr::Init::default()
+                .enable_drm_support()
+                .sort_order(u16::MAX as u32)
+                .user_presence_support(false)
+                .with_app_name("Oyasumi VR")
+                .init_overlay();
+            if let Err(xr_overlay::error::Error::InitNotReady) = ctx {
+                drop(ctx);
+                tokio::time::sleep(Duration::from_secs(1)).await;
+                continue;
+            } else {
+                break ctx.unwrap();
+            }
+        };
         info!("[Init] connected to openxr");
 
         let mut runner = xr_overlay::runner::AppRunner::new(AppRunnerCreateInfo {
@@ -64,10 +72,13 @@ pub async fn init() {
             loop {
                 match OXR_HANDLE.get().unwrap().lock().await.run() {
                     xr_overlay::runner::PollResult::Success => continue,
-                    xr_overlay::runner::PollResult::Sleep(duration) => {
-                        tokio::time::sleep(duration).await
+                    xr_overlay::runner::PollResult::UserNotPresent => {
+                        tokio::time::sleep(Duration::from_secs(1)).await
                     }
                     xr_overlay::runner::PollResult::Exit => break,
+                    xr_overlay::runner::PollResult::Starting => {
+                        tokio::time::sleep(Duration::from_millis(100)).await
+                    }
                 }
             }
         });
