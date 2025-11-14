@@ -83,10 +83,31 @@ pub struct BindingOriginData {
     pub slot_name: String,
     pub input_source_type: String,
 }
-#[derive(Serialize, Clone,Display)]
+#[derive(Serialize, Clone,Display,Copy,PartialEq,Debug)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum VRStatus {
     Inactive,
     Initializing,
     Initialized,
+}
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SleepDetectorStateReport {
+    pub distance_in_last_15_minutes: f64,
+    pub distance_in_last_10_minutes: f64,
+    pub distance_in_last_5_minutes: f64,
+    pub distance_in_last_1_minute: f64,
+    pub distance_in_last_10_seconds: f64,
+    pub rotation_in_last_15_minutes: f64,
+    pub rotation_in_last_10_minutes: f64,
+    pub rotation_in_last_5_minutes: f64,
+    pub rotation_in_last_1_minute: f64,
+    pub rotation_in_last_10_seconds: f64,
+    pub start_time: u128,
+    pub last_log: u128,
+}
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GestureDetected {
+    pub gesture: String,
 }

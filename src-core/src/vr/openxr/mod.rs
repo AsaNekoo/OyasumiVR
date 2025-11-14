@@ -1,20 +1,17 @@
 use std::{
     fs,
     io::Write,
-    sync::{Arc, OnceLock},
+    sync::{Arc, LazyLock, OnceLock},
     time::Duration,
 };
 
 use log::{debug, error, info};
 use tokio::{sync::Mutex, task::spawn_blocking};
 use xr_overlay::{
-    openxr::Vector3f,
-    runner::{events::AppEvent, AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle},
-    xr::ReferenceSpaceT,
-    RgbaTexture,
+    RgbaTexture, openxr::{Posef, Vector3f}, runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent}, xr::ReferenceSpaceT
 };
 
-use crate::vr::model::VRStatus;
+use crate::vr::{gesture_detector::GestureDetector, model::VRStatus, sleep_detector::SleepDetector};
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
 pub static OXR_BRIGHTNES_OVERLAY_HANDLE: OnceLock<Mutex<OverlayHandle>> = OnceLock::new();
 pub static OXR_STATE: Mutex<VRStatus> = Mutex::const_new(VRStatus::Inactive);
@@ -24,7 +21,7 @@ pub async fn init() {
         *OXR_STATE.lock().await = VRStatus::Initializing;
         let ctx = loop {
             let ctx = xr_overlay::xr::Init::default()
-                .enable_drm_support()
+                .disable_hand_tracking()
                 .sort_order(u16::MAX as u32)
                 .user_presence_support(false)
                 .with_app_name("Oyasumi VR")
@@ -69,19 +66,35 @@ pub async fn init() {
             .unwrap();
         OXR_HANDLE.set(Mutex::new(runner)).unwrap();
         tokio::task::spawn(async {
-            let time_frame=(1000./OXR_HANDLE.get().unwrap().lock().await.current_refresh_rate()) as u64;
+            let time_frame = (1000.
+                / OXR_HANDLE
+                    .get()
+                    .unwrap()
+                    .lock()
+                    .await
+                    .current_refresh_rate()) as u64;
             loop {
-                match OXR_HANDLE.get().unwrap().lock().await.run() {
-                    xr_overlay::runner::PollResult::Success => continue,
+                let mut xr_ctx=OXR_HANDLE.get().unwrap().lock().await;
+                match xr_ctx.run() {
+                    xr_overlay::runner::PollResult::Success =>(),
                     xr_overlay::runner::PollResult::UserNotPresent => {
-                        tokio::time::sleep(Duration::from_secs(1)).await
+                        tokio::time::sleep(Duration::from_secs(1)).await;
+                        continue;
                     }
-                    xr_overlay::runner::PollResult::Exit => break,
+                    xr_overlay::runner::PollResult::Exit => {
+                        tokio::time::sleep(Duration::from_secs(10)).await;
+                        debug_assert_eq!(*OXR_STATE.lock().await,VRStatus::Inactive);
+                        continue;
+                    }
                     xr_overlay::runner::PollResult::Starting => {
-                        tokio::time::sleep(Duration::from_millis(100)).await
+                        tokio::time::sleep(Duration::from_millis(100)).await;
+                        continue;
                     }
-                    xr_overlay::runner::PollResult::SuccessNoRender => tokio::time::sleep(Duration::from_millis(time_frame)).await,
+                    xr_overlay::runner::PollResult::SuccessNoRender => {
+                        tokio::time::sleep(Duration::from_millis(time_frame)).await
+                    }
                 }
+                openxr_tick(&mut xr_ctx).await;
             }
         });
         debug!("[Init] openxr start (2)");
@@ -122,4 +135,16 @@ pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gam
 
 fn adjust_for_perceived_brightness(linear_percent: f64, gamma: f64) -> f64 {
     linear_percent.powf(1.0 / gamma)
+}
+static SLEEP_DETECTOR:LazyLock<Mutex<SleepDetector>>=LazyLock::new(||Mutex::new(SleepDetector::new()));
+static GESTURE_DETECTOR:LazyLock<Mutex<GestureDetector>>=LazyLock::new(||Mutex::new(GestureDetector::new()));
+async fn openxr_tick(ctx:&mut AppRunner) {
+    if let Some(posef)=ctx.get_hmd_posef(None,ReferenceSpaceT::STAGE){
+        let pos=posef.position;
+        let quat=posef.orientation;
+        SLEEP_DETECTOR.lock().await.log_pose([pos.x,pos.y,pos.z], [quat.x as f64,quat.y  as f64,quat.z as f64,quat.w as f64]).await;
+        GESTURE_DETECTOR.lock().await.log_pose([pos.x,pos.y,pos.z], [quat.x as f64,quat.y  as f64,quat.z as f64,quat.w as f64]).await;
+    }else {
+        info!("[Core] Failed to get hmd Posef")
+    }
 }
