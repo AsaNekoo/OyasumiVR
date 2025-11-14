@@ -11,7 +11,7 @@ use xr_overlay::{
     RgbaTexture, openxr::{Posef, Vector3f}, runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent}, xr::ReferenceSpaceT
 };
 
-use crate::vr::{gesture_detector::GestureDetector, model::VRStatus, sleep_detector::SleepDetector};
+use crate::{utils::send_event, vr::{gesture_detector::GestureDetector, model::VRStatus, sleep_detector::SleepDetector}};
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
 pub static OXR_BRIGHTNES_OVERLAY_HANDLE: OnceLock<Mutex<OverlayHandle>> = OnceLock::new();
 pub static OXR_STATE: Mutex<VRStatus> = Mutex::const_new(VRStatus::Inactive);
@@ -101,18 +101,28 @@ pub async fn init() {
     });
 }
 fn openxr_callback(event: AppEvent) {
-    spawn_blocking(move || match event {
+    spawn_blocking(async move || match event {
         AppEvent::SessionEnded | AppEvent::Killed => {
             log::debug!("[core] openxr disconnected");
-            *OXR_STATE.blocking_lock() = VRStatus::Inactive;
+            update_status(VRStatus::Inactive).await;
         }
         AppEvent::Started => {
             log::debug!("[core] openxr ready");
-            *OXR_STATE.blocking_lock() = VRStatus::Initialized;
+            update_status(VRStatus::Initialized).await;
         }
         _ => (),
     });
 }
+async fn update_status(new_status: VRStatus) {
+    let mut status = OXR_STATE.lock().await;
+    *status = new_status.clone();
+    send_event(
+        "VR_STATUS_UPDATE",
+        status.to_string(),
+    )
+    .await;
+}
+
 pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gamma: Option<f64>) {
     if OXR_HANDLE.get().is_none() {
         return;

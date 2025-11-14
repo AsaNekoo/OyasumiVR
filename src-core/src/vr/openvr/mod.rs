@@ -294,10 +294,9 @@ pub async fn task() {
 async fn update_status(new_status: OpenVRStatus) {
     let mut status = OVR_STATUS.lock().await;
     *status = new_status.clone();
-    let status_str = serde_json::to_string(&new_status).unwrap();
     send_event(
-        "OVR_STATUS_UPDATE",
-        status_str.substring(1, status_str.len() - 1).to_string(),
+        "VR_STATUS_UPDATE",
+        status.to_string(),
     )
     .await;
 }

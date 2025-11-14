@@ -58,7 +58,7 @@ export class OpenVRService {
       listen<DeviceUpdateEvent>('OVR_DEVICE_UPDATE', (event) =>
         this.onDeviceUpdate(event.payload.device)
       ),
-      listen<OpenVRStatus>('OVR_STATUS_UPDATE', (event) => this.onStatusUpdate(event.payload)),
+      listen<OpenVRStatus>('VR_STATUS_UPDATE', (event) => this.onStatusUpdate(event.payload)),
       listen<any>('OVR_POSE_UPDATE', (event) => {
         const poses = structuredClone(this._devicePoses.value);
         const {
