@@ -41,7 +41,11 @@ pub async fn vr_get_app_framelimit(app_id: u32) -> Result<Option<OVRFrameLimits>
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn vr_sleep_mode_check(value:bool){
-    
+    #[cfg(unix)]
+    {match value {
+        true => super::openxr::start_head_shake_detection().await,
+        false => super::openxr::stop_head_shake_detection().await,
+    }}
 }
 
 #[tauri::command]

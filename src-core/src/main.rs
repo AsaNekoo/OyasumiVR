@@ -362,6 +362,7 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         vr::commands::vr_set_analog_color_temp,
         vr::commands::vr_set_app_framelimit,
         vr::commands::vr_get_app_framelimit,
+        vr::commands::vr_sleep_mode_check,
         hardware::beyond::commands::bigscreen_beyond_is_connected,
         hardware::beyond::commands::bigscreen_beyond_set_brightness,
         hardware::beyond::commands::bigscreen_beyond_set_led_color,

@@ -8,10 +8,16 @@ use std::{
 use log::{debug, error, info};
 use tokio::{sync::Mutex, task::spawn_blocking};
 use xr_overlay::{
-    RgbaTexture, openxr::{Posef, Vector3f}, runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent}, xr::ReferenceSpaceT
+    openxr::{Posef, Vector3f},
+    runner::{events::AppEvent, AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle},
+    xr::ReferenceSpaceT,
+    RgbaTexture,
 };
 
-use crate::{utils::send_event, vr::{gesture_detector::GestureDetector, model::VRStatus, sleep_detector::SleepDetector}};
+use crate::{
+    utils::send_event,
+    vr::{gesture_detector::GestureDetector, model::VRStatus, sleep_detector::SleepDetector},
+};
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
 pub static OXR_BRIGHTNES_OVERLAY_HANDLE: OnceLock<Mutex<OverlayHandle>> = OnceLock::new();
 pub static OXR_STATE: Mutex<VRStatus> = Mutex::const_new(VRStatus::Inactive);
@@ -67,16 +73,16 @@ pub async fn init() {
         OXR_HANDLE.set(Mutex::new(runner)).unwrap();
         tokio::task::spawn(async {
             loop {
-                let mut xr_ctx=OXR_HANDLE.get().unwrap().lock().await;
+                let mut xr_ctx = OXR_HANDLE.get().unwrap().lock().await;
                 match xr_ctx.run() {
-                    xr_overlay::runner::PollResult::Success =>(),
+                    xr_overlay::runner::PollResult::Success => (),
                     xr_overlay::runner::PollResult::UserNotPresent => {
                         tokio::time::sleep(Duration::from_secs(1)).await;
                         continue;
                     }
                     xr_overlay::runner::PollResult::Exit => {
                         tokio::time::sleep(Duration::from_secs(10)).await;
-                        debug_assert_eq!(*OXR_STATE.lock().await,VRStatus::Inactive);
+                        debug_assert_eq!(*OXR_STATE.lock().await, VRStatus::Inactive);
                         continue;
                     }
                     xr_overlay::runner::PollResult::Starting => {
@@ -87,26 +93,30 @@ pub async fn init() {
                         tokio::time::sleep(Duration::from_secs(60)).await
                     }
                 }
-                
             }
         });
-         let frane_time = (1000.
-                / OXR_HANDLE
-                    .get()
-                    .unwrap()
-                    .lock()
-                    .await
-                    .current_refresh_rate()) as u64;
-        tokio::task::spawn(async move{
-            loop {
-                if *OXR_STATE.lock().await==VRStatus::Initialized{
-                pose_tick(&mut *OXR_HANDLE.get().unwrap().lock().await).await;
-                tokio::time::sleep(Duration::from_millis(frane_time)).await;
-                }else {
-                    tokio::time::sleep(Duration::from_secs(10)).await;
-                }
-            }
 
+        tokio::task::spawn(async move {
+            loop {
+                if *OXR_STATE.lock().await == VRStatus::Initialized {
+                    let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
+                    if let Some(posef) = ctx.get_hmd_posef(None, ReferenceSpaceT::STAGE) {
+                        let pos = posef.position;
+                        let quat = posef.orientation;
+                        SLEEP_DETECTOR
+                            .lock()
+                            .await
+                            .log_pose(
+                                [pos.x, pos.y, pos.z],
+                                [quat.x as f64, quat.y as f64, quat.z as f64, quat.w as f64],
+                            )
+                            .await;
+                    } else {
+                        info!("[Core] Failed to get hmd Posef")
+                    }
+                }
+                tokio::time::sleep(Duration::from_secs(5)).await;
+            }
         });
         debug!("[Init] openxr start (2)");
     });
@@ -127,11 +137,51 @@ fn openxr_callback(event: AppEvent) {
 async fn update_status(new_status: VRStatus) {
     let mut status = OXR_STATE.lock().await;
     *status = new_status.clone();
-    send_event(
-        "VR_STATUS_UPDATE",
-        status.to_string(),
-    )
-    .await;
+    send_event("VR_STATUS_UPDATE", status.to_string()).await;
+}
+static ABORT_GESTURE_DETECTION: Mutex<bool> = Mutex::const_new(false);
+static GESTURE_DETECTION_RUNNING: Mutex<bool> = Mutex::const_new(false);
+pub async fn stop_head_shake_detection() {
+    if *GESTURE_DETECTION_RUNNING.lock().await {
+        *ABORT_GESTURE_DETECTION.lock().await = true;
+    }
+}
+pub async fn start_head_shake_detection() {
+    let frame_time = (1000.
+        / OXR_HANDLE
+            .get()
+            .unwrap()
+            .lock()
+            .await
+            .current_refresh_rate()) as u64;
+    tokio::task::spawn(async move {
+        *GESTURE_DETECTION_RUNNING.lock().await = true;
+        *ABORT_GESTURE_DETECTION.lock().await = false;
+        loop {
+            if *ABORT_GESTURE_DETECTION.lock().await {
+                break;
+            }
+            if *OXR_STATE.lock().await == VRStatus::Initialized {
+                let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
+                if let Some(posef) = ctx.get_hmd_posef(None, ReferenceSpaceT::STAGE) {
+                    let pos = posef.position;
+                    let quat = posef.orientation;
+                    GESTURE_DETECTOR
+                        .lock()
+                        .await
+                        .log_pose(
+                            [pos.x, pos.y, pos.z],
+                            [quat.x as f64, quat.y as f64, quat.z as f64, quat.w as f64],
+                        )
+                        .await;
+                } else {
+                    info!("[Core] Failed to get hmd Posef")
+                }
+            }
+            tokio::time::sleep(Duration::from_millis(frame_time)).await;
+        }
+        *GESTURE_DETECTION_RUNNING.lock().await = false;
+    });
 }
 
 pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gamma: Option<f64>) {
@@ -158,15 +208,31 @@ pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gam
 fn adjust_for_perceived_brightness(linear_percent: f64, gamma: f64) -> f64 {
     linear_percent.powf(1.0 / gamma)
 }
-static SLEEP_DETECTOR:LazyLock<Mutex<SleepDetector>>=LazyLock::new(||Mutex::new(SleepDetector::new()));
-static GESTURE_DETECTOR:LazyLock<Mutex<GestureDetector>>=LazyLock::new(||Mutex::new(GestureDetector::new()));
-async fn pose_tick(ctx:&mut AppRunner) {
-    if let Some(posef)=ctx.get_hmd_posef(None,ReferenceSpaceT::STAGE){
-        let pos=posef.position;
-        let quat=posef.orientation;
-        SLEEP_DETECTOR.lock().await.log_pose([pos.x,pos.y,pos.z], [quat.x as f64,quat.y  as f64,quat.z as f64,quat.w as f64]).await;
-        GESTURE_DETECTOR.lock().await.log_pose([pos.x,pos.y,pos.z], [quat.x as f64,quat.y  as f64,quat.z as f64,quat.w as f64]).await;
-    }else {
+static SLEEP_DETECTOR: LazyLock<Mutex<SleepDetector>> =
+    LazyLock::new(|| Mutex::new(SleepDetector::new()));
+static GESTURE_DETECTOR: LazyLock<Mutex<GestureDetector>> =
+    LazyLock::new(|| Mutex::new(GestureDetector::new()));
+async fn pose_tick(ctx: &mut AppRunner) {
+    if let Some(posef) = ctx.get_hmd_posef(None, ReferenceSpaceT::STAGE) {
+        let pos = posef.position;
+        let quat = posef.orientation;
+        SLEEP_DETECTOR
+            .lock()
+            .await
+            .log_pose(
+                [pos.x, pos.y, pos.z],
+                [quat.x as f64, quat.y as f64, quat.z as f64, quat.w as f64],
+            )
+            .await;
+        GESTURE_DETECTOR
+            .lock()
+            .await
+            .log_pose(
+                [pos.x, pos.y, pos.z],
+                [quat.x as f64, quat.y as f64, quat.z as f64, quat.w as f64],
+            )
+            .await;
+    } else {
         info!("[Core] Failed to get hmd Posef")
     }
 }
