@@ -5,10 +5,15 @@ edition = "2024"
 
 [dependencies]
 env_logger = "0.11.8"
-log = { version = "0.4.28", features = ["max_level_debug", "release_max_level_info"] }
-tonic = "0.14.2"
-xr_overlay = { version = "0.1.0", path = "../../xr_overlay/core" }
+log = { version = "0.4.28", features = ["max_level_debug", "release_max_level_error"] }
+tokio = "1.48.0"
+tonic = { version = "0.14.2", default-features = false, features = ["codegen", "transport"] }
+xr_overlay = { version = "0.1.0", path = "../../xr_overlay/core",default-features = false }
 xr_overlay_cef = { version = "0.1.0", path = "../../xr_overlay/cef_app" }
+prost = "0.14"
+tonic-prost = "*"
+[build-dependencies]
+tonic-prost-build = "*"
 [profile.release]
 panic = "abort"   # Strip expensive panic clean-up logic
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
