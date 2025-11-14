@@ -38,6 +38,11 @@ pub async fn vr_get_app_framelimit(app_id: u32) -> Result<Option<OVRFrameLimits>
     #[cfg(unix)]
     Ok(crate::os::linux::mangohud::get_app_framelimit(app_id).await)
 }
+#[tauri::command]
+#[oyasumivr_macros::command_profiling]
+pub async fn vr_sleep_mode_check(value:bool){
+    
+}
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]

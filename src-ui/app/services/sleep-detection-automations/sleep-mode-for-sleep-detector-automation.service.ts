@@ -25,6 +25,7 @@ import { OVRInputEventAction } from '../../models/ovr-input-event';
 import { SleepingPose } from '../../models/sleeping-pose';
 import { TelemetryService } from '../telemetry.service';
 import { getBuiltInNotificationSound } from 'src-ui/app/models/notification-sounds';
+import { invoke } from '@tauri-apps/api/core';
 
 export type SleepDetectorStateReportHandlingResult =
   | 'AUTOMATION_DISABLED'
@@ -104,6 +105,8 @@ export class SleepModeForSleepDetectorAutomationService {
       // Dismiss sleep check for head shake
       await listen<{ gesture: string }>('GESTURE_DETECTED', (event) => {
         if (event.payload.gesture !== 'head_shake') return;
+        invoke("vr_sleep_mode_check",{boolean:false});
+
         this.dismissSleepCheck();
       });
       // Detect controller button presence indication
@@ -202,6 +205,8 @@ export class SleepModeForSleepDetectorAutomationService {
         8000
       );
       if (this.sleepEnableTimeoutId) return 'SLEEP_CHECK_ALREADY_IN_PROGRESS';
+      //notify backend it should check for a head shake
+      await invoke("vr_sleep_mode_check",{boolean:true});
       this.sleepEnableTimeoutId = setTimeout(async () => {
         this.sleepEnableTimeoutId = null;
         this._lastStateReportHandlingResult.next('SLEEP_CHECK_USER_ASLEEP');

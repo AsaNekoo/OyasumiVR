@@ -27,6 +27,7 @@ import { EventLogService } from './event-log.service';
 import { EventLogSleepModeDisabled, EventLogSleepModeEnabled } from '../models/event-log-entry';
 import { AppSettingsService } from './app-settings.service';
 import { listen } from '@tauri-apps/api/event';
+import { invoke } from '@tauri-apps/api/core';
 
 @Injectable({
   providedIn: 'root',
@@ -108,6 +109,7 @@ export class SleepService {
   }
 
   async enableSleepMode(reason: SleepModeStatusChangeReason) {
+    invoke("vr_sleep_mode_check",{boolean:false});
     if (this._mode.value) return;
     reason.enabled = true;
     info(`[Sleep] Sleep mode enabled (reason=${reason.type})`);
