@@ -121,6 +121,10 @@ impl SidecarManager {
         let exe_file = self.exe_file.clone();
         let exe_dir = self.exe_dir.clone();
         let exe_path = std::path::Path::new(&exe_dir).join(&exe_file);
+        if !exe_path.is_file(){
+            error!("[Core] {} sidecar not found",self.sidecar_id);
+            return 0;
+        }
         let mut args = vec![
             format!("{core_grpc_port}"),
             format!("{}", std::process::id()),
