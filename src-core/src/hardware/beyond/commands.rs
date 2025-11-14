@@ -12,6 +12,7 @@ pub async fn bigscreen_beyond_is_connected() -> bool {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn bigscreen_beyond_get_saved_preferences() -> Result<Option<String>, String> {
+    {
     let steamdir = match SteamDir::locate() {
         Ok(dir) => dir,
         Err(e) => {
@@ -55,6 +56,7 @@ pub async fn bigscreen_beyond_get_saved_preferences() -> Result<Option<String>, 
             Err("READ_ERROR".to_string())
         }
     }
+}
 }
 
 #[tauri::command]

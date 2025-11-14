@@ -252,6 +252,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     // Initialize utility module
     utils::init();
     // Initialize Steam module
+    #[cfg(feature="steam")]
     steam::init().await;
     // Initialize HTTP server
     http::init().await;
