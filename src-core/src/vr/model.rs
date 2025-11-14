@@ -83,7 +83,7 @@ pub struct BindingOriginData {
     pub slot_name: String,
     pub input_source_type: String,
 }
-#[derive(Serialize, Clone,Display,PartialEq,Copy)]
+#[derive(Serialize, Clone,Display)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum VRStatus {
     Inactive,

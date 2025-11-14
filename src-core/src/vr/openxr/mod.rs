@@ -8,7 +8,7 @@ use std::{
 use log::{debug, error, info};
 use tokio::{sync::Mutex, task::spawn_blocking};
 use xr_overlay::{
-    openxr::{sys::pfn::PollEvent, Vector3f},
+    openxr::Vector3f,
     runner::{events::AppEvent, AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle},
     xr::ReferenceSpaceT,
     RgbaTexture,
@@ -69,35 +69,18 @@ pub async fn init() {
             .unwrap();
         OXR_HANDLE.set(Mutex::new(runner)).unwrap();
         tokio::task::spawn(async {
+            let time_frame=(1000./OXR_HANDLE.get().unwrap().lock().await.current_refresh_rate()) as u64;
             loop {
-                if *OXR_STATE.lock().await == VRStatus::Initialized {
-                    tokio::time::sleep(Duration::from_secs(30)).await;
-                }
-
                 match OXR_HANDLE.get().unwrap().lock().await.run() {
                     xr_overlay::runner::PollResult::Success => continue,
                     xr_overlay::runner::PollResult::UserNotPresent => {
                         tokio::time::sleep(Duration::from_secs(1)).await
                     }
-                    xr_overlay::runner::PollResult::Exit => {
-                        tokio::time::sleep(Duration::from_secs(30)).await;
-                        continue;
-                    }
+                    xr_overlay::runner::PollResult::Exit => break,
                     xr_overlay::runner::PollResult::Starting => {
                         tokio::time::sleep(Duration::from_millis(100)).await
                     }
-                    xr_overlay::runner::PollResult::SuccessNoRender => {
-                        tokio::time::sleep(Duration::from_millis(
-                            (1000.
-                                / OXR_HANDLE
-                                    .get()
-                                    .unwrap()
-                                    .lock()
-                                    .await
-                                    .current_refresh_rate()) as u64,
-                        ))
-                        .await
-                    }
+                    xr_overlay::runner::PollResult::SuccessNoRender => tokio::time::sleep(Duration::from_millis(time_frame)).await,
                 }
             }
         });
@@ -121,18 +104,13 @@ pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gam
     if OXR_HANDLE.get().is_none() {
         return;
     }
-    if *OXR_STATE.lock().await == VRStatus::Inactive {
-        return ;
-    }
-    let mut ctx = OXR_HANDLE.wait().lock().await;
-
     let mut brightness = brightness.clamp(0.0, 1.0);
     // Adjust the brightness value for perceived brightness
     if let Some(gamma) = perceived_brightness_adjustment_gamma {
         brightness = adjust_for_perceived_brightness(brightness, gamma);
     }
     let brightness = ((1. - brightness) * 255.) as u8;
-
+    let mut ctx = OXR_HANDLE.wait().lock().await;
     let overlay_handle = OXR_BRIGHTNES_OVERLAY_HANDLE.wait().lock().await;
 
     ctx.set_raw_texture(
@@ -140,9 +118,6 @@ pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gam
         // RgbaTexture::new(1, 1, [brightness, 0, 0, 255].to_vec()),
         RgbaTexture::new(1, 1, [0, 0, 0, brightness].to_vec()),
     );
-    if let xr_overlay::runner::PollResult::Exit = ctx.run() {
-        *OXR_STATE.lock().await = VRStatus::Inactive
-    }
 }
 
 fn adjust_for_perceived_brightness(linear_percent: f64, gamma: f64) -> f64 {
