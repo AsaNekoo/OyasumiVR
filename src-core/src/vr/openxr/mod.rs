@@ -66,13 +66,6 @@ pub async fn init() {
             .unwrap();
         OXR_HANDLE.set(Mutex::new(runner)).unwrap();
         tokio::task::spawn(async {
-            let time_frame = (1000.
-                / OXR_HANDLE
-                    .get()
-                    .unwrap()
-                    .lock()
-                    .await
-                    .current_refresh_rate()) as u64;
             loop {
                 let mut xr_ctx=OXR_HANDLE.get().unwrap().lock().await;
                 match xr_ctx.run() {
@@ -91,11 +84,29 @@ pub async fn init() {
                         continue;
                     }
                     xr_overlay::runner::PollResult::SuccessNoRender => {
-                        tokio::time::sleep(Duration::from_millis(time_frame)).await
+                        tokio::time::sleep(Duration::from_secs(60)).await
                     }
                 }
-                openxr_tick(&mut xr_ctx).await;
+                
             }
+        });
+         let frane_time = (1000.
+                / OXR_HANDLE
+                    .get()
+                    .unwrap()
+                    .lock()
+                    .await
+                    .current_refresh_rate()) as u64;
+        tokio::task::spawn(async move{
+            loop {
+                if *OXR_STATE.lock().await==VRStatus::Initialized{
+                pose_tick(&mut *OXR_HANDLE.get().unwrap().lock().await).await;
+                tokio::time::sleep(Duration::from_millis(frane_time)).await;
+                }else {
+                    tokio::time::sleep(Duration::from_secs(10)).await;
+                }
+            }
+
         });
         debug!("[Init] openxr start (2)");
     });
@@ -141,6 +152,7 @@ pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gam
         // RgbaTexture::new(1, 1, [brightness, 0, 0, 255].to_vec()),
         RgbaTexture::new(1, 1, [0, 0, 0, brightness].to_vec()),
     );
+    let _ = OXR_HANDLE.get().unwrap().lock().await.run();
 }
 
 fn adjust_for_perceived_brightness(linear_percent: f64, gamma: f64) -> f64 {
@@ -148,7 +160,7 @@ fn adjust_for_perceived_brightness(linear_percent: f64, gamma: f64) -> f64 {
 }
 static SLEEP_DETECTOR:LazyLock<Mutex<SleepDetector>>=LazyLock::new(||Mutex::new(SleepDetector::new()));
 static GESTURE_DETECTOR:LazyLock<Mutex<GestureDetector>>=LazyLock::new(||Mutex::new(GestureDetector::new()));
-async fn openxr_tick(ctx:&mut AppRunner) {
+async fn pose_tick(ctx:&mut AppRunner) {
     if let Some(posef)=ctx.get_hmd_posef(None,ReferenceSpaceT::STAGE){
         let pos=posef.position;
         let quat=posef.orientation;
