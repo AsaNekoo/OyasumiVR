@@ -2,7 +2,7 @@
   "source": "builtin",
   "applications": [
     {
-      "app_key": "steam.overlay.2538150-DEV",
+      "app_key": "steam.overlay.2538150-STANDALONE",
       "launch_type": "binary",
       "binary_path_windows": "..\\OyasumiVR.exe",
       "action_manifest_path": ".\\input\\action_manifest.json",

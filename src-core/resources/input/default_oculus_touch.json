@@ -7,7 +7,7 @@
   "options": {},
   "category": "steamvr_input",
   "alias_info": {},
-  "app_key": "steam.overlay.2538150-DEV",
+  "app_key": "steam.overlay.2538150-STANDALONE",
   "bindings": {
     "/actions/main": {
       "sources": [

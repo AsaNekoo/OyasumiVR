@@ -69,6 +69,7 @@ pub async fn init() {
             .unwrap();
         OXR_HANDLE.set(Mutex::new(runner)).unwrap();
         tokio::task::spawn(async {
+            let time_frame=(1000./OXR_HANDLE.get().unwrap().lock().await.current_refresh_rate()) as u64;
             loop {
                 match OXR_HANDLE.get().unwrap().lock().await.run() {
                     xr_overlay::runner::PollResult::Success => continue,
@@ -79,6 +80,7 @@ pub async fn init() {
                     xr_overlay::runner::PollResult::Starting => {
                         tokio::time::sleep(Duration::from_millis(100)).await
                     }
+                    xr_overlay::runner::PollResult::SuccessNoRender => tokio::time::sleep(Duration::from_millis(time_frame)).await,
                 }
             }
         });

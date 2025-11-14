@@ -8,4 +8,4 @@ pub enum BuildFlavour {
     SteamCn,
 }
 
-pub const BUILD_FLAVOUR: BuildFlavour = BuildFlavour::Dev;
+pub const BUILD_FLAVOUR: BuildFlavour = BuildFlavour::Standalone;
