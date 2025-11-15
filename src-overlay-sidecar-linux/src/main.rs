@@ -1,40 +1,20 @@
-use std::{
-    net::SocketAddr,
-    sync::{Arc, LazyLock, Mutex, OnceLock, RwLock},
-    thread::JoinHandle,
-    time::Duration,
-};
+use std::sync::{LazyLock, Mutex, OnceLock};
 
 use argh::FromArgs;
 use log::{error, info};
 use tokio::join;
-use tonic::{Request, transport::Server};
-use xr_overlay::{
-    input::{InputHandler, InputHandlerCreateInfo, InputSettings},
-    openxr::Vector3f,
-    runner::{
-        AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, ShowMode, events::AppEvent,
-    },
-};
-use xr_overlay_cef::{
-    CefOverlayCreateInfo,
-    cef::{Browser, ImplBrowser, ImplFrame},
-    create_cef_overlay, pointless_cef_thread_spawner,
-};
+use xr_overlay_cef::
+    pointless_cef_thread_spawner
+;
 
 use crate::{
     core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
-    globals::{CORE_GRPC_DEV_PORT, CORE_MODE, CoreMode, OVERLAY_SIDECAR_GRPC_WEB_DEV_PORT},
-    grpc::{GrpcServer, start_grpc_server, start_grpc_web_server},
-    input::get_controller_create_info,
-    overlay_grpc::{
-        oyasumi_overlay_sidecar_client::OyasumiOverlaySidecarClient,
-        oyasumi_overlay_sidecar_server::OyasumiOverlaySidecarServer,
-    },
+    grpc::{start_grpc_server, start_grpc_web_server}, vr::start_vr,
 };
 pub mod globals;
 pub mod grpc;
 pub mod input;
+pub mod vr;
 pub mod core_grpc {
     tonic::include_proto!("oyasumi_core");
 }
@@ -49,107 +29,9 @@ pub struct StartArgs {
     no_vr: bool,
 }
 static CMD_ARGS: OnceLock<StartArgs> = OnceLock::new();
-static OVERLAY_BROWSER: OnceLock<Browser> = OnceLock::new();
-static mut KILL_VR: bool = false;
-fn kill_vr() {
-    unsafe { KILL_VR = true };
-}
-fn vr() -> JoinHandle<()> {
-    let ctx = loop {
-        match xr_overlay::xr::Init::default()
-            .enable_drm_support()
-            .user_presence_support(false)
-            .sort_order(4089)
-            .with_app_name("Oyasumi VR Overlay")
-            .init_overlay()
-        {
-            Ok(v) => break v,
-            Err(_) => {
-                std::thread::sleep(Duration::from_secs(1));
-            }
-        };
-    };
-    let input_handler = InputHandler::new(InputHandlerCreateInfo {
-        ctx: ctx.clone(),
-        setting: InputSettings {
-            oculus_touch: true,
-            valve_index: true,
-            hand_tracking: true,
-            palm_pose: false,
-        },
-        actionset_name: None,
-        tracked_actions: None,
-    })
-    .unwrap();
-    let app = AppRunner::new(AppRunnerCreateInfo {
-        ctx,
-        space_type: xr_overlay::xr::ReferenceSpaceT::VIEW,
-        callback: openxr_callback,
-        input: Some(AppRunnerCreateInfoInput {
-            input_handler,
-            l_pointer_color: [1., 1., 1., 0.2],
-            r_pointer_color: [1., 1., 1., 0.],
-            controllers: get_controller_create_info(),
-            draw_pointers_only_when_hit: true,
-            overlay_move_speed: 0.01,
-        }),
-    });
-    let app = Arc::new(RwLock::new(app));
-    let pos = Vector3f {
-        x: -0.0,
-        y: -0.0,
-        z: -1.2,
-    };
-    let framerate = app.read().unwrap().current_refresh_rate() as u32;
-    let overlay = create_cef_overlay(
-        app.clone(),
-        CefOverlayCreateInfo {
-            size: [0.6, 0.6],
-            visibility_switch_actions: None,
-            spawn_visible: true,
-            interactable: true,
-            movable: true,
-            allow_visibility_switch: false,
-            pos,
-            framerate,
-            resolution: [1024, 1024],
-            show_mode: ShowMode::CamerPos((pos, true)),
-            ..Default::default()
-        },
-    );
-    overlay
-        .browser
-        .main_frame()
-        .unwrap()
-        .load_url(Some(&"http://localhost:5173/dashboard".into()));
-    assert!(OVERLAY_BROWSER.set(overlay.browser.clone()).is_ok());
-    let overlay_thread = std::thread::spawn(move || {
-        let frame_time = (1000. / app.write().unwrap().current_refresh_rate()) as u64;
-        loop {
-            if unsafe { KILL_VR } {
-                app.write().unwrap().request_end_session();
-            }
-            match app.write().unwrap().run() {
-                xr_overlay::runner::PollResult::Success => {
-                    std::thread::sleep(Duration::from_millis(frame_time))
-                }
-                xr_overlay::runner::PollResult::SuccessNoRender => {
-                    std::thread::sleep(Duration::from_millis(frame_time * 3))
-                }
-                xr_overlay::runner::PollResult::UserNotPresent => {
-                    std::thread::sleep(Duration::from_secs(1))
-                }
-                xr_overlay::runner::PollResult::Starting => (),
-                xr_overlay::runner::PollResult::Exit => {
-                    //no session resuming bc google's trash doesn't support restarting after calling shutdown
-                    unsafe { xr_overlay_cef::shutdown() };
-                    break;
-                }
-            }
-        }
-    });
-    overlay_thread
-}
+
+
+
 fn main() {
     pointless_cef_thread_spawner();
     CMD_ARGS.set(argh::from_env()).unwrap();
@@ -157,7 +39,7 @@ fn main() {
         .filter_level(log::LevelFilter::Trace)
         .init();
     let vr_thread = if !CMD_ARGS.get().unwrap().no_vr {
-        Some(vr())
+        Some(start_vr())
     } else {
         None
     };
@@ -187,7 +69,7 @@ fn main() {
 }
 static HANDLES: LazyLock<Mutex<Vec<tokio::task::JoinHandle<()>>>> =
     LazyLock::new(|| Mutex::default());
-fn openxr_callback(event: AppEvent) {}
+
 async fn tokio_main() {
     let mut core_client =
         OyasumiCoreClient::connect(format!("http://127.0.0.1:{}", globals::CORE_GRPC_DEV_PORT))
