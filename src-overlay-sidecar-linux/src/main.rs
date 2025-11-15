@@ -1,20 +1,22 @@
-use std::sync::{LazyLock, Mutex, OnceLock};
+use std::{sync::{LazyLock, Mutex, OnceLock}, time::Duration};
 
 use argh::FromArgs;
 use log::{error, info};
 use tokio::join;
-use xr_overlay_cef::
-    pointless_cef_thread_spawner
+use xr_overlay_cef::{cef::{ImplBrowser, ImplFrame}, 
+    pointless_cef_thread_spawner}
 ;
 
 use crate::{
     core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
-    grpc::{start_grpc_server, start_grpc_web_server}, vr::start_vr,
+    grpc::{start_grpc_server, start_grpc_web_server}, vr::{OVERLAY_BROWSER, start_vr},
 };
 pub mod globals;
 pub mod grpc;
 pub mod input;
 pub mod vr;
+pub mod model;
+pub mod overlay_ipc;
 pub mod core_grpc {
     tonic::include_proto!("oyasumi_core");
 }
@@ -87,5 +89,11 @@ async fn tokio_main() {
         })
         .await
         .unwrap();
+    loop {
+        OVERLAY_BROWSER.get().unwrap().main_frame().unwrap().execute_java_script(Some(&"window.OyasumiIPCIn.hideDashboard();".into()), None, 0);
+        tokio::time::sleep(Duration::from_millis(500)).await;
+        OVERLAY_BROWSER.get().unwrap().main_frame().unwrap().execute_java_script(Some(&"window.OyasumiIPCIn.showDashboard();".into()), None, 0);
+        tokio::time::sleep(Duration::from_millis(500)).await;
+    }
     // let res=overlya_client.sync_state(request)
 }
