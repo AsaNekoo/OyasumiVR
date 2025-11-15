@@ -23,7 +23,7 @@ use xr_overlay_cef::{
 
 use crate::{
     core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
-    globals::{CORE_MODE, CoreMode},
+    globals::{CORE_GRPC_DEV_PORT, CORE_MODE, CoreMode, OVERLAY_SIDECAR_GRPC_WEB_DEV_PORT},
     grpc::GrpcServer,
     input::get_controller_create_info,
     overlay_grpc::{
@@ -206,7 +206,7 @@ async fn tokio_main() {
     info!("got http port:{:?}", http_port);
     let grpc_server_port = init_server().await;
     info!("server running on 127.0.0.1:{}", grpc_server_port);
-    core_client.on_overlay_sidecar_start(OverlaySidecarStartArgs{ pid: std::process::id(), grpc_port: grpc_server_port as u32, grpc_web_port: 0 }).await.unwrap();
+    core_client.on_overlay_sidecar_start(OverlaySidecarStartArgs{ pid: std::process::id(), grpc_port: grpc_server_port as u32, grpc_web_port: OVERLAY_SIDECAR_GRPC_WEB_DEV_PORT as u32 }).await.unwrap();
     tokio::time::sleep(Duration::from_secs(100000)).await;
     // let res=overlya_client.sync_state(request)
     
