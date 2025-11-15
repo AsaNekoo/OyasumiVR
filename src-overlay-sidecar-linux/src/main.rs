@@ -154,7 +154,7 @@ fn main() {
     pointless_cef_thread_spawner();
     CMD_ARGS.set(argh::from_env()).unwrap();
     env_logger::Builder::from_default_env()
-        .filter_level(log::LevelFilter::Info)
+        .filter_level(log::LevelFilter::Trace)
         .init();
     let vr_thread = if !CMD_ARGS.get().unwrap().no_vr {
         Some(vr())

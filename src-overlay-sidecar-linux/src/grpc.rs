@@ -7,7 +7,7 @@ use tower_http::cors::{AllowHeaders, AllowOrigin};
 
 use crate::{
     HANDLES,
-    globals::{CORE_MODE, CoreMode},
+    globals::{CORE_MODE, CoreMode, STATE},
     overlay_grpc::{
         self, AddNotificationRequest, AddNotificationResponse, ClearNotificationRequest, Empty,
         OverlayMenuOpenRequest, OyasumiSidecarState, SetDebugTranslationsRequest,
@@ -19,134 +19,61 @@ use crate::{
 pub struct GrpcServer {}
 #[tonic::async_trait]
 impl OyasumiOverlaySidecar for GrpcServer {
-    fn add_notification<'life0, 'async_trait>(
-        &'async_trait self,
+    async fn add_notification(
+        &self,
         request: tonic::Request<AddNotificationRequest>,
-    ) -> ::core::pin::Pin<
-        Box<
-            dyn ::core::future::Future<
-                    Output = std::result::Result<
-                        tonic::Response<AddNotificationResponse>,
-                        tonic::Status,
-                    >,
-                > + ::core::marker::Send,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-    {
+    ) ->Result<tonic::Response<AddNotificationResponse>, tonic::Status> {
         todo!()
     }
 
-    fn clear_notification<'life0, 'async_trait>(
-        &'life0 self,
+    async fn clear_notification(
+        &self,
         request: tonic::Request<ClearNotificationRequest>,
-    ) -> ::core::pin::Pin<
-        Box<
-            dyn ::core::future::Future<
-                    Output = std::result::Result<tonic::Response<Empty>, tonic::Status>,
-                > + ::core::marker::Send,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-    {
+    ) ->Result<tonic::Response<Empty>, tonic::Status>{
         todo!()
     }
 
-    fn sync_state<'life0, 'async_trait>(
-        &'life0 self,
+    async fn sync_state(
+        &self,
         request: tonic::Request<OyasumiSidecarState>,
-    ) -> ::core::pin::Pin<
-        Box<
-            dyn ::core::future::Future<
-                    Output = std::result::Result<tonic::Response<Empty>, tonic::Status>,
-                > + ::core::marker::Send,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-    {
-        todo!()
+    ) -> Result<tonic::Response<Empty>, tonic::Status> {
+        log::trace!("sync_state:{:?}",request);
+       STATE.lock().await.replace(request.into_inner());
+       Ok(Empty::default().into())
     }
 
-    fn set_debug_translations<'life0, 'async_trait>(
-        &'life0 self,
+    async fn set_debug_translations(
+        &self,
         request: tonic::Request<SetDebugTranslationsRequest>,
-    ) -> ::core::pin::Pin<
-        Box<
-            dyn ::core::future::Future<
-                    Output = std::result::Result<tonic::Response<Empty>, tonic::Status>,
-                > + ::core::marker::Send,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-    {
+    ) ->Result<tonic::Response<Empty>, tonic::Status>{
         todo!()
     }
 
-    fn open_overlay_menu<'life0, 'async_trait>(
-        &'life0 self,
+    async fn open_overlay_menu(
+        &self,
         request: tonic::Request<OverlayMenuOpenRequest>,
-    ) -> ::core::pin::Pin<
-        Box<
-            dyn ::core::future::Future<
-                    Output = std::result::Result<tonic::Response<Empty>, tonic::Status>,
-                > + ::core::marker::Send,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-    {
+    ) ->Result<tonic::Response<Empty>, tonic::Status>{
         todo!()
     }
 
-    fn close_overlay_menu<'life0, 'async_trait>(
-        &'life0 self,
+    async fn close_overlay_menu(
+        &self,
         request: tonic::Request<Empty>,
-    ) -> ::core::pin::Pin<
-        Box<
-            dyn ::core::future::Future<
-                    Output = std::result::Result<tonic::Response<Empty>, tonic::Status>,
-                > + ::core::marker::Send,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-    {
+    ) -> Result<tonic::Response<Empty>, tonic::Status>{
         todo!()
     }
 
-    fn toggle_overlay_menu<'life0, 'async_trait>(
-        &'life0 self,
+    async fn toggle_overlay_menu(
+        &self,
         request: tonic::Request<OverlayMenuOpenRequest>,
-    ) -> ::core::pin::Pin<
-        Box<
-            dyn ::core::future::Future<
-                    Output = std::result::Result<tonic::Response<Empty>, tonic::Status>,
-                > + ::core::marker::Send,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-    {
+    ) ->Result<tonic::Response<Empty>, tonic::Status> {
         todo!()
     }
 
-    fn set_microphone_active<'life0, 'async_trait>(
-        &'life0 self,
+    async fn set_microphone_active(
+        &self,
         request: tonic::Request<SetMicrophoneActiveRequest>,
-    ) -> ::core::pin::Pin<
-        Box<
-            dyn ::core::future::Future<
-                    Output = std::result::Result<tonic::Response<Empty>, tonic::Status>,
-                > + ::core::marker::Send,
-        >,
-    >
-    where
-        'life0: 'async_trait,
-    {
+    ) ->Result<tonic::Response<Empty>, tonic::Status> {
         todo!()
     }
 }
@@ -178,7 +105,12 @@ pub async fn start_grpc_web_server() -> u16 {
     let addr: SocketAddr = format!("127.0.0.1:{}", port).parse().unwrap();
     info!("Starting gRPC web server on {}", addr);
     let server = Server::builder()
-        .accept_http1(true).layer(tower_http::cors::CorsLayer::new().allow_origin(AllowOrigin::any()).allow_headers(AllowHeaders::any()))
+        .accept_http1(true)
+        .layer(
+            tower_http::cors::CorsLayer::new()
+                .allow_origin(AllowOrigin::any())
+                .allow_headers(AllowHeaders::any()),
+        )
         .layer(GrpcWebLayer::new())
         .add_service(OyasumiOverlaySidecarServer::new(GrpcServer::default()))
         .serve(addr);
