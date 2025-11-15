@@ -14,6 +14,8 @@ prost = "0.14"
 tonic-prost = "*"
 argh = { version = "0.1.13", default-features = false }
 tonic-web = "0.14.2"
+tokio-stream = "0.1.17"
+tower-http = { version = "0.6.6", features = ["cors"] }
 [build-dependencies]
 tonic-prost-build = "*"
 [profile.release]

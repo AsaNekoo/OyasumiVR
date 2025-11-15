@@ -7,6 +7,7 @@ use std::{
 
 use argh::FromArgs;
 use log::{error, info};
+use tokio::join;
 use tonic::{Request, transport::Server};
 use xr_overlay::{
     input::{InputHandler, InputHandlerCreateInfo, InputSettings},
@@ -24,7 +25,7 @@ use xr_overlay_cef::{
 use crate::{
     core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
     globals::{CORE_GRPC_DEV_PORT, CORE_MODE, CoreMode, OVERLAY_SIDECAR_GRPC_WEB_DEV_PORT},
-    grpc::GrpcServer,
+    grpc::{GrpcServer, start_grpc_server, start_grpc_web_server},
     input::get_controller_create_info,
     overlay_grpc::{
         oyasumi_overlay_sidecar_client::OyasumiOverlaySidecarClient,
@@ -166,7 +167,17 @@ fn main() {
             .build()
             .unwrap();
         runtime.block_on(tokio_main());
-      
+        loop {
+            let handle = {
+                let mut g = HANDLES.lock().unwrap();
+                let l = g.len();
+                if l == 0 {
+                    break;
+                }
+                g.swap_remove(l - 1)
+            };
+            runtime.block_on(async move { join!(handle).0.unwrap() });
+        }
     });
 
     runtime_thread.join().unwrap();
@@ -177,26 +188,6 @@ fn main() {
 static HANDLES: LazyLock<Mutex<Vec<tokio::task::JoinHandle<()>>>> =
     LazyLock::new(|| Mutex::default());
 fn openxr_callback(event: AppEvent) {}
-pub async fn init_server() -> u16 {
-    let port: u16 = match CORE_MODE {
-        CoreMode::Dev => crate::globals::OVERLAY_SIDECAR_GRPC_DEV_PORT,
-        CoreMode::Release => 0,
-    };
-    let addr: SocketAddr = format!("127.0.0.1:{}", port).parse().unwrap();
-    info!("Starting gRPC server on {}", addr);
-
-    let server = Server::builder()
-        .add_service(OyasumiOverlaySidecarServer::new(GrpcServer::default()))
-        .serve(addr);
-    HANDLES.lock().unwrap().push(tokio::task::spawn(async move {
-        {
-            if let Err(err) = server.await {
-                error!("Failed to start gRPC server: {}", err);
-            }
-        }
-    }));
-    addr.port()
-}
 async fn tokio_main() {
     let mut core_client =
         OyasumiCoreClient::connect(format!("http://127.0.0.1:{}", globals::CORE_GRPC_DEV_PORT))
@@ -204,10 +195,15 @@ async fn tokio_main() {
             .unwrap();
     let http_port = core_client.get_http_server_port(Empty {}).await.unwrap();
     info!("got http port:{:?}", http_port);
-    let grpc_server_port = init_server().await;
-    info!("server running on 127.0.0.1:{}", grpc_server_port);
-    core_client.on_overlay_sidecar_start(OverlaySidecarStartArgs{ pid: std::process::id(), grpc_port: grpc_server_port as u32, grpc_web_port: OVERLAY_SIDECAR_GRPC_WEB_DEV_PORT as u32 }).await.unwrap();
-    tokio::time::sleep(Duration::from_secs(100000)).await;
+    let grpc_server_port = start_grpc_server().await;
+    let grpc_web_server_pos=start_grpc_web_server().await;
+    core_client
+        .on_overlay_sidecar_start(OverlaySidecarStartArgs {
+            pid: std::process::id(),
+            grpc_port: grpc_server_port as u32,
+            grpc_web_port: grpc_web_server_pos as u32,
+        })
+        .await
+        .unwrap();
     // let res=overlya_client.sync_state(request)
-    
 }
