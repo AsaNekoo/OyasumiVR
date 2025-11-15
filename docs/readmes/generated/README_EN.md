@@ -609,6 +609,8 @@ OyasumiVR's has been built with:
 - [Angular](https://angular.io/) (TypeScript, Main UI)
 - [Tauri](https://tauri.app/) (Rust, Desktop Framework)
 - [SvelteKit](https://kit.svelte.dev/) (TypeScript, Overlay UI)
+
+windows:
 - [.NET](https://dotnet.microsoft.com/en-us/) (C#, Overlay)
 
 ## Development
@@ -646,3 +648,5 @@ Alternatively, you can reach out to me directly on [Twitter at @Raphiiko](https:
 
 OyasumiVR is available under the [MIT](https://github.com/Raphiiko/OyasumiVR/blob/develop/LICENSE.md) license.
 
+
+Linux specific code is partially [AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html)
