@@ -23,7 +23,8 @@ impl OyasumiOverlaySidecar for GrpcServer {
         &self,
         request: tonic::Request<AddNotificationRequest>,
     ) ->Result<tonic::Response<AddNotificationResponse>, tonic::Status> {
-        todo!()
+        //core calls this to spawn notification overlay
+        Ok(AddNotificationResponse{ notification_id: None }.into())
     }
 
     async fn clear_notification(
@@ -38,7 +39,9 @@ impl OyasumiOverlaySidecar for GrpcServer {
         request: tonic::Request<OyasumiSidecarState>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
         log::trace!("got new state from core:{:?}",request);
-       STATE.lock().await.replace(request.into_inner());
+        let req=request.into_inner();
+       STATE.lock().await.replace(req.clone());
+       OVERLAY.wait().set_state(req);
        Ok(Empty::default().into())
     }
 

@@ -47,9 +47,15 @@ const OyasumiOverlayIPCOut = {
   sendEventJson: async function (eventName: string, data: string): Promise<void> {
     rpc(FuntionCalls.sendEventJson, { eventName: eventName, data: data });
   },
-  // sendEvent:async function(eventName:string,data: string | boolean | number):Promise<void>{
-  //     rpc(FuntionCalls.sendEvent,{eventName:eventName,data:data})
-  // },
+  sendEvent:async function(eventName:string,data: string | boolean | number):Promise<void>{
+        if (typeof data === "boolean"){
+            this.sendEventBool(eventName,data);
+        }else  if (typeof data === "string"){
+            this.sendEventString(eventName,data);
+        }else  if (typeof data === "number"){
+            this.sendEventInt(eventName,data);
+        }
+  },
 
   addNotification: async function (message: string, duration: number): Promise<string | null> {
     return rpc_ret(FuntionCalls.addNotification, { message: message, duration: duration });
@@ -81,7 +87,7 @@ ws.onmessage = (event) => {
   const resolver = pending.get(data.seq);
   if (resolver) {
     resolver(data);
-    pending.delete(data.id);
+    pending.delete(data.seq);
   }
 };
 

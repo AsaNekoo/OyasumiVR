@@ -4,15 +4,16 @@ use std::{
 };
 
 use argh::FromArgs;
-use log::{error, info};
+use log::{error, info, trace};
 use tokio::join;
+use tonic::transport::Channel;
 use xr_overlay_cef::{
     cef::{ImplBrowser, ImplFrame},
     disable_vr, pointless_cef_thread_spawner,
 };
 
 use crate::{
-    core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient}, globals::STATE, grpc::{start_grpc_server, start_grpc_web_server}, overlay_grpc::OyasumiSidecarState, overlay_ipc::start_websocket_server, vr::{OVERLAY, start_vr}
+    core_grpc::{Empty, EventParams, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient}, globals::STATE, grpc::{start_grpc_server, start_grpc_web_server}, overlay_grpc::OyasumiSidecarState, overlay_ipc::start_websocket_server, vr::{OVERLAY, start_vr}
 };
 pub mod globals;
 pub mod grpc;
@@ -71,11 +72,13 @@ fn main() {
 static HANDLES: LazyLock<Mutex<Vec<tokio::task::JoinHandle<()>>>> =
     LazyLock::new(|| Mutex::default());
 
+static CORE_CLIENT:OnceLock<tokio::sync::Mutex<OyasumiCoreClient<Channel>>>=OnceLock::new();
 async fn tokio_main() {
     let mut core_client =
         OyasumiCoreClient::connect(format!("http://127.0.0.1:{}", globals::CORE_GRPC_DEV_PORT))
             .await
             .unwrap();
+    CORE_CLIENT.set(core_client.clone().into()).unwrap();
     let http_port = core_client.get_http_server_port(Empty {}).await.unwrap();
     info!("got http port:{:?}", http_port);
     let grpc_server_port = start_grpc_server().await;
@@ -89,18 +92,19 @@ async fn tokio_main() {
         .await
         .unwrap();
     let ws_port = start_websocket_server().await;
+    trace!("inject");
     OVERLAY.wait().inject_ipc(ws_port);
     tokio::time::sleep(Duration::from_secs(1)).await;
     loop {
-        let mut state=STATE.lock().await.as_ref().unwrap().clone();
-        state.sleep_mode=true;
-        OVERLAY.wait().set_state(state.clone());
-        // OVERLAY.wait().hide_dashboard();
-        tokio::time::sleep(Duration::from_millis(2000)).await;
-        // OVERLAY.wait().show_dashboard();
-        tokio::time::sleep(Duration::from_millis(2000)).await;
-        // state.sleep_mode=true;
-       OVERLAY.wait().set_state(state);
+    //     let mut state=STATE.lock().await.as_ref().unwrap().clone();
+    //     state.sleep_mode=true;
+    //     OVERLAY.wait().set_state(state.clone());
+    //     // OVERLAY.wait().hide_dashboard();
+    //     tokio::time::sleep(Duration::from_millis(2000)).await;
+    //     // OVERLAY.wait().show_dashboard();
+    //     tokio::time::sleep(Duration::from_millis(2000)).await;
+    //     // state.sleep_mode=true;
+    //    OVERLAY.wait().set_state(state);
     }
     // let res=overlya_client.sync_state(request)
 }
