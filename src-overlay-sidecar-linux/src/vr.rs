@@ -4,6 +4,7 @@ use std::{
     time::Duration,
 };
 
+use log::trace;
 use xr_overlay::{
     input::{InputHandler, InputHandlerCreateInfo, InputSettings},
     openxr::Vector3f,
@@ -92,8 +93,16 @@ pub fn start_vr() -> JoinHandle<()> {
         .main_frame()
         .unwrap()
         .load_url(Some(&"http://localhost:5173/dashboard".into()));
-    debug_assert!(OVERLAY.set(Overlay { browser: overlay.browser.clone(), xr_handle: overlay.overlay_handle }).is_ok());
-    let overlay_thread = std::thread::spawn(move || {
+    debug_assert!(
+        OVERLAY
+            .set(Overlay {
+                browser: overlay.browser.clone(),
+                xr_handle: overlay.overlay_handle
+            })
+            .is_ok()
+    );
+
+    std::thread::spawn(move || {
         let frame_time = (1000. / app.write().unwrap().current_refresh_rate()) as u64;
         loop {
             if unsafe { KILL_VR } {
@@ -117,7 +126,8 @@ pub fn start_vr() -> JoinHandle<()> {
                 }
             }
         }
-    });
-    overlay_thread
+    })
 }
-fn openxr_callback(event: AppEvent) {}
+fn openxr_callback(event: AppEvent) {
+    trace!("[openxr] {:?}", event);
+}

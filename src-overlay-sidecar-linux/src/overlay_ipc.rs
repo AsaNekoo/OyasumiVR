@@ -1,17 +1,10 @@
-use std::{mem::ManuallyDrop, sync::OnceLock, time::Duration};
+use std::time::Duration;
 
-use base64::{
-    Engine,
-    alphabet::URL_SAFE,
-    prelude::{BASE64_STANDARD, BASE64_STANDARD_NO_PAD, BASE64_URL_SAFE_NO_PAD},
-};
+use base64::{Engine, prelude::BASE64_STANDARD};
 use futures_util::{SinkExt, StreamExt};
 use log::{debug, error, info, trace};
 use prost::Message;
-use rand::{
-    distr::{Alphabetic, SampleString},
-    rand_core::le,
-};
+use rand::distr::{Alphabetic, SampleString};
 use serde::{Deserialize, Serialize};
 use tokio::net::TcpListener;
 use xr_overlay_cef::cef::{ImplBrowser, ImplFrame};
@@ -31,7 +24,7 @@ fn get_ipc_script(port: u16) -> String {
     let mut out = String::with_capacity(IPC_SCRIPT.len() + 20);
     out.push_str(f.next().unwrap());
     out.push_str(&format!("localhost:{}", port));
-    out.push_str(&f.next().unwrap());
+    out.push_str(f.next().unwrap());
     out
 }
 //OyasumiOverlayIPCIn
@@ -212,7 +205,9 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
                             .send_event(EventParams {
                                 event_name: args.event_name,
                                 event_data: Some(
-                                    crate::core_grpc::event_params::EventData::DoubleData(args.data),
+                                    crate::core_grpc::event_params::EventData::DoubleData(
+                                        args.data,
+                                    ),
                                 ),
                             })
                             .await
@@ -264,8 +259,7 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
                             #[serde(rename(deserialize = "eventName"))]
                             pub event_name: String,
                         }
-                        let args =
-                            serde_json::from_str::<VoidEvent>(msg.next().unwrap()).unwrap();
+                        let args = serde_json::from_str::<VoidEvent>(msg.next().unwrap()).unwrap();
                         if let Err(err) = CORE_CLIENT
                             .wait()
                             .lock()
@@ -299,6 +293,7 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
     log::info!("Client disconnected");
 }
 #[derive(Clone, Copy, PartialEq, PartialOrd, Debug)]
+#[allow(dead_code)]
 enum FuntionCall {
     SetSleepMpde = 0,
     OnUiReady = 1,

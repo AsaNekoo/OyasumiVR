@@ -9,74 +9,79 @@ use crate::{
     HANDLES,
     globals::{CORE_MODE, CoreMode, STATE},
     overlay_grpc::{
-        self, AddNotificationRequest, AddNotificationResponse, ClearNotificationRequest, Empty,
+        AddNotificationRequest, AddNotificationResponse, ClearNotificationRequest, Empty,
         OverlayMenuOpenRequest, OyasumiSidecarState, SetDebugTranslationsRequest,
         SetMicrophoneActiveRequest,
         oyasumi_overlay_sidecar_server::{OyasumiOverlaySidecar, OyasumiOverlaySidecarServer},
-    }, vr::OVERLAY,
+    },
+    vr::OVERLAY,
 };
 #[derive(Debug, Default, Clone)]
 pub struct GrpcServer {}
+#[allow(unused_variables)]
 #[tonic::async_trait]
 impl OyasumiOverlaySidecar for GrpcServer {
     async fn add_notification(
         &self,
         request: tonic::Request<AddNotificationRequest>,
-    ) ->Result<tonic::Response<AddNotificationResponse>, tonic::Status> {
+    ) -> Result<tonic::Response<AddNotificationResponse>, tonic::Status> {
         //core calls this to spawn notification overlay
-        Ok(AddNotificationResponse{ notification_id: None }.into())
+        Ok(AddNotificationResponse {
+            notification_id: None,
+        }
+        .into())
     }
 
     async fn clear_notification(
         &self,
         request: tonic::Request<ClearNotificationRequest>,
-    ) ->Result<tonic::Response<Empty>, tonic::Status>{
-        todo!()
+    ) -> Result<tonic::Response<Empty>, tonic::Status> {
+        Ok(Empty {}.into())
     }
 
     async fn sync_state(
         &self,
         request: tonic::Request<OyasumiSidecarState>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
-        log::trace!("got new state from core:{:?}",request);
-        let req=request.into_inner();
-       STATE.lock().await.replace(req.clone());
-       OVERLAY.wait().set_state(req);
-       Ok(Empty::default().into())
+        log::trace!("got new state from core:{:?}", request);
+        let req = request.into_inner();
+        STATE.lock().await.replace(req.clone());
+        OVERLAY.wait().set_state(req);
+        Ok(Empty::default().into())
     }
 
     async fn set_debug_translations(
         &self,
         request: tonic::Request<SetDebugTranslationsRequest>,
-    ) ->Result<tonic::Response<Empty>, tonic::Status>{
+    ) -> Result<tonic::Response<Empty>, tonic::Status> {
         todo!()
     }
 
     async fn open_overlay_menu(
         &self,
         request: tonic::Request<OverlayMenuOpenRequest>,
-    ) ->Result<tonic::Response<Empty>, tonic::Status>{
+    ) -> Result<tonic::Response<Empty>, tonic::Status> {
         todo!()
     }
 
     async fn close_overlay_menu(
         &self,
         request: tonic::Request<Empty>,
-    ) -> Result<tonic::Response<Empty>, tonic::Status>{
+    ) -> Result<tonic::Response<Empty>, tonic::Status> {
         todo!()
     }
 
     async fn toggle_overlay_menu(
         &self,
         request: tonic::Request<OverlayMenuOpenRequest>,
-    ) ->Result<tonic::Response<Empty>, tonic::Status> {
+    ) -> Result<tonic::Response<Empty>, tonic::Status> {
         todo!()
     }
 
     async fn set_microphone_active(
         &self,
         request: tonic::Request<SetMicrophoneActiveRequest>,
-    ) ->Result<tonic::Response<Empty>, tonic::Status> {
+    ) -> Result<tonic::Response<Empty>, tonic::Status> {
         todo!()
     }
 }
