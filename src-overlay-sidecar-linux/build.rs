@@ -2,7 +2,7 @@ use std::{path::PathBuf, process::Command};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("cargo::rerun-if-changed=ts-src/index.ts");
-    let mut out_dir=PathBuf::from(std::env::var("OUT_DIR").unwrap());
+    let out_dir=PathBuf::from(std::env::var("OUT_DIR").unwrap());
     // out_dir.push("modified_proto");
     // fs::create_dir(&out_dir).unwrap();
     // out_dir.push("modified-overlay-sidecar.proto");

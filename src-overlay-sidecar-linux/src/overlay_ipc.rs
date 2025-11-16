@@ -18,9 +18,8 @@ pub struct OverlayIPCAddNotification<'a> {
     message: &'a str,
     duration: Duration,
 }
-fn get_ipc_script_for_port(port: u16) -> String {
+fn get_ipc_script(port: u16) -> String {
     let mut f = IPC_SCRIPT.splitn(2, "WS_ADDR");
-    println!("{}", f.clone().count());
     let mut out = String::with_capacity(IPC_SCRIPT.len() + 20);
     out.push_str(f.next().unwrap());
     out.push_str(&format!("localhost:{}", port));
@@ -66,7 +65,7 @@ impl Overlay {
         ));
     }
     pub fn inject_ipc(&self, port: u16) {
-        self.execute_js(&get_ipc_script_for_port(port));
+        self.execute_js(&get_ipc_script(port));
     }
     pub fn set_state(&self, state: OyasumiSidecarState) {
         //idk how to encode this
