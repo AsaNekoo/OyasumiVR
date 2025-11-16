@@ -13,13 +13,13 @@ use xr_overlay::{
 };
 use xr_overlay_cef::{
     CefOverlayCreateInfo,
-    cef::{Browser, ImplBrowser, ImplFrame},
+    cef::{ImplBrowser, ImplFrame},
     create_cef_overlay,
 };
 
-use crate::input::get_controller_create_info;
+use crate::{input::get_controller_create_info, model::Overlay};
 static mut KILL_VR: bool = false;
-pub static OVERLAY_BROWSER: OnceLock<Browser> = OnceLock::new();
+pub static OVERLAY: OnceLock<Overlay> = OnceLock::new();
 #[allow(dead_code)]
 pub fn kill_vr() {
     unsafe { KILL_VR = true };
@@ -92,7 +92,7 @@ pub fn start_vr() -> JoinHandle<()> {
         .main_frame()
         .unwrap()
         .load_url(Some(&"http://localhost:5173/dashboard".into()));
-    assert!(OVERLAY_BROWSER.set(overlay.browser.clone()).is_ok());
+    debug_assert!(OVERLAY.set(Overlay { browser: overlay.browser.clone(), xr_handle: overlay.overlay_handle }).is_ok());
     let overlay_thread = std::thread::spawn(move || {
         let frame_time = (1000. / app.write().unwrap().current_refresh_rate()) as u64;
         loop {

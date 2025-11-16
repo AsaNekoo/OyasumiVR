@@ -1,22 +1,28 @@
-use std::{sync::{LazyLock, Mutex, OnceLock}, time::Duration};
+use std::{
+    sync::{LazyLock, Mutex, OnceLock},
+    time::Duration,
+};
 
 use argh::FromArgs;
 use log::{error, info};
 use tokio::join;
-use xr_overlay_cef::{cef::{ImplBrowser, ImplFrame}, 
-    pointless_cef_thread_spawner}
-;
+use xr_overlay_cef::{
+    cef::{ImplBrowser, ImplFrame},
+    disable_vr, pointless_cef_thread_spawner,
+};
 
 use crate::{
     core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
-    grpc::{start_grpc_server, start_grpc_web_server}, vr::{OVERLAY_BROWSER, start_vr},
+    grpc::{start_grpc_server, start_grpc_web_server},
+    overlay_ipc::start_websocket_server,
+    vr::{OVERLAY, start_vr},
 };
 pub mod globals;
 pub mod grpc;
 pub mod input;
-pub mod vr;
 pub mod model;
 pub mod overlay_ipc;
+pub mod vr;
 pub mod core_grpc {
     tonic::include_proto!("oyasumi_core");
 }
@@ -32,19 +38,17 @@ pub struct StartArgs {
 }
 static CMD_ARGS: OnceLock<StartArgs> = OnceLock::new();
 
-
-
 fn main() {
     pointless_cef_thread_spawner();
     CMD_ARGS.set(argh::from_env()).unwrap();
+    if CMD_ARGS.get().unwrap().no_vr {
+        disable_vr();
+    }
     env_logger::Builder::from_default_env()
         .filter_level(log::LevelFilter::Trace)
+        .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
         .init();
-    let vr_thread = if !CMD_ARGS.get().unwrap().no_vr {
-        Some(start_vr())
-    } else {
-        None
-    };
+    let vr_thread = start_vr();
     let runtime_thread = std::thread::spawn(|| {
         let runtime = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
@@ -65,9 +69,7 @@ fn main() {
     });
 
     runtime_thread.join().unwrap();
-    if let Some(vr_thread) = vr_thread {
-        vr_thread.join().unwrap();
-    }
+    vr_thread.join().unwrap();
 }
 static HANDLES: LazyLock<Mutex<Vec<tokio::task::JoinHandle<()>>>> =
     LazyLock::new(|| Mutex::default());
@@ -80,7 +82,7 @@ async fn tokio_main() {
     let http_port = core_client.get_http_server_port(Empty {}).await.unwrap();
     info!("got http port:{:?}", http_port);
     let grpc_server_port = start_grpc_server().await;
-    let grpc_web_server_pos=start_grpc_web_server().await;
+    let grpc_web_server_pos = start_grpc_web_server().await;
     core_client
         .on_overlay_sidecar_start(OverlaySidecarStartArgs {
             pid: std::process::id(),
@@ -89,11 +91,13 @@ async fn tokio_main() {
         })
         .await
         .unwrap();
+    let ws_port = start_websocket_server().await;
+    OVERLAY.wait().inject_ipc(ws_port);
     loop {
-        OVERLAY_BROWSER.get().unwrap().main_frame().unwrap().execute_java_script(Some(&"window.OyasumiIPCIn.hideDashboard();".into()), None, 0);
+        OVERLAY.wait().hide_dashboard();
         tokio::time::sleep(Duration::from_millis(500)).await;
-        OVERLAY_BROWSER.get().unwrap().main_frame().unwrap().execute_java_script(Some(&"window.OyasumiIPCIn.showDashboard();".into()), None, 0);
-        tokio::time::sleep(Duration::from_millis(500)).await;
+        OVERLAY.wait().show_dashboard();
+        tokio::time::sleep(Duration::from_millis(5000)).await;
     }
     // let res=overlya_client.sync_state(request)
 }

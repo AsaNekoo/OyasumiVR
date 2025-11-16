@@ -1,7 +1,8 @@
-use std::{fs, path::PathBuf};
+use std::{path::PathBuf, process::Command};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // let mut out_dir=PathBuf::from(std::env::var("OUT_DIR").unwrap());
+    println!("cargo::rerun-if-changed=ts-src/index.ts");
+    let mut out_dir=PathBuf::from(std::env::var("OUT_DIR").unwrap());
     // out_dir.push("modified_proto");
     // fs::create_dir(&out_dir).unwrap();
     // out_dir.push("modified-overlay-sidecar.proto");
@@ -17,8 +18,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //             "../proto/overlay-sidecar.proto",
     //         ],
     //         &["../proto/"],
-    //     )?;
+    //     )?; 
     tonic_prost_build::compile_protos("../proto/oyasumi-core.proto")?;
     tonic_prost_build::compile_protos("../proto/overlay-sidecar.proto")?;
+    // panic!("{}",format!("esbuild ts-src/index.ts --bundle --outfile={}/bundle.js --minify=true",out_dir.to_str().unwrap()));
+    #[cfg(not(debug_assertions))]
+    Command::new("npx").args(format!("esbuild ts-src/index.ts --bundle --outfile={}/bundle.js --minify=true",out_dir.to_str().unwrap()).split(" ")).output().unwrap();
+    #[cfg(debug_assertions)]
+    Command::new("npx").args(format!("esbuild ts-src/index.ts --bundle --outfile={}/bundle.js --minify=false",out_dir.to_str().unwrap()).split(" ")).output().unwrap();
     Ok(())
 }
