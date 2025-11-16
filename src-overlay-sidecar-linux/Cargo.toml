@@ -5,8 +5,7 @@ edition = "2024"
 
 [dependencies]
 env_logger = { version = "0.11.8", default-features = false, features = ["auto-color", "humantime"] }
-# log = { version = "0.4.28", features = ["max_level_debug", "release_max_level_error"] }
-log = { version = "0.4.28"}
+log = { version = "0.4.28", features = ["release_max_level_error"] }
 tokio = { version = "1.48.0", default-features = false, features = ["rt", "rt-multi-thread"] }
 tonic = { version = "0.14.2"}
 xr_overlay = { version = "0.1.0", path = "../../xr_overlay/core",default-features = false }
