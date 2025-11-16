@@ -58,10 +58,10 @@ impl Overlay {
         self.execute_js(&format!("window.OyasumiIPCIn.addNotification({});", args));
         id
     }
-    pub fn clear_notification(&self, string: &str) {
+    pub fn clear_notification(&self, id: &str) {
         self.execute_js(&format!(
             "window.OyasumiIPCIn.clearNotification({});",
-            string
+            id
         ));
     }
     pub fn inject_ipc(&self, port: u16) {

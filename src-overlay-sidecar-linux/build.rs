@@ -10,17 +10,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // data=data.replacen("SyncState", "sync_state", 1);
     // fs::write(&out_dir, data).unwrap();
     // tonic_prost_build::compile_protos(out_dir)?;
-    // tonic_prost_build::configure()
-    //     .type_attribute("*", "#[derive(serde::Serialize, serde::Deserialize)]")
-    //     .compile_protos(
-    //         &[
-    //             "../proto/oyasumi-core.proto",
-    //             "../proto/overlay-sidecar.proto",
-    //         ],
-    //         &["../proto/"],
-    //     )?; 
-    tonic_prost_build::compile_protos("../proto/oyasumi-core.proto")?;
-    tonic_prost_build::compile_protos("../proto/overlay-sidecar.proto")?;
+    tonic_prost_build::configure()
+        .type_attribute(".", "#[derive(serde::Serialize, serde::Deserialize)]")
+        .compile_protos(
+            &[
+                "../proto/oyasumi-core.proto",
+                "../proto/overlay-sidecar.proto",
+            ],
+            &["../proto/"],
+        )?; 
+    // tonic_prost_build::compile_protos("../proto/oyasumi-core.proto")?;
+    // tonic_prost_build::compile_protos("../proto/overlay-sidecar.proto")?;
     // panic!("{}",format!("esbuild ts-src/index.ts --bundle --outfile={}/bundle.js --minify=true",out_dir.to_str().unwrap()));
     #[cfg(not(debug_assertions))]
     Command::new("npx").args(format!("esbuild ts-src/index.ts --bundle --outfile={}/bundle.js --minify=true",out_dir.to_str().unwrap()).split(" ")).output().unwrap();
