@@ -13,7 +13,7 @@ use crate::{
         OverlayMenuOpenRequest, OyasumiSidecarState, SetDebugTranslationsRequest,
         SetMicrophoneActiveRequest,
         oyasumi_overlay_sidecar_server::{OyasumiOverlaySidecar, OyasumiOverlaySidecarServer},
-    },
+    }, vr::OVERLAY,
 };
 #[derive(Debug, Default, Clone)]
 pub struct GrpcServer {}
@@ -37,7 +37,7 @@ impl OyasumiOverlaySidecar for GrpcServer {
         &self,
         request: tonic::Request<OyasumiSidecarState>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
-        log::trace!("sync_state:{:?}",request);
+        log::trace!("got new state from core:{:?}",request);
        STATE.lock().await.replace(request.into_inner());
        Ok(Empty::default().into())
     }

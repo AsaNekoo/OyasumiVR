@@ -2398,6 +2398,7 @@ name = "src-overlay-sidecar-linux"
 version = "0.1.0"
 dependencies = [
  "argh",
+ "base64",
  "env_logger",
  "futures-util",
  "log",

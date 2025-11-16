@@ -12,10 +12,7 @@ use xr_overlay_cef::{
 };
 
 use crate::{
-    core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
-    grpc::{start_grpc_server, start_grpc_web_server},
-    overlay_ipc::start_websocket_server,
-    vr::{OVERLAY, start_vr},
+    core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient}, globals::STATE, grpc::{start_grpc_server, start_grpc_web_server}, overlay_grpc::OyasumiSidecarState, overlay_ipc::start_websocket_server, vr::{OVERLAY, start_vr}
 };
 pub mod globals;
 pub mod grpc;
@@ -93,11 +90,17 @@ async fn tokio_main() {
         .unwrap();
     let ws_port = start_websocket_server().await;
     OVERLAY.wait().inject_ipc(ws_port);
+    tokio::time::sleep(Duration::from_secs(1)).await;
     loop {
-        OVERLAY.wait().hide_dashboard();
-        tokio::time::sleep(Duration::from_millis(500)).await;
-        OVERLAY.wait().show_dashboard();
-        tokio::time::sleep(Duration::from_millis(5000)).await;
+        let mut state=STATE.lock().await.as_ref().unwrap().clone();
+        state.sleep_mode=true;
+        OVERLAY.wait().set_state(state.clone());
+        // OVERLAY.wait().hide_dashboard();
+        tokio::time::sleep(Duration::from_millis(2000)).await;
+        // OVERLAY.wait().show_dashboard();
+        tokio::time::sleep(Duration::from_millis(2000)).await;
+        // state.sleep_mode=true;
+       OVERLAY.wait().set_state(state);
     }
     // let res=overlya_client.sync_state(request)
 }

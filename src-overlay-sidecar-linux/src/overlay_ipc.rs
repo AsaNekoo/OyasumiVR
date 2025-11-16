@@ -1,17 +1,18 @@
-use std::{sync::OnceLock, time::Duration};
+use std::{mem::ManuallyDrop, sync::OnceLock, time::Duration};
 
+use base64::{Engine, alphabet::URL_SAFE, prelude::{BASE64_STANDARD, BASE64_STANDARD_NO_PAD, BASE64_URL_SAFE_NO_PAD}};
 use futures_util::{SinkExt, StreamExt};
 use log::{debug, error, info, trace};
+use prost::Message;
 use rand::{
     distr::{Alphabetic, SampleString},
     rand_core::le,
 };
 use serde::Serialize;
 use tokio::net::TcpListener;
-use tokio_tungstenite::tungstenite::Message;
 use xr_overlay_cef::cef::{ImplBrowser, ImplFrame};
 
-use crate::{model::Overlay, overlay_grpc::OyasumiSidecarState};
+use crate::{globals::STATE, model::Overlay, overlay_grpc::OyasumiSidecarState, vr::OVERLAY};
 pub const IPC_SCRIPT: &str = include_str!(concat!(env!("OUT_DIR"), "/bundle.js"));
 // pub const IPC_SCRIPT:&str=include_str!("../target/debug/build/src-overlay-sidecar-linux-8079ff49c704d0bc/out/bundle.js");
 pub struct OverlayIPCAddNotification<'a> {
@@ -68,9 +69,9 @@ impl Overlay {
         self.execute_js(&get_ipc_script(port));
     }
     pub fn set_state(&self, state: OyasumiSidecarState) {
-        //idk how to encode this
-        todo!()
-        // self.browser.main_frame().unwrap().execute_java_script(Some(&format!("window.OyasumiIPCIn.showToolTip({});",string.unwrap_or_default()).into()), None, 0);
+        let state=unsafe { String::from_utf8_unchecked(state.encode_to_vec()) };
+        let state=BASE64_STANDARD.encode(state);
+        self.execute_js(&format!("window.OyasumiIPCIn.setState(\"{}\");",state));
     }
 }
 pub async fn start_websocket_server() -> u16 {
@@ -90,7 +91,7 @@ pub async fn start_websocket_server() -> u16 {
 async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::net::TcpStream>) {
     log::info!("[websocket] New client connected");
     let (mut sender, mut receiver) = ws_stream.split();
-
+    tokio::time::sleep(Duration::from_millis(200)).await;
     while let Some(message) = receiver.next().await {
         match message {
             Ok(msg) => {
@@ -107,8 +108,10 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
                     FuntionCall::OnUiReady => {
                         debug_assert_eq!("{}",msg.next().unwrap());
                         debug!("[websocket] recived on ui ready");
+                        OVERLAY.wait().set_state(STATE.lock().await.as_ref().unwrap().clone());
                     }
-                    _=>panic!("function with id:{} is not implemented",call_id)
+                    _=>(),
+                    // _=>panic!("function with id:{} is not implemented",call_id)
                 }
             }
             Err(e) => {
