@@ -176,7 +176,7 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
         .level(LevelFilter::Info)
         .target(tauri_plugin_log::Target::new(
             tauri_plugin_log::TargetKind::Stdout,
-        ))
+        )).level_for("vrchat_osc", LevelFilter::Error)
         .target(tauri_plugin_log::Target::new(
             tauri_plugin_log::TargetKind::LogDir { file_name: None },
         ));
@@ -187,7 +187,7 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
             .target(tauri_plugin_log::Target::new(
                 tauri_plugin_log::TargetKind::Webview,
             ))
-            .level(LevelFilter::Debug);
+            .level(LevelFilter::Debug).level_for("vrchat_osc", LevelFilter::Warn);
     }
 
     builder.build()
