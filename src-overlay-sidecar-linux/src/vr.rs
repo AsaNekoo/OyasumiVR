@@ -7,9 +7,10 @@ use std::{
 use log::trace;
 use xr_overlay::{
     input::{InputHandler, InputHandlerCreateInfo, InputSettings},
-    openxr::Vector3f,
+    openxr::{Posef, Vector3f},
     runner::{
-        AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, ShowMode, events::AppEvent,
+        AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, ShowMode,
+        events::AppEvent,
     },
 };
 use xr_overlay_cef::{
@@ -86,7 +87,14 @@ pub fn start_vr() -> JoinHandle<()> {
             pos,
             framerate,
             resolution: [1024, 1024],
-            show_mode: ShowMode::CamerPos((pos, true)),
+            show_mode: ShowMode::DeviceCallback((
+                openxr_show_hand,
+                Posef {
+                    orientation: xr_overlay::openxr::Quaternionf::default(),
+                    position: pos,
+                },
+                false,
+            )),
             ..Default::default()
         },
     );
@@ -132,6 +140,9 @@ pub fn start_vr() -> JoinHandle<()> {
 }
 fn openxr_callback(event: AppEvent) {
     trace!("[openxr] {:?}", event);
+}
+fn openxr_show_hand()->DeviceRole{
+    DeviceRole::Hmd
 }
 pub static mut DASBOARD_VISIBLE: bool = false;
 pub fn show_dashboard() {
