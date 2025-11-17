@@ -14,7 +14,7 @@ use crate::{
         SetMicrophoneActiveRequest,
         oyasumi_overlay_sidecar_server::{OyasumiOverlaySidecar, OyasumiOverlaySidecarServer},
     },
-    vr::OVERLAY,
+    vr::{DASBOARD_VISIBLE, OVERLAY, XR_CTX, hide_dashboard, show_dashboard},
 };
 #[derive(Debug, Default, Clone)]
 pub struct GrpcServer {}
@@ -61,21 +61,27 @@ impl OyasumiOverlaySidecar for GrpcServer {
         &self,
         request: tonic::Request<OverlayMenuOpenRequest>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
-        todo!()
+        show_dashboard();
+        Ok(Empty{}.into())
     }
 
     async fn close_overlay_menu(
         &self,
         request: tonic::Request<Empty>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
-        todo!()
+        hide_dashboard().await;
+        Ok(Empty{}.into())
     }
 
     async fn toggle_overlay_menu(
         &self,
         request: tonic::Request<OverlayMenuOpenRequest>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
-        todo!()
+        match unsafe{DASBOARD_VISIBLE}{
+            true => hide_dashboard().await,
+            false => show_dashboard(),
+        }
+        Ok(Empty{}.into())
     }
 
     async fn set_microphone_active(

@@ -1,5 +1,5 @@
 use std::{
-    sync::{Arc, OnceLock, RwLock},
+    sync::{Arc, LazyLock, Mutex, OnceLock, RwLock},
     thread::JoinHandle,
     time::Duration,
 };
@@ -21,6 +21,7 @@ use xr_overlay_cef::{
 use crate::{input::get_controller_create_info, model::Overlay};
 static mut KILL_VR: bool = false;
 pub static OVERLAY: OnceLock<Overlay> = OnceLock::new();
+pub static XR_CTX: OnceLock<Arc<RwLock<AppRunner>>> = OnceLock::new();
 #[allow(dead_code)]
 pub fn kill_vr() {
     unsafe { KILL_VR = true };
@@ -66,6 +67,7 @@ pub fn start_vr() -> JoinHandle<()> {
         }),
     });
     let app = Arc::new(RwLock::new(app));
+    XR_CTX.set(app.clone()).unwrap();
     let pos = Vector3f {
         x: -0.0,
         y: -0.0,
@@ -130,4 +132,24 @@ pub fn start_vr() -> JoinHandle<()> {
 }
 fn openxr_callback(event: AppEvent) {
     trace!("[openxr] {:?}", event);
+}
+pub static mut DASBOARD_VISIBLE: bool = false;
+pub fn show_dashboard() {
+    unsafe { DASBOARD_VISIBLE = true };
+    XR_CTX
+        .wait()
+        .write()
+        .unwrap()
+        .show(OVERLAY.wait().xr_handle, true);
+    OVERLAY.wait().show_dashboard();
+}
+pub async fn hide_dashboard() {
+    unsafe { DASBOARD_VISIBLE = false };
+    OVERLAY.wait().hide_dashboard();
+    tokio::time::sleep(Duration::from_millis(500)).await; //give animation some time
+    XR_CTX
+        .wait()
+        .write()
+        .unwrap()
+        .show(OVERLAY.wait().xr_handle, false);
 }

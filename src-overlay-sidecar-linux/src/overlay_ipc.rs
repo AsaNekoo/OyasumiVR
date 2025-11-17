@@ -11,7 +11,7 @@ use xr_overlay_cef::cef::{ImplBrowser, ImplFrame};
 
 use crate::{
     CORE_CLIENT, core_grpc::EventParams, globals::STATE, model::Overlay,
-    overlay_grpc::OyasumiSidecarState, vr::OVERLAY,
+    overlay_grpc::OyasumiSidecarState, vr::{OVERLAY, XR_CTX, hide_dashboard},
 };
 pub const IPC_SCRIPT: &str = include_str!(concat!(env!("OUT_DIR"), "/bundle.js"));
 // pub const IPC_SCRIPT:&str=include_str!("../target/debug/build/src-overlay-sidecar-linux-8079ff49c704d0bc/out/bundle.js");
@@ -159,7 +159,7 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
                         }
                     }
                     FuntionCall::Close => {
-                        // OVERLAY.wait().hide_dashboard();
+                        hide_dashboard().await;
                     }
                     FuntionCall::SendEventBool => {
                         let args =
