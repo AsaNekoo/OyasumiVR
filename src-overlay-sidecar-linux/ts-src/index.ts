@@ -105,6 +105,6 @@ function rpc(id: number, payload: any):Promise<void> {
     resolve()
   });
 }
-// window.CefSharp = CefSharp;
+window.CefSharp = CefSharp;
 window.OyasumiIPCOut = OyasumiOverlayIPCOut;
 window.OyasumiIPCOut_Dashboard = OyasumiOverlayIPCOut_Dashboard;

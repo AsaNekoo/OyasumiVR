@@ -98,11 +98,7 @@ pub fn start_vr() -> JoinHandle<()> {
             ..Default::default()
         },
     );
-    overlay
-        .browser
-        .main_frame()
-        .unwrap()
-        .load_url(Some(&"http://localhost:5173/dashboard".into()));
+ 
     debug_assert!(
         OVERLAY
             .set(Overlay {
@@ -139,7 +135,9 @@ pub fn start_vr() -> JoinHandle<()> {
     })
 }
 fn openxr_callback(event: AppEvent) {
+    if event!=AppEvent::ButtonsUpdated{
     trace!("[openxr] {:?}", event);
+    }
 }
 fn openxr_show_hand()->DeviceRole{
     DeviceRole::Hmd

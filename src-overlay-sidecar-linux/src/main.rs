@@ -1,16 +1,23 @@
-use std::{fs, sync::{LazyLock, Mutex, OnceLock}};
+use std::{
+    fs,
+    sync::{LazyLock, Mutex, OnceLock},
+    time::Duration,
+};
 
 use argh::FromArgs;
 use log::info;
 use tokio::join;
 use tonic::transport::Channel;
-use xr_overlay_cef::{disable_vr, pointless_cef_thread_spawner};
+use xr_overlay_cef::{
+    cef::{ImplBrowser, ImplFrame},
+    disable_vr, pointless_cef_thread_spawner,
+};
 
 use crate::{
     core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
     grpc::{start_grpc_server, start_grpc_web_server},
     overlay_ipc::start_websocket_server,
-    vr::{OVERLAY, start_vr},
+    vr::{OVERLAY, show_dashboard, start_vr},
 };
 pub mod globals;
 pub mod grpc;
@@ -43,6 +50,8 @@ fn main() {
     env_logger::Builder::from_default_env()
         .filter_level(log::LevelFilter::Trace)
         .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
+        .filter_module("xr_overlay", log::LevelFilter::Debug)
+        .filter_module("tokio_tungstenite", log::LevelFilter::Warn)
         .init();
     let vr_thread = start_vr();
     let runtime_thread = std::thread::spawn(|| {
@@ -76,8 +85,23 @@ async fn tokio_main() {
             .await
             .unwrap();
     CORE_CLIENT.set(core_client.clone().into()).unwrap();
-    let http_port = core_client.get_http_server_port(Empty {}).await.unwrap();
+    let http_port = core_client
+        .get_http_server_port(Empty {})
+        .await
+        .unwrap()
+        .into_inner()
+        .port;
     info!("got http port:{:?}", http_port);
+    OVERLAY
+        .get()
+        .as_ref()
+        .unwrap()
+        .browser
+        .main_frame()
+        .unwrap()
+        .load_url(Some(
+            &(format!("http://localhost:5173/dashboard?corePort={}", http_port).as_str()).into(),
+        ));
     let grpc_server_port = start_grpc_server().await;
     let grpc_web_server_pos = start_grpc_web_server().await;
     core_client
@@ -90,4 +114,6 @@ async fn tokio_main() {
         .unwrap();
     let ws_port = start_websocket_server().await;
     OVERLAY.wait().inject_ipc(ws_port);
+    tokio::time::sleep(Duration::from_millis(200)).await;
+    show_dashboard();
 }
