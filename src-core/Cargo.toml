@@ -95,7 +95,7 @@ widestring = "1.2.0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 pulseaudio = "0.3.0"
-xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="bb917b46464b0a7c2c007b110019b3518a16f487" }
+xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="ffa2e8a1e511777e9fd9e91b1a6ece423886ca2d" }
 [target.'cfg(target_os = "windows")'.dependencies]
 named_pipe = "0.4.1"
 webview2-com = "0.38.0"
