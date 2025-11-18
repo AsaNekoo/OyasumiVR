@@ -56,7 +56,7 @@ fn main() {
         .init();
     let vr_thread = start_vr();
     let runtime_thread = std::thread::spawn(|| {
-        let runtime = tokio::runtime::Builder::new_multi_thread()
+        let runtime = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
             .unwrap();
