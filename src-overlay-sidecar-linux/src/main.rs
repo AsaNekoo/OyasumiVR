@@ -4,7 +4,6 @@ use std::{
     time::Duration,
 };
 
-use argh::FromArgs;
 use log::info;
 use tokio::join;
 use tonic::transport::Channel;
@@ -31,20 +30,13 @@ pub mod core_grpc {
 pub mod overlay_grpc {
     tonic::include_proto!("oyasumi_overlay_sidecar");
 }
-#[derive(FromArgs, Debug)]
-/// s
-pub struct StartArgs {
-    /// dev option
-    #[argh(switch)]
-    no_vr: bool,
-}
-static CMD_ARGS: OnceLock<StartArgs> = OnceLock::new();
+static NO_VR: OnceLock<bool> = OnceLock::new();
 
 fn main() {
     fs::write("/proc/self/oom_score_adj", "1000").ok();
     pointless_cef_thread_spawner();
-    CMD_ARGS.set(argh::from_env()).unwrap();
-    if CMD_ARGS.get().unwrap().no_vr {
+    NO_VR.set(std::env::var("NO_VR").unwrap_or_default().to_lowercase()=="true").unwrap();
+    if *NO_VR.get().unwrap() {
         disable_vr();
     }
     env_logger::Builder::from_default_env()
