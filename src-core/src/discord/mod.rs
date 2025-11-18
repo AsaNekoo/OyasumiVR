@@ -188,7 +188,7 @@ pub async fn update_activity(
     }
 }
 #[cfg(unix)]
-fn is_discord_running() {
+fn is_discord_running() ->bool {
     let tmp_path = std::env::var("XDG_RUNTIME_DIR")
         .or_else(|_| std::env::var("TMPDIR"))
         .or_else(|_| std::env::var("TMP"))
@@ -199,7 +199,7 @@ fn is_discord_running() {
     for path in [&mut socket_path, &mut fallback_path] {
         use std::path::PathBuf;
 
-        if PathBuf::from(path).is_file() {
+        if PathBuf::from(path.as_str()).is_file() {
           return true;  
         }
     }
