@@ -46,6 +46,8 @@ use crate::globals::APTABASE_HOST;
 
 #[tokio::main]
 async fn main() {
+    #[cfg(unix)]
+    std::fs::write("/proc/self/oom_score_adj", "1000").ok();
     // Attach to parent console if we're running from a command line
     #[cfg(windows)]
     {

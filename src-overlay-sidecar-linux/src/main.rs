@@ -1,4 +1,4 @@
-use std::sync::{LazyLock, Mutex, OnceLock};
+use std::{fs, sync::{LazyLock, Mutex, OnceLock}};
 
 use argh::FromArgs;
 use log::info;
@@ -34,6 +34,7 @@ pub struct StartArgs {
 static CMD_ARGS: OnceLock<StartArgs> = OnceLock::new();
 
 fn main() {
+    fs::write("/proc/self/oom_score_adj", "1000").ok();
     pointless_cef_thread_spawner();
     CMD_ARGS.set(argh::from_env()).unwrap();
     if CMD_ARGS.get().unwrap().no_vr {
