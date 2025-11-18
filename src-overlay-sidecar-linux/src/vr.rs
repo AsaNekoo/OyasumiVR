@@ -96,7 +96,7 @@ pub fn start_vr() -> JoinHandle<()> {
         },
     );
  
-    debug_assert!(
+    assert!(
         OVERLAY
             .set(Overlay {
                 browser: overlay.browser.clone(),

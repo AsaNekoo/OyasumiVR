@@ -76,6 +76,7 @@ fn main() {
     NO_VR
         .set(std::env::var("NO_VR").unwrap_or_default().to_lowercase() == "true")
         .unwrap();
+    log::debug!("NO_VR:{:?}",NO_VR.get().as_ref().unwrap());
     if *NO_VR.get().unwrap() {
         disable_vr();
     }
