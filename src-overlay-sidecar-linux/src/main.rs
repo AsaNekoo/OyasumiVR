@@ -52,6 +52,7 @@ fn main() {
         .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
         .filter_module("xr_overlay", log::LevelFilter::Debug)
         .filter_module("tokio_tungstenite", log::LevelFilter::Warn)
+        .filter_module("tungstenite", log::LevelFilter::Warn)
         .init();
     let vr_thread = start_vr();
     let runtime_thread = std::thread::spawn(|| {
