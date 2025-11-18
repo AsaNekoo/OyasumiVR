@@ -31,10 +31,32 @@ pub mod overlay_grpc {
     tonic::include_proto!("oyasumi_overlay_sidecar");
 }
 static NO_VR: OnceLock<bool> = OnceLock::new();
-
+static ARGS:OnceLock<Args>=OnceLock::new();
+#[derive(Clone, Copy,Debug)]
+pub struct Args{
+    core_grpc_port:u16,
+    core_pid:u64,
+    disable_gpu:bool,
+}
 fn main() {
     fs::write("/proc/self/oom_score_adj", "1000").ok();
     pointless_cef_thread_spawner();
+    log::trace!("starting overlay sidecar with arguments:{:?}",std::env::args());
+    let args=std::env::args().into_iter().collect::<Vec<_>>();
+    if !(args.len()==4||args.len()==3){
+        panic!("Usage: oyasumivr-overlay-sidecar-linux <core grpc port> <core process id>")
+    }
+
+    let mut args=Args{
+        core_grpc_port:args[1].parse().unwrap() ,
+        core_pid: args[2].parse().unwrap(),
+        disable_gpu: args.get(3).cloned().unwrap_or_default()=="--disable-gpu-acceleration",
+    };
+    if args.core_grpc_port==0&& args.core_pid==0{
+        args.core_grpc_port=globals::CORE_GRPC_DEV_PORT;
+    }
+    log::debug!("using arguments:{:?}",args);
+    ARGS.set(args).unwrap();
     NO_VR.set(std::env::var("NO_VR").unwrap_or_default().to_lowercase()=="true").unwrap();
     if *NO_VR.get().unwrap() {
         disable_vr();
@@ -74,7 +96,7 @@ static HANDLES: LazyLock<Mutex<Vec<tokio::task::JoinHandle<()>>>> = LazyLock::ne
 static CORE_CLIENT: OnceLock<tokio::sync::Mutex<OyasumiCoreClient<Channel>>> = OnceLock::new();
 async fn tokio_main() {
     let mut core_client =
-        OyasumiCoreClient::connect(format!("http://127.0.0.1:{}", globals::CORE_GRPC_DEV_PORT))
+        OyasumiCoreClient::connect(format!("http://127.0.0.1:{}", ARGS.get().as_ref().unwrap().core_grpc_port))
             .await
             .unwrap();
     CORE_CLIENT.set(core_client.clone().into()).unwrap();
