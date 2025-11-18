@@ -113,6 +113,9 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
                 match funtion {
                     FuntionCall::OnUiReady => {
                         debug_assert_eq!("{}", msg.next().unwrap());
+                        if STATE.lock().await.as_ref().is_none(){
+                            continue;
+                        }
                         debug!("[websocket] recived on ui ready");
                         OVERLAY
                             .wait()
