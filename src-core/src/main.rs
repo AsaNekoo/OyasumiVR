@@ -11,7 +11,6 @@ mod http;
 mod image_cache;
 mod lighthouse;
 mod migrations;
-mod vr;
 mod os;
 mod osc;
 mod overlay_sidecar;
@@ -19,12 +18,13 @@ mod steam;
 mod system_tray;
 mod telemetry;
 mod utils;
+mod vr;
 mod vrc_log_parser;
 mod vrcx;
 
-use std::sync::atomic::Ordering;
 #[cfg(windows)]
 use std::mem;
+use std::sync::atomic::Ordering;
 
 use config::Config;
 pub use flavour::BUILD_FLAVOUR;
@@ -178,7 +178,9 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
         .level(LevelFilter::Info)
         .target(tauri_plugin_log::Target::new(
             tauri_plugin_log::TargetKind::Stdout,
-        )).level_for("vrchat_osc", LevelFilter::Error)
+        ))
+        .level_for("vrchat_osc", LevelFilter::Error)
+        .level_for("xr_overlay", LevelFilter::Debug)
         .target(tauri_plugin_log::Target::new(
             tauri_plugin_log::TargetKind::LogDir { file_name: None },
         ));
@@ -189,7 +191,9 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
             .target(tauri_plugin_log::Target::new(
                 tauri_plugin_log::TargetKind::Webview,
             ))
-            .level(LevelFilter::Debug).level_for("vrchat_osc", LevelFilter::Warn);
+            .level_for("xr_overlay", LevelFilter::Trace)
+            .level(LevelFilter::Debug)
+            .level_for("vrchat_osc", LevelFilter::Warn);
     }
 
     builder.build()
@@ -254,7 +258,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     // Initialize utility module
     utils::init();
     // Initialize Steam module
-    #[cfg(feature="steam")]
+    #[cfg(feature = "steam")]
     steam::init().await;
     // Initialize HTTP server
     http::init().await;

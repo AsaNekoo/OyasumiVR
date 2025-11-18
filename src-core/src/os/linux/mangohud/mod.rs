@@ -2,7 +2,7 @@ use std::{fs, io::Write};
 
 use log::error;
 
-use crate::vr::{model::OVRFrameLimits, openxr::OXR_HANDLE};
+use crate::vr::{model::{OVRFrameLimits, VRStatus}, openxr::{OXR_HANDLE, OXR_STATE}};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum GameAppId {
@@ -22,7 +22,10 @@ impl From<u32> for GameAppId {
 }
 
 pub async fn get_app_framelimit(app_id: u32) -> Option<OVRFrameLimits> {
-    let mut target_fps = OXR_HANDLE
+    if *OXR_STATE.lock().await!=VRStatus::Initialized{
+        return None;
+    }
+    let target_fps = OXR_HANDLE
         .get()
         .unwrap()
         .lock()
@@ -87,6 +90,10 @@ pub async fn get_app_framelimit(app_id: u32) -> Option<OVRFrameLimits> {
     None
 }
 pub async fn limit_frame_rate(app_id: u32, limits: Option<OVRFrameLimits>) {
+      if *OXR_STATE.lock().await!=VRStatus::Initialized{
+        log::debug!("called limit_frame_rate when not read");
+        return;
+    }
     let mut target_fps = OXR_HANDLE
         .get()
         .unwrap()
