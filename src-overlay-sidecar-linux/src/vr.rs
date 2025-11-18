@@ -130,6 +130,7 @@ pub fn start_vr() -> JoinHandle<()> {
                     unsafe { xr_overlay_cef::shutdown() };
                     break;
                 }
+                xr_overlay::runner::PollResult::SessionLost => unreachable!(),
             }
         }
     })

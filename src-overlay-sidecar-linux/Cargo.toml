@@ -8,8 +8,6 @@ env_logger = { version = "0.11.8", default-features = false, features = ["auto-c
 log = { version = "0.4.28", features = ["release_max_level_error"] }
 tokio = { version = "1.48.0", default-features = false, features = ["rt", "rt-multi-thread"] }
 tonic = { version = "0.14.2"}
-xr_overlay = { version = "0.1.0", path = "../../xr_overlay/core",default-features = false }
-xr_overlay_cef = { version = "0.1.0", path = "../../xr_overlay/cef_app" }
 prost = "0.14"
 tonic-prost = "*"
 argh = { version = "0.1.13", default-features = false }
@@ -22,6 +20,8 @@ serde = { version = "1.0.228", features = ["derive"] }
 tokio-tungstenite = "0.28.0"
 futures-util = { version = "0.3.31", default-features = false }
 base64 = "0.22.1"
+xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="bb917b46464b0a7c2c007b110019b3518a16f487" }
+xr_overlay_cef = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="bb917b46464b0a7c2c007b110019b3518a16f487" }
 [build-dependencies]
 tonic-prost-build = "*"
 [profile.release]
