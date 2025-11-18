@@ -11,19 +11,34 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use tonic::transport::Channel;
 
-pub static SIDECAR_GRPC_CLIENT: LazyLock<Mutex<Option<OyasumiOverlaySidecarClient<Channel>>>> = LazyLock::new(Default::default);
+pub static SIDECAR_GRPC_CLIENT: LazyLock<Mutex<Option<OyasumiOverlaySidecarClient<Channel>>>> =
+    LazyLock::new(Default::default);
 static SIDECAR_MANAGER: LazyLock<Mutex<Option<SidecarManager>>> = LazyLock::new(Default::default);
 
 pub async fn init() {
     let (tx, mut rx) = tokio::sync::mpsc::channel(10);
-    *SIDECAR_MANAGER.lock().await = Some(SidecarManager::new(
-        "OVERLAY".to_string(),
-        "resources/dotnet-sidecars/".to_string(),
-        "oyasumivr-overlay-sidecar.exe".to_string(),
-        tx,
-        true,
-        vec![],
-    ));
+    #[cfg(windows)]
+    {
+        *SIDECAR_MANAGER.lock().await = Some(SidecarManager::new(
+            "OVERLAY".to_string(),
+            "resources/dotnet-sidecars/".to_string(),
+            "oyasumivr-overlay-sidecar.exe".to_string(),
+            tx,
+            true,
+            vec![],
+        ));
+    }
+    #[cfg(unix)]
+    {
+        *SIDECAR_MANAGER.lock().await = Some(SidecarManager::new(
+            "OVERLAY".to_string(),
+            "resources/sidecars/".to_string(),
+            "oyasumivr-overlay-sidecar".to_string(),
+            tx,
+            true, 
+            vec![],
+        ));
+    }
     // Listen for sidecar stop signals
     tokio::spawn(async move {
         while (rx.recv().await).is_some() {

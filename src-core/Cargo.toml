@@ -42,6 +42,8 @@ md5 = "0.8.0"
 mime = "0.3.17"
 mime_guess = "2.0.5"
 nalgebra = "0.33.2"
+nix = "0.30.1"
+
 oyasumivr-shared = { path = "../src-shared-rust", version = '*' }
 oyasumivr_macros = { path = "./macros" }
 prost = "0.13.5"
@@ -95,7 +97,7 @@ widestring = "1.2.0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 pulseaudio = "0.3.0"
-xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="ffa2e8a1e511777e9fd9e91b1a6ece423886ca2d" }
+xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="77a1b490c103c7563993789f099ea4f5bd5cc3ee" }
 [target.'cfg(target_os = "windows")'.dependencies]
 named_pipe = "0.4.1"
 webview2-com = "0.38.0"
@@ -140,7 +142,7 @@ tonic-build = { version = "0.13.1", features = [] }
 
 [profile.release]
 panic = "abort"   # Strip expensive panic clean-up logic
-codegen-units = 1 # Compile crates one after another so the compiler can optimize better
-lto = true        # Enables link to optimizations
+codegen-units = 32 # Compile crates one after another so the compiler can optimize better
+lto = false        # Enables link to optimizations
 opt-level = "s"   # Optimize for binary size
 strip = true      # Remove debug symbols

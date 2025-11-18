@@ -6,7 +6,7 @@ use std::{
 };
 
 use log::{debug, error, info};
-use tokio::{spawn, sync::Mutex, task::spawn_blocking};
+use tokio::{spawn, sync::Mutex, task::{spawn_blocking, spawn_local}};
 use xr_overlay::{
     model::AppContext,
     openxr::{Posef, Vector3f},
@@ -26,24 +26,24 @@ pub static OXR_BRIGHTNES_OVERLAY_HANDLE: Mutex<Option<OverlayHandle>> = Mutex::c
 pub static OXR_STATE: Mutex<VRStatus> = Mutex::const_new(VRStatus::Inactive);
 async fn get_ctx() -> AppContext<xr_overlay::openxr::Vulkan> {
     let ctx = loop {
-        let ctx = xr_overlay::xr::Init::default()
-            .disable_hand_tracking()
-            .sort_order(u16::MAX as u32)
-            .user_presence_support(false)
-            .with_app_name("Oyasumi VR");
-        // if let Some(ref app)=app{
-        //     ctx=ctx.with_instance(&unsafe { app.get_ctx() }.xr.instance);
-        // }
-        let ctx = ctx.init_overlay();
-        if let Err(xr_overlay::error::Error::InitNotReady) = ctx {
-            drop(ctx);
-            tokio::time::sleep(Duration::from_secs(10)).await;
-            continue;
-        } else {
-            break ctx.unwrap();
-        }
-    };
-    spawn(update_status(VRStatus::Initializing));
+            let ctx = xr_overlay::xr::Init::default()
+                .disable_hand_tracking()
+                .sort_order(u16::MAX as u32)
+                .user_presence_support(false)
+                .with_app_name("Oyasumi VR");
+            // if let Some(ref app)=app{
+            //     ctx=ctx.with_instance(&unsafe { app.get_ctx() }.xr.instance);
+            // }
+            let ctx = ctx.init_overlay();
+            if let Err(xr_overlay::error::Error::InitNotReady) = ctx {
+                drop(ctx);
+                tokio::time::sleep(Duration::from_secs(10)).await;
+                continue;
+            } else {
+                break ctx.unwrap();
+            }
+        };
+    update_status(VRStatus::Initializing).await;
     ctx
 }
 fn get_overlay_info() -> OverlayCreateInfo {
@@ -172,6 +172,10 @@ fn openxr_callback(event: AppEvent) {
     });
 }
 async fn update_status(new_status: VRStatus) {
+    info!("[core] updating openxr status:{:?}",new_status);
+    if *OXR_STATE.lock().await==VRStatus::Initialized && new_status==VRStatus::Initializing{
+        unreachable!("possible race condition for update_status"); //panic instead of error since this is a logic error and need to be fixed
+    }
     *OXR_STATE.lock().await = new_status.clone();
     send_event("VR_STATUS_UPDATE", new_status.to_string().to_uppercase()).await;
 }

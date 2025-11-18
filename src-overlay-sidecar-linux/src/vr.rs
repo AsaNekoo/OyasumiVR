@@ -19,15 +19,12 @@ use xr_overlay_cef::{
     create_cef_overlay,
 };
 
-use crate::{input::get_controller_create_info, model::Overlay};
-static mut KILL_VR: bool = false;
+use crate::{KILL, input::get_controller_create_info, kill, model::Overlay};
 pub static OVERLAY: OnceLock<Overlay> = OnceLock::new();
 pub static XR_CTX: OnceLock<Arc<RwLock<AppRunner>>> = OnceLock::new();
-#[allow(dead_code)]
-pub fn kill_vr() {
-    unsafe { KILL_VR = true };
-}
+
 pub fn start_vr() -> JoinHandle<()> {
+    trace!("start_vr");
     let ctx = loop {
         match xr_overlay::xr::Init::default()
             .enable_drm_support()
@@ -111,7 +108,7 @@ pub fn start_vr() -> JoinHandle<()> {
     std::thread::spawn(move || {
         let frame_time = (1000. / app.write().unwrap().current_refresh_rate()) as u64;
         loop {
-            if unsafe { KILL_VR } {
+            if unsafe { KILL } {
                 app.write().unwrap().request_end_session();
             }
             match app.write().unwrap().run() {
@@ -128,9 +125,10 @@ pub fn start_vr() -> JoinHandle<()> {
                 xr_overlay::runner::PollResult::Exit => {
                     //no session resuming bc google's trash doesn't support restarting after calling shutdown
                     unsafe { xr_overlay_cef::shutdown() };
+                    kill();
                     break;
                 }
-                xr_overlay::runner::PollResult::SessionLost => unreachable!(),
+                xr_overlay::runner::PollResult::SessionLost => kill(),
             }
         }
     })

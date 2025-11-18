@@ -3961,7 +3961,7 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=ffa2e8a1e511777e9fd9e91b1a6ece423886ca2d#ffa2e8a1e511777e9fd9e91b1a6ece423886ca2d"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=77a1b490c103c7563993789f099ea4f5bd5cc3ee#77a1b490c103c7563993789f099ea4f5bd5cc3ee"
 
 [[package]]
 name = "markup5ever"
@@ -4994,6 +4994,7 @@ dependencies = [
  "mime_guess",
  "nalgebra",
  "named_pipe",
+ "nix 0.30.1",
  "ovr_overlay",
  "oyasumivr-shared",
  "oyasumivr_macros",
@@ -9867,7 +9868,7 @@ checksum = "3ae8337f8a065cfc972643663ea4279e04e7256de865aa66fe25cec5fb912d3f"
 [[package]]
 name = "xr_input"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=ffa2e8a1e511777e9fd9e91b1a6ece423886ca2d#ffa2e8a1e511777e9fd9e91b1a6ece423886ca2d"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=77a1b490c103c7563993789f099ea4f5bd5cc3ee#77a1b490c103c7563993789f099ea4f5bd5cc3ee"
 dependencies = [
  "macros",
 ]
@@ -9875,7 +9876,7 @@ dependencies = [
 [[package]]
 name = "xr_overlay"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=ffa2e8a1e511777e9fd9e91b1a6ece423886ca2d#ffa2e8a1e511777e9fd9e91b1a6ece423886ca2d"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=77a1b490c103c7563993789f099ea4f5bd5cc3ee#77a1b490c103c7563993789f099ea4f5bd5cc3ee"
 dependencies = [
  "ash",
  "glam",

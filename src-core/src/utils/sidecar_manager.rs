@@ -1,5 +1,6 @@
 use log::{error, info, warn};
-use std::sync::Arc;
+use nix::libc::fork;
+use std::{fs, sync::Arc};
 use std::time::Duration;
 use sysinfo::{Pid, System};
 use tokio::sync::{mpsc, Mutex};
@@ -119,10 +120,10 @@ impl SidecarManager {
             self.sidecar_id
         );
         let exe_file = self.exe_file.clone();
-        let exe_dir = self.exe_dir.clone();
-        let exe_path = std::path::Path::new(&exe_dir).join(&exe_file);
+        let mut exe_dir = std::path::PathBuf::from(self.exe_dir.as_str());
+        let mut exe_path = std::path::Path::new(&exe_dir).join(&exe_file);
         if !exe_path.is_file(){
-            error!("[Core] {} sidecar not found",self.sidecar_id);
+            error!("[Core] {} sidecar not found at path:{:?}",self.sidecar_id,exe_path);
             return 0;
         }
         let mut args = vec![
@@ -135,11 +136,16 @@ impl SidecarManager {
                 args.push(arg.clone());
             }
         }
+        #[cfg(unix)]
+        {
+         exe_path=fs::canonicalize(exe_path).unwrap();
+         exe_dir=fs::canonicalize(exe_dir).unwrap();
+        }
         let child = std::process::Command::new(exe_path)
-            .current_dir(exe_dir)
-            .args(args)
+            .current_dir(&exe_dir)
+            .args(&args)
             .spawn()
-            .expect("Could not spawn command");
+            .unwrap_or_else(|err|panic!("Could not spawn command {:?} {:?}, in path:{:?},with args:{:?}",err,exe_file,exe_dir,args));
         let child_pid = child.id();
         *self.sidecar_pid.lock().await = Some(child_pid);
         *self.sidecar_child.lock().await = Some(child);
