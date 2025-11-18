@@ -51,59 +51,75 @@ pub async fn is_vrchat_active() -> bool {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn run_command(command: String, args: Vec<String>) -> Result<Output, String> {
-    let command = {
-        let handle = TAURI_APP_HANDLE.lock().await;
-        handle.as_ref().unwrap().shell().command(command).args(args)
-    };
+    log::debug!("running: {} with args:{:?}", command, args);
+    #[cfg(windows)]
+    {
+        let command = {
+            let handle = TAURI_APP_HANDLE.lock().await;
+            handle.as_ref().unwrap().shell().command(command).args(args)
+        };
 
-    let (mut rx, _child) = match command.spawn() {
-        Ok(child) => child,
-        Err(error) => match error {
-            Error::Io(io_err) => match io_err.kind() {
-                std::io::ErrorKind::NotFound => {
-                    error!("[Core] [run_command] Executable not found: {}", io_err);
-                    return Err(String::from("NOT_FOUND"));
-                }
-                std::io::ErrorKind::PermissionDenied => {
-                    error!("[Core] [run_command] Permission Denied: {}", io_err);
-                    return Err(String::from("PERMISSION_DENIED"));
-                }
+        let (mut rx, _child) = match command.spawn() {
+            Ok(child) => child,
+            Err(error) => match error {
+                Error::Io(io_err) => match io_err.kind() {
+                    std::io::ErrorKind::NotFound => {
+                        error!("[Core] [run_command] Executable not found: {}", io_err);
+                        return Err(String::from("NOT_FOUND"));
+                    }
+                    std::io::ErrorKind::PermissionDenied => {
+                        error!("[Core] [run_command] Permission Denied: {}", io_err);
+                        return Err(String::from("PERMISSION_DENIED"));
+                    }
+                    other => {
+                        error!(
+                            "[Core] [run_command] Unknown IO error occurred: (kind={}, error={})",
+                            other, io_err
+                        );
+                        return Err(String::from("UNKNOWN_ERROR"));
+                    }
+                },
                 other => {
-                    error!(
-                        "[Core] [run_command] Unknown IO error occurred: (kind={}, error={})",
-                        other, io_err
-                    );
+                    error!("[Core] [run_command] Unknown error occurred: {}", other);
                     return Err(String::from("UNKNOWN_ERROR"));
                 }
             },
-            other => {
-                error!("[Core] [run_command] Unknown error occurred: {}", other);
-                return Err(String::from("UNKNOWN_ERROR"));
+        };
+        let mut stdout: Vec<String> = Vec::new();
+        let mut stderr: Vec<String> = Vec::new();
+        let mut status = -1;
+        while let Some(event) = rx.recv().await {
+            match &event {
+                CommandEvent::Stdout(line) => {
+                    stdout.push(String::from_utf8_lossy(line).to_string());
+                }
+                CommandEvent::Stderr(line) => {
+                    stderr.push(String::from_utf8_lossy(line).to_string());
+                }
+                CommandEvent::Terminated(payload) => {
+                    status = payload.code.unwrap_or(-1);
+                }
+                _ => {}
             }
-        },
-    };
-    let mut stdout: Vec<String> = Vec::new();
-    let mut stderr: Vec<String> = Vec::new();
-    let mut status = -1;
-    while let Some(event) = rx.recv().await {
-        match &event {
-            CommandEvent::Stdout(line) => {
-                stdout.push(String::from_utf8_lossy(line).to_string());
-            }
-            CommandEvent::Stderr(line) => {
-                stderr.push(String::from_utf8_lossy(line).to_string());
-            }
-            CommandEvent::Terminated(payload) => {
-                status = payload.code.unwrap_or(-1);
-            }
-            _ => {}
         }
+        Ok(Output {
+            stdout: stdout.join("\n"),
+            stderr: stderr.join("\n"),
+            status,
+        })
     }
-    Ok(Output {
-        stdout: stdout.join("\n"),
-        stderr: stderr.join("\n"),
-        status,
-    })
+    #[cfg(unix)]
+    {
+        Command::new(command)
+            .args(args)
+            .output()
+            .map_err(|err| err.to_string())
+            .map(|res| Output {
+                stdout: String::from_utf8_lossy(&res.stdout).to_string(),
+                stderr: String::from_utf8_lossy(&res.stderr).to_string(),
+                status: res.status.code().unwrap_or_default(),
+            })
+    }
 }
 
 #[tauri::command]
