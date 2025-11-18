@@ -109,7 +109,7 @@ export class SleepService {
   }
 
   async enableSleepMode(reason: SleepModeStatusChangeReason) {
-    invoke("vr_sleep_mode_check",{boolean:false});
+    invoke("vr_sleep_mode_check",{value:false});
     if (this._mode.value) return;
     reason.enabled = true;
     info(`[Sleep] Sleep mode enabled (reason=${reason.type})`);

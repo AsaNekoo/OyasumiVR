@@ -105,7 +105,7 @@ export class SleepModeForSleepDetectorAutomationService {
       // Dismiss sleep check for head shake
       await listen<{ gesture: string }>('GESTURE_DETECTED', (event) => {
         if (event.payload.gesture !== 'head_shake') return;
-        invoke("vr_sleep_mode_check",{boolean:false});
+        invoke("vr_sleep_mode_check",{value:false});
 
         this.dismissSleepCheck();
       });
