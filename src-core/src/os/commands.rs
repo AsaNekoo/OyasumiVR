@@ -125,94 +125,129 @@ pub async fn run_command(command: String, args: Vec<String>) -> Result<Output, S
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn run_cmd_commands(commands: String) {
-    info!("[Core] Running commands:\n{}", commands);
+    #[cfg(windows)]
+    {
+        info!("[Core] Running commands:\n{}", commands);
 
-    // Get the system temp directory
-    let mut batch_path: PathBuf = env::temp_dir();
-    // Generate a unique filename
-    let filename = format!("oyasumi_{}.bat", Uuid::new_v4());
-    batch_path.push(filename);
+        // Get the system temp directory
+        let mut batch_path: PathBuf = env::temp_dir();
+        // Generate a unique filename
+        let filename = format!("oyasumi_{}.bat", Uuid::new_v4());
+        batch_path.push(filename);
 
-    info!("[Core] Creating batch file at: {}", batch_path.display());
+        info!("[Core] Creating batch file at: {}", batch_path.display());
 
-    // Write the commands to the batch file
-    match File::create(&batch_path).await {
-        Ok(mut file) => {
-            debug!("[Core] Successfully created batch file");
-            if let Err(e) = file.write_all(commands.as_bytes()).await {
-                error!("[Core] Failed to write to batch file: {}", e);
+        // Write the commands to the batch file
+        match File::create(&batch_path).await {
+            Ok(mut file) => {
+                debug!("[Core] Successfully created batch file");
+                if let Err(e) = file.write_all(commands.as_bytes()).await {
+                    error!("[Core] Failed to write to batch file: {}", e);
+                    return;
+                }
+                debug!(
+                    "[Core] Successfully wrote {} bytes to batch file",
+                    commands.len()
+                );
+
+                // Ensure file is written and closed
+                if let Err(e) = file.flush().await {
+                    error!("[Core] Failed to flush batch file: {}", e);
+                    return;
+                }
+                debug!("[Core] Successfully flushed batch file to disk");
+            }
+            Err(e) => {
+                error!("[Core] Failed to create batch file: {}", e);
                 return;
             }
-            debug!(
-                "[Core] Successfully wrote {} bytes to batch file",
-                commands.len()
-            );
-
-            // Ensure file is written and closed
-            if let Err(e) = file.flush().await {
-                error!("[Core] Failed to flush batch file: {}", e);
-                return;
-            }
-            debug!("[Core] Successfully flushed batch file to disk");
         }
-        Err(e) => {
-            error!("[Core] Failed to create batch file: {}", e);
+
+        // Verify the file exists before trying to execute it
+        if !batch_path.exists() {
+            error!(
+                "[Core] Batch file does not exist after creation: {}",
+                batch_path.display()
+            );
             return;
         }
-    }
-
-    // Verify the file exists before trying to execute it
-    if !batch_path.exists() {
-        error!(
-            "[Core] Batch file does not exist after creation: {}",
+        debug!(
+            "[Core] Verified batch file exists: {}",
             batch_path.display()
         );
-        return;
-    }
-    debug!(
-        "[Core] Verified batch file exists: {}",
-        batch_path.display()
-    );
 
-    // Log the path of the batch file
-    let mut cmd_builder = Command::new("cmd");
-    cmd_builder.args(["/C", batch_path.to_str().unwrap()]);
-    // cmd_builder.creation_flags(0x00000008);
+        // Log the path of the batch file
+        let mut cmd_builder = Command::new("cmd");
+        cmd_builder.args(["/C", batch_path.to_str().unwrap()]);
+        // cmd_builder.creation_flags(0x00000008);
 
-    debug!(
-        "[Core] Attempting to spawn cmd.exe process with batch file: {}",
-        batch_path.to_str().unwrap()
-    );
+        debug!(
+            "[Core] Attempting to spawn cmd.exe process with batch file: {}",
+            batch_path.to_str().unwrap()
+        );
 
-    match cmd_builder.spawn() {
-        Ok(child) => {
-            debug!(
-                "[Core] Successfully spawned cmd.exe process with PID: {:?}",
-                child.id()
-            );
-        }
-        Err(e) => {
-            error!("[Core] Failed to spawn cmd.exe process: {}", e);
-            error!("[Core] Error kind: {:?}", e.kind());
+        match cmd_builder.spawn() {
+            Ok(child) => {
+                debug!(
+                    "[Core] Successfully spawned cmd.exe process with PID: {:?}",
+                    child.id()
+                );
+            }
+            Err(e) => {
+                error!("[Core] Failed to spawn cmd.exe process: {}", e);
+                error!("[Core] Error kind: {:?}", e.kind());
 
-            // Additional debug information
-            match e.kind() {
-                std::io::ErrorKind::NotFound => {
-                    error!("[Core] cmd.exe not found - this should not happen on Windows");
-                }
-                std::io::ErrorKind::PermissionDenied => {
-                    error!("[Core] Permission denied when trying to execute cmd.exe");
-                    error!("[Core] This might be due to security policies or antivirus software");
-                }
-                std::io::ErrorKind::InvalidInput => {
-                    error!("[Core] Invalid input provided to cmd.exe");
-                    error!("[Core] Batch file path: {}", batch_path.display());
-                }
-                _ => {
-                    error!("[Core] Unexpected error kind: {:?}", e.kind());
+                // Additional debug information
+                match e.kind() {
+                    std::io::ErrorKind::NotFound => {
+                        error!("[Core] cmd.exe not found - this should not happen on Windows");
+                    }
+                    std::io::ErrorKind::PermissionDenied => {
+                        error!("[Core] Permission denied when trying to execute cmd.exe");
+                        error!(
+                            "[Core] This might be due to security policies or antivirus software"
+                        );
+                    }
+                    std::io::ErrorKind::InvalidInput => {
+                        error!("[Core] Invalid input provided to cmd.exe");
+                        error!("[Core] Batch file path: {}", batch_path.display());
+                    }
+                    _ => {
+                        error!("[Core] Unexpected error kind: {:?}", e.kind());
+                    }
                 }
             }
         }
+    }
+    #[cfg(unix)]
+    {
+        async fn inner(commands: String) -> Result<(), Box<dyn std::error::Error>> {
+            let mut file = File::options()
+                .write(true)
+                .create_new(true)
+                .open("/tmp/Oyasumi_bash_script.sh")
+                .await?;
+            file.write_all(commands.as_bytes()).await?;
+            Command::new("chmod")
+                .arg("+x")
+                .arg("/tmp/Oyasumi_bash_script.sh")
+                .output()?;
+            let out = Command::new("bash")
+                .arg("/tmp/Oyasumi_bash_script.sh")
+                .output()?;
+            if !out.status.success() {
+                log::warn!("[core] command failed:{:?}", out);
+            }
+            Ok(())
+        }
+        tokio::task::spawn(async {
+            use tokio::fs;
+
+            if let Err(err) = inner(commands).await {
+                error!("[core] command failed with:{:?}", err);
+            }
+            fs::remove_file("/tmp/Oyasumi_bash_script.sh").await.ok();
+        });
     }
 }
 

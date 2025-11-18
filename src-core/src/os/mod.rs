@@ -62,7 +62,7 @@ pub async fn init_audio_device_manager() {
         tokio::task::spawn(watch_processes());
     }
 }
-
+#[cfg(windows)]
 async fn watch_processes() {
     loop {
         {
