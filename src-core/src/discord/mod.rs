@@ -1,4 +1,7 @@
-use std::{sync::LazyLock, time::{Duration, SystemTime}};
+use std::{
+    sync::LazyLock,
+    time::{Duration, SystemTime},
+};
 
 pub use discord_sdk as ds;
 use log::error;
@@ -9,9 +12,11 @@ pub const APP_ID: ds::AppId = 1223302812021035169;
 
 static DISCORD_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 static DISCORD_CLIENT: LazyLock<Mutex<Option<Client>>> = LazyLock::new(Default::default);
-static LAST_ACTIVITY_UPDATE: LazyLock<Mutex<Option<ActivityUpdate>>> = LazyLock::new(Default::default);
+static LAST_ACTIVITY_UPDATE: LazyLock<Mutex<Option<ActivityUpdate>>> =
+    LazyLock::new(Default::default);
 
 pub async fn init() {
+    #[cfg(windows)]
     tokio::task::spawn(async {
         loop {
             {
@@ -26,6 +31,19 @@ pub async fn init() {
                         on_discord_stopped().await;
                     }
                 }
+            }
+            tokio::time::sleep(Duration::from_secs(1)).await;
+        }
+    });
+      #[cfg(unix)]
+    tokio::task::spawn(async {
+        loop {
+            {
+                    if is_discord_running() {
+                        on_discord_started().await;
+                    } else {
+                        on_discord_stopped().await;
+                    }
             }
             tokio::time::sleep(Duration::from_secs(1)).await;
         }
@@ -169,7 +187,24 @@ pub async fn update_activity(
         }
     }
 }
+#[cfg(unix)]
+fn is_discord_running() {
+    let tmp_path = std::env::var("XDG_RUNTIME_DIR")
+        .or_else(|_| std::env::var("TMPDIR"))
+        .or_else(|_| std::env::var("TMP"))
+        .or_else(|_| std::env::var("TEMP"))
+        .unwrap_or_else(|_| "/tmp".to_owned());
+    let mut socket_path = format!("{}/app/com.discordapp.Discord/discord-ipc-0", tmp_path);
+    let mut fallback_path = format!("{}/discord-ipc-0", tmp_path);
+    for path in [&mut socket_path, &mut fallback_path] {
+        use std::path::PathBuf;
 
+        if PathBuf::from(path).is_file() {
+          return true;  
+        }
+    }
+    false
+}
 struct Client {
     pub discord: ds::Discord,
     // pub user: ds::user::User,

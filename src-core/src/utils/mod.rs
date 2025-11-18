@@ -33,7 +33,7 @@ pub fn init() {
         }
     });
 }
-
+#[cfg(windows)]
 pub async fn is_process_active(process_name: &str, refresh_processes: bool) -> bool {
     let mut sysinfo_guard = SYSINFO.lock().await;
     let sysinfo = &mut *sysinfo_guard;
