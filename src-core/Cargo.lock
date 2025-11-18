@@ -8672,6 +8672,7 @@ dependencies = [
 [[package]]
 name = "vrchat_osc"
 version = "1.3.0"
+source = "git+https://github.com/minetake01/vrchat_osc#972b8036c82811519f1327e43eccdd4b2adea821"
 dependencies = [
  "axum",
  "convert_case 0.7.1",
