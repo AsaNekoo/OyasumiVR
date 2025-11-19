@@ -10,8 +10,10 @@ use xr_overlay::{
     openxr::{Posef, Vector3f},
     runner::{
         AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, ShowMode,
+        actions::{MetaSwitchAction, ProfilesMetaSwitchAction, SwitchActionEnum},
         events::AppEvent,
     },
+    xr_input::{InputSource, ProfileName},
 };
 use xr_overlay_cef::{
     CefOverlayCreateInfo,
@@ -76,11 +78,18 @@ pub fn start_vr() -> JoinHandle<()> {
         app.clone(),
         CefOverlayCreateInfo {
             size: [0.6, 0.6],
-            visibility_switch_actions: None,
+            visibility_switch_actions: Some(ProfilesMetaSwitchAction::new(&[(
+                ProfileName::OCULUS_TOUCH,
+                MetaSwitchAction::new(&[
+                    SwitchActionEnum::Bool(InputSource::OCULUS_TOUCH_LEFT_X_TOUCH),
+                    SwitchActionEnum::Bool(InputSource::OCULUS_TOUCH_LEFT_Y_TOUCH),
+                    SwitchActionEnum::Bool(InputSource::OCULUS_TOUCH_RIGHT_THUMBSTICK_CLICK),
+                ]),
+            )])),
             spawn_visible: true,
             interactable: true,
             movable: true,
-            allow_visibility_switch: false,
+            allow_visibility_switch: true,
             pos,
             framerate,
             resolution: [1024, 1024],
@@ -95,7 +104,7 @@ pub fn start_vr() -> JoinHandle<()> {
             ..Default::default()
         },
     );
- 
+
     assert!(
         OVERLAY
             .set(Overlay {
@@ -134,11 +143,11 @@ pub fn start_vr() -> JoinHandle<()> {
     })
 }
 fn openxr_callback(event: AppEvent) {
-    if event!=AppEvent::ButtonsUpdated{
-    trace!("[openxr] {:?}", event);
+    if event != AppEvent::ButtonsUpdated {
+        trace!("[openxr] {:?}", event);
     }
 }
-fn openxr_show_hand()->DeviceRole{
+fn openxr_show_hand() -> DeviceRole {
     DeviceRole::Hmd
 }
 pub static mut DASBOARD_VISIBLE: bool = false;
