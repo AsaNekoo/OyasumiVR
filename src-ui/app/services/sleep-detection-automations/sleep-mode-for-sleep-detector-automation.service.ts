@@ -206,7 +206,7 @@ export class SleepModeForSleepDetectorAutomationService {
       );
       if (this.sleepEnableTimeoutId) return 'SLEEP_CHECK_ALREADY_IN_PROGRESS';
       //notify backend it should check for a head shake
-      await invoke("vr_sleep_mode_check",{boolean:true});
+      await invoke("vr_sleep_mode_check",{value:true});
       this.sleepEnableTimeoutId = setTimeout(async () => {
         this.sleepEnableTimeoutId = null;
         this._lastStateReportHandlingResult.next('SLEEP_CHECK_USER_ASLEEP');
