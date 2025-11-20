@@ -5,6 +5,7 @@ use std::{
 };
 
 use log::trace;
+use tokio::spawn;
 use xr_overlay::{
     input::{InputHandler, InputHandlerCreateInfo, InputSettings},
     openxr::{Posef, Vector3f},
@@ -55,7 +56,7 @@ pub fn start_vr() -> JoinHandle<()> {
     .unwrap();
     let app = AppRunner::new(AppRunnerCreateInfo {
         ctx,
-        space_type: xr_overlay::xr::ReferenceSpaceT::VIEW,
+        space_type: xr_overlay::xr::ReferenceSpaceT::STAGE,
         callback: openxr_callback,
         input: Some(AppRunnerCreateInfoInput {
             input_handler,
@@ -69,9 +70,9 @@ pub fn start_vr() -> JoinHandle<()> {
     let app = Arc::new(RwLock::new(app));
     XR_CTX.set(app.clone()).unwrap();
     let pos = Vector3f {
-        x: -0.0,
-        y: -0.0,
-        z: -1.2,
+        x: 0.1,
+        y: -0.2,
+        z: -0.8,
     };
     let framerate = app.read().unwrap().current_refresh_rate() as u32;
     let overlay = create_cef_overlay(
@@ -93,18 +94,16 @@ pub fn start_vr() -> JoinHandle<()> {
             pos,
             framerate,
             resolution: [1024, 1024],
-            show_mode: ShowMode::DeviceCallback((
-                openxr_show_hand,
-                Posef {
-                    orientation: xr_overlay::openxr::Quaternionf::default(),
-                    position: pos,
-                },
-                false,
-            )),
+            show_mode: ShowMode::DeviceCallback {
+                role_callback: openxr_show_hand,
+                pos,
+                rot: None,
+            },
             ..Default::default()
         },
     );
-
+    let delay=Duration::from_millis(500).as_millis() as f32/(1000./app.read().unwrap().current_refresh_rate());
+    app.write().unwrap().set_delay_hide(overlay.overlay_handle, delay as u8);
     assert!(
         OVERLAY
             .set(Overlay {
@@ -146,12 +145,25 @@ fn openxr_callback(event: AppEvent) {
     if event != AppEvent::ButtonsUpdated {
         trace!("[openxr] {:?}", event);
     }
+    match event{
+        AppEvent::OverlayVisibilityChanged { handle:_, visible } => {
+            if visible{
+                OVERLAY.get().as_ref().unwrap().show_dashboard();
+            }
+    },
+        AppEvent::OverlayHiding { handle:_, frames_left:_ }=>
+            { 
+            OVERLAY.get().as_ref().unwrap().hide_dashboard()
+},
+        _=>()
+}
 }
 fn openxr_show_hand() -> DeviceRole {
     DeviceRole::Hmd
 }
 pub static mut DASBOARD_VISIBLE: bool = false;
 pub fn show_dashboard() {
+    trace!("show_dashboard");
     unsafe { DASBOARD_VISIBLE = true };
     XR_CTX
         .wait()
@@ -161,6 +173,7 @@ pub fn show_dashboard() {
     OVERLAY.wait().show_dashboard();
 }
 pub async fn hide_dashboard() {
+    trace!("hide_dashboard");
     unsafe { DASBOARD_VISIBLE = false };
     OVERLAY.wait().hide_dashboard();
     tokio::time::sleep(Duration::from_millis(500)).await; //give animation some time

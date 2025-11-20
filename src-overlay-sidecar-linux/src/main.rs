@@ -40,7 +40,7 @@ fn main() {
     env_logger::Builder::from_default_env()
         .filter_level(log::LevelFilter::Trace)
         .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
-        .filter_module("xr_overlay", log::LevelFilter::Debug)
+        // .filter_module("xr_overlay", log::LevelFilter::Debug)
         .filter_module("tokio_tungstenite", log::LevelFilter::Warn)
         .filter_module("tungstenite", log::LevelFilter::Warn)
         .init();
@@ -145,7 +145,8 @@ async fn tokio_main() {
         .unwrap();
     let ws_port = start_websocket_server().await;
     OVERLAY.wait().inject_ipc(ws_port);
-    tokio::time::sleep(Duration::from_millis(200)).await;
+    tokio::time::sleep(Duration::from_millis(2000)).await;
+    println!("showing");
     show_dashboard();
 }
 static mut KILL: bool = false;

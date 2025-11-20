@@ -20,8 +20,10 @@ serde = { version = "1.0.228", features = ["derive"] }
 tokio-tungstenite = "0.28.0"
 futures-util = { version = "0.3.31", default-features = false }
 base64 = "0.22.1"
-xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="77a1b490c103c7563993789f099ea4f5bd5cc3ee" }
-xr_overlay_cef = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="77a1b490c103c7563993789f099ea4f5bd5cc3ee" }
+xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="1d5a7325d0fe608b2ddead31958d81a3cd7c0908" }
+# xr_overlay = { path="../../xr_overlay/core/" }
+xr_overlay_cef = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="1d5a7325d0fe608b2ddead31958d81a3cd7c0908" }
+# xr_overlay_cef = {  path="../../xr_overlay/cef_app/" }
 [build-dependencies]
 tonic-prost-build = "*"
 [profile.release]
