@@ -5,7 +5,7 @@ use std::{
     time::Duration,
 };
 
-use log::{info, trace};
+use log::{debug, info, trace};
 use tokio::join;
 use tonic::transport::Channel;
 use xr_overlay_cef::{
@@ -14,7 +14,7 @@ use xr_overlay_cef::{
 };
 
 use crate::{
-    core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient}, globals::STATE, grpc::{start_grpc_server, start_grpc_web_server}, overlay_ipc::start_websocket_server, vr::{OVERLAY, show_dashboard, start_vr}
+    core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient}, globals::STATE, grpc::{start_grpc_server, start_grpc_web_server}, overlay_ipc::start_websocket_server, ui::serve_ui, vr::{OVERLAY, show_dashboard, start_vr}
 };
 pub mod globals;
 pub mod grpc;
@@ -22,6 +22,7 @@ pub mod input;
 pub mod model;
 pub mod overlay_ipc;
 pub mod vr;
+pub mod ui;
 pub mod core_grpc {
     tonic::include_proto!("oyasumi_core");
 }
@@ -123,6 +124,12 @@ async fn tokio_main() {
         .into_inner()
         .port;
     info!("got http port:{:?}", http_port);
+    let ui_port=match ARGS.get().as_ref().unwrap().core_grpc_port==0 {
+        true => 5173,
+        false => serve_ui().await,
+    };
+    let url=format!("http://localhost:{}/dashboard?corePort={}",ui_port, http_port);
+    trace!("navigating to:{}",url);
     OVERLAY
         .get()
         .as_ref()
@@ -131,7 +138,7 @@ async fn tokio_main() {
         .main_frame()
         .unwrap()
         .load_url(Some(
-            &(format!("http://localhost:5173/dashboard?corePort={}", http_port).as_str()).into(),
+            &(url.as_str()).into(),
         ));
     let grpc_server_port = start_grpc_server().await;
     let grpc_web_server_pos = start_grpc_web_server().await;
@@ -157,6 +164,7 @@ pub fn kill() {
     std::thread::spawn(|| {
         std::thread::sleep(Duration::from_millis(100));
         Command::new("killall").arg("-9").arg("oyasumivr-overlay-sidecar").spawn().unwrap();
+        std::thread::sleep(Duration::from_millis(100));
         exit(0);
     });
 }
