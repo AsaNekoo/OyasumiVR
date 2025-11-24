@@ -42,24 +42,11 @@ pub fn start_vr() -> JoinHandle<()> {
             }
         };
     };
-    let input_handler = InputHandler::new(InputHandlerCreateInfo {
-        ctx: ctx.clone(),
-        setting: InputSettings {
-            oculus_touch: true,
-            valve_index: true,
-            hand_tracking: true,
-            palm_pose: false,
-        },
-        actionset_name: None,
-        tracked_actions: None,
-    })
-    .unwrap();
     let app = AppRunner::new(AppRunnerCreateInfo {
         ctx,
         space_type: xr_overlay::xr::ReferenceSpaceT::STAGE,
         callback: openxr_callback,
         input: Some(AppRunnerCreateInfoInput {
-            input_handler,
             l_pointer_color: [1., 1., 1., 0.2],
             r_pointer_color: [1., 1., 1., 0.],
             controllers: get_controller_create_info(),
