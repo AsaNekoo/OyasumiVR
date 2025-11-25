@@ -1,6 +1,7 @@
 use std::sync::atomic::Ordering;
 
 use log::{error, warn};
+#[cfg(feature = "steam")]
 use steamlocate::SteamDir;
 
 #[tauri::command]
@@ -12,6 +13,7 @@ pub async fn bigscreen_beyond_is_connected() -> bool {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn bigscreen_beyond_get_saved_preferences() -> Result<Option<String>, String> {
+    #[cfg(feature = "steam")]
     {
     let steamdir = match SteamDir::locate() {
         Ok(dir) => dir,
@@ -56,6 +58,10 @@ pub async fn bigscreen_beyond_get_saved_preferences() -> Result<Option<String>, 
             Err("READ_ERROR".to_string())
         }
     }
+}
+#[cfg(not(feature = "steam"))]
+{
+Ok(None)
 }
 }
 

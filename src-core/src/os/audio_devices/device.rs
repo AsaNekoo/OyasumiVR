@@ -7,7 +7,7 @@ use serde::Serialize;
 use tokio::runtime::Handle;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
 use tokio::sync::Mutex;
-use widestring::U16Str;
+// use widestring::U16Str;
 use windows::core::{Interface, PCWSTR, PWSTR};
 use windows::Win32::Devices::FunctionDiscovery::PKEY_Device_FriendlyName;
 use windows::Win32::Media::Audio::Endpoints::{
