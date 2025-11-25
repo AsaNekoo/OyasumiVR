@@ -21,6 +21,7 @@ use std::os::windows::ffi::OsStringExt;
 #[cfg(windows)]
 use std::slice;
 use std::sync::LazyLock;
+#[cfg(windows)]
 use std::time::Duration;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;

@@ -1,8 +1,8 @@
 use log::{error, info, warn};
 use nix::libc::fork;
-use std::{fs, sync::Arc};
 use std::time::Duration;
-use sysinfo::{Pid, System};
+use std::{fs, sync::Arc};
+use sysinfo::{Pid, ProcessRefreshKind, System};
 use tokio::sync::{mpsc, Mutex};
 
 const LAUNCH_RETRY_INTERVALS: [Duration; 9] = [
@@ -122,8 +122,11 @@ impl SidecarManager {
         let exe_file = self.exe_file.clone();
         let mut exe_dir = std::path::PathBuf::from(self.exe_dir.as_str());
         let mut exe_path = std::path::Path::new(&exe_dir).join(&exe_file);
-        if !exe_path.is_file(){
-            error!("[Core] {} sidecar not found at path:{:?}",self.sidecar_id,exe_path);
+        if !exe_path.is_file() {
+            error!(
+                "[Core] {} sidecar not found at path:{:?}",
+                self.sidecar_id, exe_path
+            );
             return 0;
         }
         let mut args = vec![
@@ -138,26 +141,29 @@ impl SidecarManager {
         }
         #[cfg(unix)]
         {
-         exe_path=fs::canonicalize(exe_path).unwrap();
-         exe_dir=fs::canonicalize(exe_dir).unwrap();
+            exe_path = fs::canonicalize(exe_path).unwrap();
+            exe_dir = fs::canonicalize(exe_dir).unwrap();
         }
         let child = std::process::Command::new(exe_path)
             .current_dir(&exe_dir)
             .args(&args)
             .spawn()
-            .unwrap_or_else(|err|panic!("Could not spawn command {:?} {:?}, in path:{:?},with args:{:?}",err,exe_file,exe_dir,args));
+            .unwrap_or_else(|err| {
+                panic!(
+                    "Could not spawn command {:?} {:?}, in path:{:?},with args:{:?}",
+                    err, exe_file, exe_dir, args
+                )
+            });
         let child_pid = child.id();
         *self.sidecar_pid.lock().await = Some(child_pid);
         *self.sidecar_child.lock().await = Some(child);
-        let self_=self.clone();
-        tokio::task::spawn(async move{
+        let self_ = self.clone();
+        tokio::task::spawn(async move {
             loop {
-                
                 tokio::time::sleep(Duration::from_secs(1)).await;
-                if let Some(child) =&mut *self_.sidecar_child.lock().await{
+                if let Some(child) = &mut *self_.sidecar_child.lock().await {
                     //process exit code should be collected
-                    let _= child.try_wait();
- 
+                    let _ = child.try_wait();
                 }
             }
         });
@@ -244,13 +250,19 @@ impl SidecarManager {
                 loop {
                     tokio::time::sleep(Duration::from_secs(1)).await;
                     let self_guard = self_arc.lock().await;
-
-                    s.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
+                    let current_sidecar_pid =
+                        { self_guard.sidecar_pid.lock().await.as_ref().map(|pid| *pid) };
+                    s.refresh_processes_specifics(
+                        sysinfo::ProcessesToUpdate::Some(&[Pid::from_u32(
+                            current_sidecar_pid.unwrap_or_default(),
+                        )]),
+                        true,
+                        ProcessRefreshKind::nothing(),
+                    );
                     // Check if the child process is no longer found
                     if s.process(Pid::from(pid as usize)).is_none() {
-                        let current_sidecar_pid = {
-                            self_guard.sidecar_pid.lock().await.as_ref().map(|pid| *pid)
-                        };
+                        let current_sidecar_pid =
+                            { self_guard.sidecar_pid.lock().await.as_ref().map(|pid| *pid) };
                         // Check if the sidecar pid is still the same.
                         // If it is, then we can assume the sidecar stopped.
                         // If not, it likely got replaced by another instance of the sidecar.

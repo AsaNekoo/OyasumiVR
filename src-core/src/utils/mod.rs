@@ -1,17 +1,23 @@
 use log::error;
 use serde::Serialize;
 use std::{
-    ffi::OsStr,
     os::raw::c_char,
-    sync::LazyLock,
-    time::{Duration, SystemTime, UNIX_EPOCH},
+    time::{SystemTime, UNIX_EPOCH},
 };
-use sysinfo::{ProcessesToUpdate, Signal, System};
+#[cfg(windows)]
+use std::{
+    ffi::OsStr,
+    sync::LazyLock,
+    time::Duration,
+};
+
+use sysinfo::{ProcessesToUpdate, RefreshKind, Signal, System};
 use tauri::Emitter;
+#[cfg(windows)]
 use tokio::sync::Mutex;
 
 use crate::globals::{TAURI_APP_HANDLE, TAURI_CLI_MATCHES};
-
+#[cfg(windows)]
 static SYSINFO: LazyLock<Mutex<System>> = LazyLock::new(|| Mutex::new(System::new_all()));
 
 
@@ -21,13 +27,16 @@ pub mod serialization;
 pub mod sidecar_manager;
 
 pub fn init() {
+    #[cfg(windows)]
     // Refresh processes at least every second
     tokio::task::spawn(async {
         loop {
             {
                 let mut sysinfo_guard = SYSINFO.lock().await;
                 let sysinfo = &mut *sysinfo_guard;
-                sysinfo.refresh_processes(ProcessesToUpdate::All, true);
+                //todo: there is no need to query all process just to check if steamvr or sidecard are running
+                //discord ipc can be checked without looking at process
+                sysinfo.refresh_processes_specifics(ProcessesToUpdate::All, true, RefreshKind::nothing());
             }
             tokio::time::sleep(Duration::from_secs(1)).await;
         }
@@ -43,7 +52,7 @@ pub async fn is_process_active(process_name: &str, refresh_processes: bool) -> b
     let processes = sysinfo.processes_by_exact_name(OsStr::new(process_name));
     processes.count() > 0
 }
-
+#[cfg(windows)]
 pub async fn stop_process(process_name: &str, kill: bool) {
     let mut sysinfo_guard = SYSINFO.lock().await;
     let sysinfo = &mut *sysinfo_guard;

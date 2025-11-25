@@ -8,14 +8,14 @@ use crate::globals::TAURI_APP_HANDLE;
 use crate::os::audio_devices::AudioDeviceDto;
 #[cfg(unix)]
 use crate::os::linux::audio::LINUX_AUDIO_DEVICE_MANAGER;
-use log::{debug, error, info};
+use log::error;
 #[cfg(windows)]
 use oyasumivr_shared::windows::is_elevated;
+use tauri_plugin_shell::ShellExt;
 use std::process::Command;
-use std::{env, path::PathBuf};
-use tauri_plugin_shell::{process::CommandEvent, Error, ShellExt};
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
+#[cfg(windows)]
 use uuid::Uuid;
 
 #[tauri::command]
@@ -37,8 +37,12 @@ pub async fn play_sound(name: String, volume: f32) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg_attr(unix, allow(unused_variables))]
 pub async fn quit_steamvr(kill: bool) {
+    #[cfg(windows)]
     crate::utils::stop_process("vrmonitor.exe", kill).await;
+    #[cfg(unix)]
+    {crate::vr::openxr::OXR_HANDLE.get().unwrap().lock().await.request_end_session();}
 }
 
 #[tauri::command]
@@ -498,6 +502,7 @@ pub async fn set_audio_device_mute(device_id: String, mute: bool) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg_attr(unix, allow(unused_variables))]
 pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
     #[cfg(windows)]
     {
@@ -519,6 +524,7 @@ pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg_attr(unix, allow(unused_variables))]
 pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
     #[cfg(windows)]
     {
@@ -540,6 +546,7 @@ pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg_attr(unix, allow(unused_variables))]
 pub async fn set_mic_activity_device_id(device_id: Option<String>) {
     #[cfg(windows)]
     {
