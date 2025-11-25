@@ -11,7 +11,7 @@ use xr_overlay_cef::cef::{ImplBrowser, ImplFrame};
 
 use crate::{
     CORE_CLIENT, core_grpc::EventParams, globals::STATE, model::Overlay,
-    overlay_grpc::OyasumiSidecarState, vr::{OVERLAY, XR_CTX, hide_dashboard},
+    overlay_grpc::OyasumiSidecarState, vr::{OVERLAY, hide_dashboard},
 };
 pub const IPC_SCRIPT: &str = include_str!(concat!(env!("OUT_DIR"), "/bundle.js"));
 // pub const IPC_SCRIPT:&str=include_str!("../target/debug/build/src-overlay-sidecar-linux-8079ff49c704d0bc/out/bundle.js");

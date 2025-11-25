@@ -14,7 +14,7 @@ use crate::{
         SetMicrophoneActiveRequest,
         oyasumi_overlay_sidecar_server::{OyasumiOverlaySidecar, OyasumiOverlaySidecarServer},
     },
-    vr::{DASBOARD_VISIBLE, OVERLAY, XR_CTX, hide_dashboard, show_dashboard},
+    vr::{DASBOARD_VISIBLE, OVERLAY, hide_dashboard, show_dashboard},
 };
 #[derive(Debug, Default, Clone)]
 pub struct GrpcServer {}

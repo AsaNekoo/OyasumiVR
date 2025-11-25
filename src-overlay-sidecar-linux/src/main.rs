@@ -1,12 +1,11 @@
 use std::{
     fs,
     process::{Command, exit},
-    sync::{Arc, LazyLock, Mutex, OnceLock},
+    sync::{LazyLock, Mutex, OnceLock},
     time::Duration,
 };
 
-use log::{debug, info, trace};
-use tokio::{join, runtime::Runtime};
+use log::{info, trace};
 use tonic::transport::Channel;
 use xr_overlay_cef::{
     cef::{ImplBrowser, ImplFrame},
@@ -14,7 +13,7 @@ use xr_overlay_cef::{
 };
 
 use crate::{
-    core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient}, globals::STATE, grpc::{start_grpc_server, start_grpc_web_server}, overlay_ipc::start_websocket_server, ui::serve_ui, vr::{OVERLAY, show_dashboard, start_vr}
+    core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient}, grpc::{start_grpc_server, start_grpc_web_server}, overlay_ipc::start_websocket_server, ui::serve_ui, vr::{OVERLAY, show_dashboard, start_vr}
 };
 pub mod globals;
 pub mod grpc;
@@ -59,7 +58,7 @@ fn main() {
         std::process::id()
     );
     log::trace!("args:{:?}", std::env::args());
-    let args = std::env::args().into_iter().collect::<Vec<_>>();
+    let args = std::env::args().collect::<Vec<_>>();
     if !(args.len() == 4 || args.len() == 3) {
         panic!("Usage: oyasumivr-overlay-sidecar <core grpc port> <core process id>")
     }

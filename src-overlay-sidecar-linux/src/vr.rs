@@ -1,14 +1,12 @@
 use std::{
-    sync::{Arc, LazyLock, Mutex, OnceLock, RwLock},
+    sync::{Arc, OnceLock, RwLock},
     thread::JoinHandle,
     time::Duration,
 };
 
 use log::trace;
-use tokio::spawn;
 use xr_overlay::{
-    input::{InputHandler, InputHandlerCreateInfo, InputSettings},
-    openxr::{Posef, Vector3f},
+    openxr::Vector3f,
     runner::{
         AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, ShowMode,
         actions::{MetaSwitchAction, ProfilesMetaSwitchAction, SwitchActionEnum},
@@ -18,7 +16,6 @@ use xr_overlay::{
 };
 use xr_overlay_cef::{
     CefOverlayCreateInfo,
-    cef::{ImplBrowser, ImplFrame},
     create_cef_overlay,
 };
 
@@ -89,7 +86,7 @@ pub fn start_vr() -> JoinHandle<()> {
             ..Default::default()
         },
     );
-    let delay=Duration::from_millis(500).as_millis() as f32/(1000./app.read().unwrap().current_refresh_rate());
+    let delay=Duration::from_millis(500).as_millis() as f32/(1000./app.read().unwrap().current_refresh_rate() as f32);
     app.write().unwrap().set_delay_hide(overlay.overlay_handle, delay as u8);
     assert!(
         OVERLAY
@@ -101,7 +98,7 @@ pub fn start_vr() -> JoinHandle<()> {
     );
 
     std::thread::spawn(move || {
-        let frame_time = (1000. / app.write().unwrap().current_refresh_rate()) as u64;
+        let frame_time = (1000. / app.write().unwrap().current_refresh_rate() as f32) as u64;
         loop {
             if unsafe { KILL } {
                 app.write().unwrap().request_end_session();
