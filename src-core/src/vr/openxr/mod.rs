@@ -192,7 +192,7 @@ pub async fn start_head_shake_detection() {
             .unwrap()
             .lock()
             .await
-            .current_refresh_rate()) as u64;
+            .current_refresh_rate() as f32) as u64;
     tokio::task::spawn(async move {
         *GESTURE_DETECTION_RUNNING.lock().await = true;
         *ABORT_GESTURE_DETECTION.lock().await = false;
