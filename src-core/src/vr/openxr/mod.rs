@@ -1,15 +1,13 @@
 use std::{
-    fs,
-    io::Write,
-    sync::{Arc, LazyLock, OnceLock},
+    sync::{LazyLock, OnceLock},
     time::Duration,
 };
 
-use log::{debug, error, info};
-use tokio::{spawn, sync::Mutex, task::{spawn_blocking, spawn_local}};
+use log::{debug, info};
+use tokio::{spawn, sync::Mutex, task::spawn_blocking};
 use xr_overlay::{
     model::AppContext,
-    openxr::{Posef, Vector3f},
+    openxr::Vector3f,
     runner::{events::AppEvent, AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle},
     xr::ReferenceSpaceT,
     RgbaTexture,
@@ -18,7 +16,7 @@ use xr_overlay::{
 use crate::{
     utils::send_event,
     vr::{
-        gesture_detector::GestureDetector, model::VRStatus, openxr, sleep_detector::SleepDetector,
+        gesture_detector::GestureDetector, model::VRStatus, sleep_detector::SleepDetector,
     },
 };
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();

@@ -81,6 +81,7 @@ pub async fn vr_status() -> String {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg_attr(unix, allow(unused_variables))]
 pub async fn openvr_set_analog_gain(analog_gain: f32) -> Result<(), String> {
     #[cfg(windows)]
     return super::brightness_analog::set_analog_gain(analog_gain).await;
@@ -140,6 +141,7 @@ pub async fn openvr_get_fade_distance() -> Result<f32, String> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg_attr(unix, allow(unused_variables))]
 pub async fn vr_set_analog_color_temp(
     temperature: Option<u32>,
 ) -> Result<(f64, f64, f64), String> {
@@ -164,6 +166,7 @@ pub async fn vr_set_image_brightness(
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg_attr(unix, allow(unused_variables))]
 pub async fn vr_launch_binding_configuration(show_on_desktop: bool) {
     #[cfg(windows)]
     {
@@ -265,6 +268,7 @@ pub async fn openvr_reregister_manifest() -> Result<(), String> {
 }
 
 #[tauri::command]
+#[cfg_attr(unix, allow(unused_variables))]
 #[oyasumivr_macros::command_profiling]
 pub async fn vr_get_binding_origins(
     action_set_key: String,

@@ -3,7 +3,7 @@ use std::sync::LazyLock;
 use tauri::AppHandle;
 use tauri_plugin_cli::Matches;
 use tokio::sync::Mutex;
-
+#[cfg(feature = "steam")]
 pub const STEAM_APP_KEY: &str = "steam.overlay.2538150-STANDALONE";
 pub const CORE_GRPC_DEV_PORT: u16 = 5176;
 pub const CORE_HTTP_DEV_PORT: u16 = 5177;

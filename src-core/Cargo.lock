@@ -5009,7 +5009,6 @@ dependencies = [
  "mime_guess",
  "nalgebra",
  "named_pipe",
- "nix 0.30.1",
  "ovr_overlay",
  "oyasumivr-shared",
  "oyasumivr_macros",

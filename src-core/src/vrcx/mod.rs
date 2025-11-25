@@ -1,4 +1,5 @@
 pub mod commands;
+#[cfg(windows)]
 pub mod models;
 #[cfg(windows)]
 use models::*;

@@ -1,16 +1,15 @@
 use log::error;
 use serde::Serialize;
-use std::{
-    os::raw::c_char,
-    time::{SystemTime, UNIX_EPOCH},
-};
+use std::time::{SystemTime, UNIX_EPOCH};
+#[cfg(windows)]
+use std::os::raw::c_char;
 #[cfg(windows)]
 use std::{
     ffi::OsStr,
     sync::LazyLock,
     time::Duration,
 };
-
+#[cfg(windows)]
 use sysinfo::{ProcessesToUpdate, RefreshKind, Signal, System};
 use tauri::Emitter;
 #[cfg(windows)]
@@ -126,7 +125,7 @@ pub async fn cli_sidecar_overlay_mode() -> models::OverlaySidecarMode {
         }
     }
 }
-
+#[cfg(windows)]
 pub fn convert_char_array_to_string(slice: &[c_char]) -> Option<String> {
     let trimmed_array: Vec<u8> = slice
         .iter()

@@ -1,5 +1,4 @@
 use log::{error, info, warn};
-use nix::libc::fork;
 use std::time::Duration;
 use std::{fs, sync::Arc};
 use sysinfo::{Pid, ProcessRefreshKind, System};

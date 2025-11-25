@@ -1,6 +1,7 @@
 pub mod commands;
 
 use crate::utils::sidecar_manager::SidecarManager;
+#[cfg(windows)]
 use crate::Models::overlay_sidecar::MicrophoneActivityMode;
 use crate::{
     utils::send_event,
@@ -73,7 +74,7 @@ pub async fn handle_overlay_sidecar_start(
     send_event("OVERLAY_SIDECAR_STARTED", args.grpc_web_port).await;
     Ok(())
 }
-
+#[cfg(windows)]
 pub async fn set_microphone_active(active: bool, mode: MicrophoneActivityMode) {
     let mut client_guard = SIDECAR_GRPC_CLIENT.lock().await;
     let client = match client_guard.as_mut() {

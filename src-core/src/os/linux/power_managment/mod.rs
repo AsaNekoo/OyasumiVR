@@ -9,6 +9,7 @@ use crate::os::{
 pub static LINUX_POWER_POLICY_MANAGER: LazyLock<Mutex<LinuxPowerPolicyManager>> =
     LazyLock::new(|| Mutex::const_new(LinuxPowerPolicyManager::new()));
 mod power_profile_daemon;
+#[allow(dead_code)]
 enum PowerPolicyProviderEnum {
     PowerProfileDaemon,
     ///to be used only by conflicts_with

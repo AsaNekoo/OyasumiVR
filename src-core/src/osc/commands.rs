@@ -1,5 +1,6 @@
-use std::{net::SocketAddr, os, str::FromStr, sync::Arc, time::Duration};
-
+use std::{net::SocketAddr, str::FromStr, sync::Arc, time::Duration};
+#[cfg(windows)]
+use std::os;
 use log::debug;
 use rosc::{OscMessage, OscPacket, OscType};
 use tokio::sync::Mutex;
