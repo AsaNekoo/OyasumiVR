@@ -1,7 +1,5 @@
 use std::{
-    sync::{Arc, OnceLock, RwLock},
-    thread::JoinHandle,
-    time::Duration,
+    path::{Path, PathBuf}, sync::{Arc, LazyLock, OnceLock, RwLock}, thread::JoinHandle, time::Duration
 };
 
 use log::trace;
@@ -18,11 +16,11 @@ use xr_overlay_cef::{
     CefOverlayCreateInfo,
     create_cef_overlay,
 };
-
+pub const DEFAULT_BINDINGS_CONFIG:&'static str=include_str!("bindings_overwrite_default.toml");
+pub static BINDING_FILE_PATH:LazyLock<PathBuf>=LazyLock::new(||PathBuf::from("../../bindings_overwrite.toml"));
 use crate::{KILL, input::get_controller_create_info, kill, model::Overlay};
 pub static OVERLAY: OnceLock<Overlay> = OnceLock::new();
 pub static XR_CTX: OnceLock<Arc<RwLock<AppRunner>>> = OnceLock::new();
-
 pub fn start_vr() -> JoinHandle<()> {
     trace!("start_vr");
     let ctx = loop {
@@ -83,6 +81,7 @@ pub fn start_vr() -> JoinHandle<()> {
                 pos,
                 rot: None,
             },
+            name:Some("oyasumi".into()),
             ..Default::default()
         },
     );

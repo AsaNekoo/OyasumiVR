@@ -1,5 +1,6 @@
 use std::{
     fs,
+    path::{Path, PathBuf},
     process::{Command, exit},
     sync::{LazyLock, Mutex, OnceLock},
     time::Duration,
@@ -13,15 +14,19 @@ use xr_overlay_cef::{
 };
 
 use crate::{
-    core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient}, grpc::{start_grpc_server, start_grpc_web_server}, overlay_ipc::start_websocket_server, ui::serve_ui, vr::{OVERLAY, show_dashboard, start_vr}
+    core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
+    grpc::{start_grpc_server, start_grpc_web_server},
+    overlay_ipc::start_websocket_server,
+    ui::serve_ui,
+    vr::{BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, OVERLAY, show_dashboard, start_vr},
 };
 pub mod globals;
 pub mod grpc;
 pub mod input;
 pub mod model;
 pub mod overlay_ipc;
-pub mod vr;
 pub mod ui;
+pub mod vr;
 pub mod core_grpc {
     tonic::include_proto!("oyasumi_core");
 }
@@ -76,31 +81,21 @@ fn main() {
     NO_VR
         .set(std::env::var("NO_VR").unwrap_or_default().to_lowercase() == "true")
         .unwrap();
-    log::debug!("NO_VR:{:?}",NO_VR.get().as_ref().unwrap());
+    log::debug!("NO_VR:{:?}", NO_VR.get().as_ref().unwrap());
     if *NO_VR.get().unwrap() {
         disable_vr();
     }
+    if !BINDING_FILE_PATH.is_file() {
+        fs::write(&*BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG).unwrap();
+    }
     let vr_thread = start_vr();
-    // let runtime_thread = std::thread::spawn(|| {
-        let runtime = tokio::runtime::Builder::new_multi_thread().worker_threads(1)
-                    .enable_all()
-                    .build()
-                    .unwrap();
-        runtime.spawn(tokio_main());
-        // loop {
-        //     let handle = {
-        //         let mut g = HANDLES.lock().unwrap();
-        //         let l = g.len();
-        //         if l == 0 {
-        //             break;
-        //         }
-        //         g.swap_remove(l - 1)
-        //     };
-        //     runtime.block_on(async move { join!(handle).0.unwrap() });
-        // }
-    // });
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .worker_threads(1)
+        .enable_all()
+        .build()
+        .unwrap();
+    runtime.spawn(tokio_main());
 
-    // runtime_thread.join().unwrap();
     vr_thread.join().unwrap();
     trace!("exiting");
     unsafe { xr_overlay_cef::shutdown() };
@@ -128,12 +123,15 @@ async fn tokio_main() {
         .into_inner()
         .port;
     info!("got http port:{:?}", http_port);
-    let ui_port=match ARGS.get().as_ref().unwrap().core_grpc_port==0 {
+    let ui_port = match ARGS.get().as_ref().unwrap().core_grpc_port == 0 {
         true => 5173,
         false => serve_ui().await,
     };
-    let url=format!("http://localhost:{}/dashboard?corePort={}",ui_port, http_port);
-    trace!("navigating to:{}",url);
+    let url = format!(
+        "http://localhost:{}/dashboard?corePort={}",
+        ui_port, http_port
+    );
+    trace!("navigating to:{}", url);
     OVERLAY
         .get()
         .as_ref()
@@ -141,9 +139,7 @@ async fn tokio_main() {
         .browser
         .main_frame()
         .unwrap()
-        .load_url(Some(
-            &(url.as_str()).into(),
-        ));
+        .load_url(Some(&(url.as_str()).into()));
     let grpc_server_port = start_grpc_server().await;
     let grpc_web_server_pos = start_grpc_web_server().await;
     core_client
@@ -167,7 +163,11 @@ pub fn kill() {
     unsafe { KILL = true };
     std::thread::spawn(|| {
         std::thread::sleep(Duration::from_millis(100));
-        Command::new("killall").arg("-9").arg("oyasumivr-overlay-sidecar").spawn().unwrap();
+        Command::new("killall")
+            .arg("-9")
+            .arg("oyasumivr-overlay-sidecar")
+            .spawn()
+            .unwrap();
         std::thread::sleep(Duration::from_millis(100));
         exit(0);
     });
