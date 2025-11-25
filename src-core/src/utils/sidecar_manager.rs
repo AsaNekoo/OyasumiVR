@@ -149,6 +149,18 @@ impl SidecarManager {
         let child_pid = child.id();
         *self.sidecar_pid.lock().await = Some(child_pid);
         *self.sidecar_child.lock().await = Some(child);
+        let self_=self.clone();
+        tokio::task::spawn(async move{
+            loop {
+                
+                tokio::time::sleep(Duration::from_secs(1)).await;
+                if let Some(child) =&mut *self_.sidecar_child.lock().await{
+                    //process exit code should be collected
+                    let _= child.try_wait();
+ 
+                }
+            }
+        });
         if !relaunch {
             self.watch_process();
         }
@@ -232,6 +244,7 @@ impl SidecarManager {
                 loop {
                     tokio::time::sleep(Duration::from_secs(1)).await;
                     let self_guard = self_arc.lock().await;
+
                     s.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
                     // Check if the child process is no longer found
                     if s.process(Pid::from(pid as usize)).is_none() {

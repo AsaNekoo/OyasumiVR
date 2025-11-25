@@ -119,11 +119,11 @@ pub fn start_vr() -> JoinHandle<()> {
                 xr_overlay::runner::PollResult::Starting => (),
                 xr_overlay::runner::PollResult::Exit => {
                     //no session resuming bc google's trash doesn't support restarting after calling shutdown
-                    unsafe { xr_overlay_cef::shutdown() };
+                    // unsafe { xr_overlay_cef::shutdown() };
                     kill();
                     break;
                 }
-                xr_overlay::runner::PollResult::SessionLost => kill(),
+                xr_overlay::runner::PollResult::SessionLost => {kill();break;},
             }
         }
     })

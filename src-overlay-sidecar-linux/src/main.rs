@@ -1,12 +1,12 @@
 use std::{
     fs,
     process::{Command, exit},
-    sync::{LazyLock, Mutex, OnceLock},
+    sync::{Arc, LazyLock, Mutex, OnceLock},
     time::Duration,
 };
 
 use log::{debug, info, trace};
-use tokio::join;
+use tokio::{join, runtime::Runtime};
 use tonic::transport::Channel;
 use xr_overlay_cef::{
     cef::{ImplBrowser, ImplFrame},
@@ -40,7 +40,7 @@ pub struct Args {
 fn main() {
     env_logger::Builder::from_default_env()
         .filter_level(log::LevelFilter::Trace)
-        .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
+        // .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
         // .filter_module("xr_overlay", log::LevelFilter::Debug)
         .filter_module("tokio_tungstenite", log::LevelFilter::Warn)
         .filter_module("tungstenite", log::LevelFilter::Warn)
@@ -81,29 +81,34 @@ fn main() {
     if *NO_VR.get().unwrap() {
         disable_vr();
     }
-
     let vr_thread = start_vr();
-    let runtime_thread = std::thread::spawn(|| {
-        let runtime = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .unwrap();
-        runtime.block_on(tokio_main());
-        loop {
-            let handle = {
-                let mut g = HANDLES.lock().unwrap();
-                let l = g.len();
-                if l == 0 {
-                    break;
-                }
-                g.swap_remove(l - 1)
-            };
-            runtime.block_on(async move { join!(handle).0.unwrap() });
-        }
-    });
+    // let runtime_thread = std::thread::spawn(|| {
+        let runtime = tokio::runtime::Builder::new_multi_thread().worker_threads(1)
+                    .enable_all()
+                    .build()
+                    .unwrap();
+        runtime.spawn(tokio_main());
+        // loop {
+        //     let handle = {
+        //         let mut g = HANDLES.lock().unwrap();
+        //         let l = g.len();
+        //         if l == 0 {
+        //             break;
+        //         }
+        //         g.swap_remove(l - 1)
+        //     };
+        //     runtime.block_on(async move { join!(handle).0.unwrap() });
+        // }
+    // });
 
-    runtime_thread.join().unwrap();
+    // runtime_thread.join().unwrap();
     vr_thread.join().unwrap();
+    trace!("exiting");
+    unsafe { xr_overlay_cef::shutdown() };
+    trace!("cef shutdown");
+    runtime.shutdown_timeout(Duration::from_millis(100));
+    trace!("runtime exited");
+    std::thread::sleep(Duration::from_millis(10)); //just in case
 }
 static HANDLES: LazyLock<Mutex<Vec<tokio::task::JoinHandle<()>>>> = LazyLock::new(Mutex::default);
 
