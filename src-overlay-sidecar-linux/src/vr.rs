@@ -4,13 +4,10 @@ use std::{
 
 use log::trace;
 use xr_overlay::{
-    openxr::Vector3f,
-    runner::{
+    openxr::Vector3f, runner::{
         AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, ShowMode,
-        actions::{MetaSwitchAction, ProfilesMetaSwitchAction, SwitchActionEnum},
         events::AppEvent,
-    },
-    xr_input::{InputSource, ProfileName},
+    }
 };
 use xr_overlay_cef::{
     CefOverlayCreateInfo,
@@ -26,7 +23,7 @@ pub fn start_vr() -> JoinHandle<()> {
     let ctx = loop {
         match xr_overlay::xr::Init::default()
             .enable_drm_support()
-            .user_presence_support(false)
+            .user_presence_support(true)
             .sort_order(4089)
             .with_app_name("Oyasumi VR Overlay")
             .init_overlay()
@@ -61,14 +58,6 @@ pub fn start_vr() -> JoinHandle<()> {
         app.clone(),
         CefOverlayCreateInfo {
             size: [0.6, 0.6],
-            visibility_switch_actions: Some(ProfilesMetaSwitchAction::new(&[(
-                ProfileName::OCULUS_TOUCH,
-                MetaSwitchAction::new(&[
-                    SwitchActionEnum::Bool(InputSource::OCULUS_TOUCH_LEFT_X_TOUCH),
-                    SwitchActionEnum::Bool(InputSource::OCULUS_TOUCH_LEFT_Y_TOUCH),
-                    SwitchActionEnum::Bool(InputSource::OCULUS_TOUCH_RIGHT_THUMBSTICK_CLICK),
-                ]),
-            )])),
             spawn_visible: true,
             interactable: true,
             movable: true,
@@ -104,10 +93,11 @@ pub fn start_vr() -> JoinHandle<()> {
             }
             match app.write().unwrap().run() {
                 xr_overlay::runner::PollResult::Success => {
-                    std::thread::sleep(Duration::from_millis(frame_time))
+                    //it already waits for next frame
+                    // std::thread::sleep(Duration::from_millis(frame_time))
                 }
                 xr_overlay::runner::PollResult::SuccessNoRender => {
-                    std::thread::sleep(Duration::from_millis(frame_time * 3))
+                    std::thread::sleep(Duration::from_millis(frame_time))
                 }
                 xr_overlay::runner::PollResult::UserNotPresent => {
                     std::thread::sleep(Duration::from_secs(1))
