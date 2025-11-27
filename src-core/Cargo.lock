@@ -4527,6 +4527,7 @@ dependencies = [
  "mime",
  "mime_guess",
  "nalgebra",
+ "named_pipe",
  "openvr",
  "openvr_sys 2.1.3 (git+https://github.com/rust-openvr/rust-openvr-sys?rev=2027d7b571127f15a6e18ce5ce3dd6ae51a86c10)",
  "oyasumivr-shared",
