@@ -28,8 +28,9 @@ pub async fn elevated_sidecar_started() -> bool {
     }
     #[cfg(unix)]
     {
-        use crate::os::linux::lact;
-        lact::LACT.lock().await.is_some()
+        // use crate::os::linux::lact;
+        // lact::LACT.lock().await.is_some()
+        true
     }
 }
 

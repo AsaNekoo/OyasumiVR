@@ -48,6 +48,8 @@ pub async fn msi_afterburner_set_profile(
     }
     #[cfg(unix)]
     {
-        Ok(true)
+        use crate::os::linux::lact;
+
+        lact::set_lact_profile(profile).await
     }
 }
