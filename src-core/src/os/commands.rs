@@ -353,9 +353,8 @@ pub async fn get_system_power_policies() -> Vec<WindowsPowerPolicy> {
 pub async fn windows_is_elevated() -> bool {
     #[cfg(windows)]
     return is_elevated();
-    //fixme: figure how to do permissions on linux
     #[cfg(unix)]
-    false
+    true
 }
 
 #[tauri::command]
