@@ -1,0 +1,2 @@
+[oculus_touch]
+oyasumi_overlay_switch=[{path="left/input/x/touch"},{path="left/input/y/touch"},{path="right/input/thumbstick/click"}]
