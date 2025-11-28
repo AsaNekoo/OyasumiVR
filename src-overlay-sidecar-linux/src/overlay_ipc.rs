@@ -10,8 +10,12 @@ use tokio::net::TcpListener;
 use xr_overlay_cef::cef::{ImplBrowser, ImplFrame};
 
 use crate::{
-    CORE_CLIENT, core_grpc::EventParams, globals::STATE, model::Overlay,
-    overlay_grpc::OyasumiSidecarState, vr::{OVERLAY, hide_dashboard},
+    CORE_CLIENT,
+    core_grpc::EventParams,
+    globals::STATE,
+    model::Overlay,
+    overlay_grpc::OyasumiSidecarState,
+    vr::{OVERLAY, hide_dashboard},
 };
 pub const IPC_SCRIPT: &str = include_str!(concat!(env!("OUT_DIR"), "/bundle.js"));
 // pub const IPC_SCRIPT:&str=include_str!("../target/debug/build/src-overlay-sidecar-linux-8079ff49c704d0bc/out/bundle.js");
@@ -113,7 +117,7 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
                 match funtion {
                     FuntionCall::OnUiReady => {
                         debug_assert_eq!("{}", msg.next().unwrap());
-                        if STATE.lock().await.as_ref().is_none(){
+                        if STATE.lock().await.as_ref().is_none() {
                             continue;
                         }
                         debug!("[websocket] recived on ui ready");

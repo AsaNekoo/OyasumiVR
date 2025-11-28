@@ -6,8 +6,8 @@ use tonic_web::GrpcWebLayer;
 use tower_http::cors::{AllowHeaders, AllowOrigin};
 
 use crate::{
-    HANDLES,
-    globals::{CORE_MODE, CoreMode, STATE},
+    ARGS, HANDLES,
+    globals::STATE,
     overlay_grpc::{
         AddNotificationRequest, AddNotificationResponse, ClearNotificationRequest, Empty,
         OverlayMenuOpenRequest, OyasumiSidecarState, SetDebugTranslationsRequest,
@@ -43,6 +43,7 @@ impl OyasumiOverlaySidecar for GrpcServer {
         &self,
         request: tonic::Request<OyasumiSidecarState>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
+        #[cfg(debug_assertions)]
         log::trace!("got new state from core:{:?}", request);
         let req = request.into_inner();
         STATE.lock().await.replace(req.clone());
@@ -62,7 +63,7 @@ impl OyasumiOverlaySidecar for GrpcServer {
         request: tonic::Request<OverlayMenuOpenRequest>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
         show_dashboard();
-        Ok(Empty{}.into())
+        Ok(Empty {}.into())
     }
 
     async fn close_overlay_menu(
@@ -70,18 +71,18 @@ impl OyasumiOverlaySidecar for GrpcServer {
         request: tonic::Request<Empty>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
         hide_dashboard().await;
-        Ok(Empty{}.into())
+        Ok(Empty {}.into())
     }
 
     async fn toggle_overlay_menu(
         &self,
         request: tonic::Request<OverlayMenuOpenRequest>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
-        match unsafe{DASBOARD_VISIBLE}{
+        match unsafe { DASBOARD_VISIBLE } {
             true => hide_dashboard().await,
             false => show_dashboard(),
         }
-        Ok(Empty{}.into())
+        Ok(Empty {}.into())
     }
 
     async fn set_microphone_active(
@@ -92,9 +93,9 @@ impl OyasumiOverlaySidecar for GrpcServer {
     }
 }
 pub async fn start_grpc_server() -> u16 {
-    let port: u16 = match CORE_MODE {
-        CoreMode::Dev => crate::globals::OVERLAY_SIDECAR_GRPC_DEV_PORT,
-        CoreMode::Release => 0,
+    let port: u16 = match ARGS.get().as_ref().unwrap().core_pid == 0 {
+        true => crate::globals::OVERLAY_SIDECAR_GRPC_DEV_PORT,
+        false => 0,
     };
     let addr: SocketAddr = format!("127.0.0.1:{}", port).parse().unwrap();
     info!("Starting gRPC server on {}", addr);
@@ -112,9 +113,9 @@ pub async fn start_grpc_server() -> u16 {
     addr.port()
 }
 pub async fn start_grpc_web_server() -> u16 {
-    let port: u16 = match CORE_MODE {
-        CoreMode::Dev => crate::globals::OVERLAY_SIDECAR_GRPC_WEB_DEV_PORT,
-        CoreMode::Release => 0,
+    let port: u16 = match ARGS.get().as_ref().unwrap().core_pid == 0 {
+        true => crate::globals::OVERLAY_SIDECAR_GRPC_WEB_DEV_PORT,
+        false => 0,
     };
     let addr: SocketAddr = format!("127.0.0.1:{}", port).parse().unwrap();
     info!("Starting gRPC web server on {}", addr);

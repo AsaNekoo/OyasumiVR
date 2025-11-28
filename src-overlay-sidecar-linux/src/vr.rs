@@ -1,21 +1,23 @@
 use std::{
-    path::{Path, PathBuf}, sync::{Arc, LazyLock, OnceLock, RwLock}, thread::JoinHandle, time::Duration
+    path::PathBuf,
+    sync::{Arc, LazyLock, OnceLock, RwLock},
+    thread::JoinHandle,
+    time::Duration,
 };
 
 use log::trace;
 use xr_overlay::{
-    openxr::Vector3f, runner::{
+    openxr::Vector3f,
+    runner::{
         AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, ShowMode,
         events::AppEvent,
-    }
+    },
 };
-use xr_overlay_cef::{
-    CefOverlayCreateInfo,
-    create_cef_overlay,
-};
-pub const DEFAULT_BINDINGS_CONFIG:&'static str=include_str!("bindings_overwrite_default.toml");
-pub static BINDING_FILE_PATH:LazyLock<PathBuf>=LazyLock::new(||PathBuf::from("../../bindings_overwrite.toml"));
-use crate::{KILL, input::get_controller_create_info, kill, model::Overlay};
+use xr_overlay_cef::{CefOverlayCreateInfo, create_cef_overlay};
+pub const DEFAULT_BINDINGS_CONFIG: &str = include_str!("bindings_overwrite_default.toml");
+pub static BINDING_FILE_PATH: LazyLock<PathBuf> =
+    LazyLock::new(|| PathBuf::from("../../bindings_overwrite.toml"));
+use crate::{KILL, input::get_controller_create_info, model::Overlay};
 pub static OVERLAY: OnceLock<Overlay> = OnceLock::new();
 pub static XR_CTX: OnceLock<Arc<RwLock<AppRunner>>> = OnceLock::new();
 pub fn start_vr() -> JoinHandle<()> {
@@ -70,12 +72,15 @@ pub fn start_vr() -> JoinHandle<()> {
                 pos,
                 rot: None,
             },
-            name:Some("oyasumi".into()),
+            name: Some("oyasumi".into()),
             ..Default::default()
         },
     );
-    let delay=Duration::from_millis(500).as_millis() as f32/(1000./app.read().unwrap().current_refresh_rate() as f32);
-    app.write().unwrap().set_delay_hide(overlay.overlay_handle, delay as u8);
+    let delay = Duration::from_millis(500).as_millis() as f32
+        / (1000. / app.read().unwrap().current_refresh_rate() as f32);
+    app.write()
+        .unwrap()
+        .set_delay_hide(overlay.overlay_handle, delay as u8);
     assert!(
         OVERLAY
             .set(Overlay {
@@ -106,10 +111,11 @@ pub fn start_vr() -> JoinHandle<()> {
                 xr_overlay::runner::PollResult::Exit => {
                     //no session resuming bc google's trash doesn't support restarting after calling shutdown
                     // unsafe { xr_overlay_cef::shutdown() };
-                    kill();
                     break;
                 }
-                xr_overlay::runner::PollResult::SessionLost => {kill();break;},
+                xr_overlay::runner::PollResult::SessionLost => {
+                    break;
+                }
             }
         }
     })
@@ -118,18 +124,18 @@ fn openxr_callback(event: AppEvent) {
     if event != AppEvent::ButtonsUpdated {
         trace!("[openxr] {:?}", event);
     }
-    match event{
-        AppEvent::OverlayVisibilityChanged { handle:_, visible } => {
-            if visible{
+    match event {
+        AppEvent::OverlayVisibilityChanged { handle: _, visible } => {
+            if visible {
                 OVERLAY.get().as_ref().unwrap().show_dashboard();
             }
-    },
-        AppEvent::OverlayHiding { handle:_, frames_left:_ }=>
-            { 
-            OVERLAY.get().as_ref().unwrap().hide_dashboard()
-},
-        _=>()
-}
+        }
+        AppEvent::OverlayHiding {
+            handle: _,
+            frames_left: _,
+        } => OVERLAY.get().as_ref().unwrap().hide_dashboard(),
+        _ => (),
+    }
 }
 fn openxr_show_hand() -> DeviceRole {
     DeviceRole::Hmd
