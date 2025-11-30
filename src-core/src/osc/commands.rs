@@ -142,7 +142,9 @@ pub async fn set_osc_receive_address_whitelist(whitelist: Vec<String>) {
         .register("OyasumiVR", root_node, |msg| match msg {
             rosc::OscPacket::Message(osc_message) => {
                 if osc_message.args.len() > 1 {
-                    unimplemented!("{:?}", osc_message);
+                    //seems to only be used by camerapos
+                    return;
+                    // unimplemented!("{:?}", osc_message);
                 }
                 let msg = osc_message
                     .args

@@ -5,7 +5,7 @@ use super::openvr::{
 };
 #[cfg(windows)]
 use crate::globals::STEAM_APP_KEY;
-use crate::vr::model::{BindingOriginData, OVRDevice, OVRFrameLimits};
+use crate::{vr::model::{BindingOriginData, OVRDevice, OVRFrameLimits}, warn_unimplemented};
 #[cfg(windows)]
 use enumset::EnumSet;
 #[cfg(windows)]
@@ -148,7 +148,9 @@ pub async fn vr_set_analog_color_temp(
     #[cfg(windows)]
     return super::colortemp_analog::set_color_temp(temperature).await;
     #[cfg(unix)]
-    unimplemented!()
+    warn_unimplemented!();
+    Err("not implemented".into())
+
 }
 
 #[tauri::command]

@@ -11,7 +11,7 @@ use tokio_tungstenite::tungstenite;
 use xr_overlay_cef::cef::{ImplBrowser, ImplFrame};
 
 use crate::{
-    CORE_CLIENT, core_grpc::EventParams, globals::STATE, kill, killed, model::Overlay, overlay_grpc::OyasumiSidecarState, vr::{OVERLAY, hide_dashboard}
+    CORE_CLIENT, core_grpc::EventParams, globals::STATE, kill, killed, model::Overlay, overlay_grpc::OyasumiSidecarState, vr::{OVERLAY, hide_dashboard}, warn_unimplemented
 };
 pub const IPC_SCRIPT: &str = include_str!(concat!(env!("OUT_DIR"), "/bundle.js"));
 pub struct OverlayIPCAddNotification<'a> {
@@ -29,7 +29,7 @@ fn get_ipc_script(port: u16) -> String {
 //OyasumiOverlayIPCIn
 impl Overlay {
     pub fn execute_js(&self, js: &str) {
-        trace!("running javascript:\n {}", js);
+        // trace!("running javascript:\n {}", js);
         self.browser
             .main_frame()
             .unwrap()
@@ -291,7 +291,7 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
                     //     let args=serde_json::from_str::<SetSleepMpdeArgs>(msg.next().unwrap()).unwrap();
 
                     // },
-                    _ => unimplemented!("maybe_name:{:?},id:{}", funtion, call_id),
+                    _ => warn_unimplemented!("maybe_name:{:?},id:{}", funtion, call_id),
                 }
             }
             Err(e) => {

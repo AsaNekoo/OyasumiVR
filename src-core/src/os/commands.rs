@@ -8,6 +8,8 @@ use crate::globals::TAURI_APP_HANDLE;
 use crate::os::audio_devices::AudioDeviceDto;
 #[cfg(unix)]
 use crate::os::linux::audio::LINUX_AUDIO_DEVICE_MANAGER;
+#[cfg(unix)]
+use crate::warn_unimplemented;
 use log::error;
 #[cfg(windows)]
 use oyasumivr_shared::windows::is_elevated;
@@ -518,7 +520,7 @@ pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
         manager.set_mic_activity_enabled(enabled).await;
     }
     #[cfg(unix)]
-    error!("what does this do?");
+    warn_unimplemented!();
 }
 
 #[tauri::command]
@@ -540,7 +542,7 @@ pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
         manager.set_mic_activation_threshold(threshold).await;
     }
     #[cfg(unix)]
-    error!("what does this do?");
+    warn_unimplemented!();
 }
 
 #[tauri::command]
@@ -562,7 +564,7 @@ pub async fn set_mic_activity_device_id(device_id: Option<String>) {
         manager.set_mic_activity_device_id(device_id).await;
     }
     #[cfg(unix)]
-    error!("what does this do?");
+    warn_unimplemented!();
 }
 
 #[tauri::command]

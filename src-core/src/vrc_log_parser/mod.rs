@@ -1,6 +1,7 @@
 pub mod commands;
 
 use crate::utils::send_event;
+use crate::warn_unimplemented;
 use chrono::{Local, NaiveDateTime, TimeZone};
 use log::{debug, info, trace, warn};
 use serde::{Deserialize, Serialize};
@@ -98,9 +99,9 @@ fn get_latest_log_path() -> Option<String> {
                         .duration_since(UNIX_EPOCH)
                         .unwrap()
                 } else {
-                    unimplemented!()
+                   unimplemented!();
                 }
-            })
+            }) 
         })
         // Get the path for it
         .and_then(|entry| entry.path().to_str().map(String::from))

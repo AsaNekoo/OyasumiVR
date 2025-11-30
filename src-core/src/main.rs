@@ -43,7 +43,15 @@ use tauri_plugin_log::RotationStrategy;
 use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings6;
 
 use crate::globals::APTABASE_HOST;
-
+#[macro_export]
+macro_rules! warn_unimplemented {
+    () => {
+        log::error!("unimplemented: {}:{}:{}",file!(),line!(),column!())
+    };
+    ($($arg:tt)+) => {
+        log::error!("unimplemented: {}:{}:{}\n{:?}",file!(),line!(),column!(),format_args!($($arg)+))
+    };
+}
 #[tokio::main]
 async fn main() {
     #[cfg(unix)]

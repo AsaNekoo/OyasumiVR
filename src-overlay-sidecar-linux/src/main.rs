@@ -32,6 +32,15 @@ pub mod core_grpc {
 pub mod overlay_grpc {
     tonic::include_proto!("oyasumi_overlay_sidecar");
 }
+#[macro_export]
+macro_rules! warn_unimplemented {
+    () => {
+        log::error!("unimplemented: {}:{}:{}",file!(),line!(),column!())
+    };
+    ($($arg:tt)+) => {
+        log::error!("unimplemented: {}:{}:{}\n{:?}",file!(),line!(),column!(),format_args!($($arg)+))
+    };
+}
 static NO_VR: OnceLock<bool> = OnceLock::new();
 static ARGS: OnceLock<Args> = OnceLock::new();
 #[derive(Clone, Copy, Debug)]
