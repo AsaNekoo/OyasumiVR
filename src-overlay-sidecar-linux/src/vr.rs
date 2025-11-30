@@ -73,6 +73,7 @@ pub fn start_vr() -> JoinHandle<()> {
                 rot: None,
             },
             name: Some("oyasumi".into()),
+            disable_dragging:true,
             ..Default::default()
         },
     );

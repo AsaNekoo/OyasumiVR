@@ -1,4 +1,5 @@
 #![cfg_attr(unix, allow(unused_imports))]
+#![cfg_attr(unix, allow(unused_variables))]
 pub mod commands;
 use crate::utils::sidecar_manager::SidecarManager;
 use crate::{
