@@ -7,18 +7,13 @@ use prost::Message;
 use rand::distr::{Alphabetic, SampleString};
 use serde::{Deserialize, Serialize};
 use tokio::net::TcpListener;
+use tokio_tungstenite::tungstenite;
 use xr_overlay_cef::cef::{ImplBrowser, ImplFrame};
 
 use crate::{
-    CORE_CLIENT,
-    core_grpc::EventParams,
-    globals::STATE,
-    model::Overlay,
-    overlay_grpc::OyasumiSidecarState,
-    vr::{OVERLAY, hide_dashboard},
+    CORE_CLIENT, core_grpc::EventParams, globals::STATE, kill, killed, model::Overlay, overlay_grpc::OyasumiSidecarState, vr::{OVERLAY, hide_dashboard}
 };
 pub const IPC_SCRIPT: &str = include_str!(concat!(env!("OUT_DIR"), "/bundle.js"));
-// pub const IPC_SCRIPT:&str=include_str!("../target/debug/build/src-overlay-sidecar-linux-8079ff49c704d0bc/out/bundle.js");
 pub struct OverlayIPCAddNotification<'a> {
     message: &'a str,
     duration: Duration,
@@ -105,6 +100,14 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
     while let Some(message) = receiver.next().await {
         match message {
             Ok(msg) => {
+                if killed(){
+                    break;
+                }
+                if matches!(msg,tungstenite::Message::Close(_)){
+                    log::debug!("recived close frame, shutting down");
+                    kill();
+                    break;
+                }
                 if !msg.is_text() {
                     error!("[websocket] msg is not text:{:?}", msg);
                     continue;

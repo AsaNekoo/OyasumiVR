@@ -95,7 +95,7 @@ pub fn start_vr() -> JoinHandle<()> {
         let frame_time = (1000. / app.write().unwrap().current_refresh_rate() as f32) as u64;
         loop {
             if unsafe { KILL } {
-                app.write().unwrap().request_end_session();
+                break;
             }
             match app.write().unwrap().run() {
                 xr_overlay::runner::PollResult::Success => {

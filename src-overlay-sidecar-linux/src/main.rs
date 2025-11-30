@@ -72,7 +72,7 @@ fn main() {
         core_pid: args[2].parse().unwrap(),
         disable_gpu: args.get(3).cloned().unwrap_or_default() == "--disable-gpu-acceleration",
     };
-    if args.disable_gpu{
+    if args.disable_gpu {
         panic!("software rendering no in implemented");
     }
     if args.core_grpc_port == 0 && args.core_pid == 0 {
@@ -92,11 +92,10 @@ fn main() {
     }
     let vr_thread = start_vr();
     let runtime = tokio::runtime::Builder::new_multi_thread()
-        .worker_threads(1)
         .enable_all()
         .build()
         .unwrap();
-    runtime.spawn(tokio_main());
+    runtime.block_on(tokio_main());
 
     vr_thread.join().unwrap();
     trace!("exiting");
@@ -117,18 +116,13 @@ async fn tokio_main() {
             trace!("core_pid 0");
             return;
         }
+        log::trace!("watching:{} pid", pid);
         loop {
-            tokio::time::sleep(Duration::from_secs(1)).await;
             if !PathBuf::from(format!("/proc/{}", pid)).exists() {
-                vr::XR_CTX
-                    .get()
-                    .as_ref()
-                    .unwrap()
-                    .write()
-                    .unwrap()
-                    .request_end_session();
+                kill();
                 break;
             }
+            tokio::time::sleep(Duration::from_secs(1)).await;
         }
     });
     let mut core_client = OyasumiCoreClient::connect(format!(
@@ -172,8 +166,8 @@ async fn tokio_main() {
         })
         .await
         .unwrap();
-    assert_ne!(grpc_web_server_pos,0);
-    assert_ne!(grpc_server_port,0);
+    assert_ne!(grpc_web_server_pos, 0);
+    assert_ne!(grpc_server_port, 0);
     let ws_port = start_websocket_server().await;
     OVERLAY.wait().inject_ipc(ws_port);
     tokio::time::sleep(Duration::from_millis(2000)).await;
@@ -182,17 +176,12 @@ async fn tokio_main() {
 }
 static mut KILL: bool = false;
 // #[allow(dead_code)]
-// pub fn kill() {
-//     trace!("overlay killed");
-//     unsafe { KILL = true };
-//     std::thread::spawn(|| {
-//         std::thread::sleep(Duration::from_millis(100));
-//         Command::new("killall")
-//             .arg("-9")
-//             .arg("oyasumivr-overlay-sidecar")
-//             .spawn()
-//             .unwrap();
-//         std::thread::sleep(Duration::from_millis(100));
-//         exit(0);
-//     });
-// }
+pub fn kill() {
+    if !killed() {
+        trace!("killing overlay");
+    }
+    unsafe { KILL = true };
+}
+pub fn killed()->bool{
+    unsafe {KILL}
+}
