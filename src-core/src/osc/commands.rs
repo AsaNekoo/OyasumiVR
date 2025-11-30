@@ -57,10 +57,14 @@ pub async fn start_osc_server() -> Option<(String, String)> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[allow(static_mut_refs)]
 pub async fn add_osc_method(method: OSCMethod) {
-    #[cfg(debug_assertions)]
-    if !WHITELIST.lock().await.contains(&method.address) {
+    //its called only "few" times at the start so cloning string is fine
+    if !unsafe{WHITELIST.contains(&method.address.clone().into())} {
+        #[cfg(debug_assertions)]
         panic!("{:?}", method);
+        #[cfg(not(debug_assertions))]
+        warn_unimplemented!("not on the whitelist: {:?}",method);
     }
 }
 
@@ -109,17 +113,21 @@ pub async fn osc_send_command(
 pub async fn osc_valid_addr(addr: String) -> bool {
     SocketAddr::from_str(&addr).is_ok()
 }
-#[cfg(debug_assertions)]
-static WHITELIST: Mutex<Vec<String>> = Mutex::const_new(Vec::new());
+
+//#Safety; it's set once and any reads will happen after the write
+static mut WHITELIST: Vec<Box<str>> = Vec::new();
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[allow(static_mut_refs)]
 pub async fn set_osc_receive_address_whitelist(whitelist: Vec<String>) {
     let mut server_guard = OSC_SERVER.lock().await;
-    #[cfg(debug_assertions)]
-    {
-        *WHITELIST.lock().await = whitelist.clone();
+     debug!("starting osc server with paths:{:?}", whitelist);
+    unsafe {
+        for s in &whitelist{
+            WHITELIST.push(s.clone().into_boxed_str());
+        }
     }
-    debug!("starting osc server with paths:{:?}", whitelist);
+   
     let vrchat_osc = VRChatOSC::new().await.unwrap();
     let mut root_node = OscRootNode::new();
     for path in whitelist {
@@ -141,10 +149,12 @@ pub async fn set_osc_receive_address_whitelist(whitelist: Vec<String>) {
     vrchat_osc
         .register("OyasumiVR", root_node, |msg| match msg {
             rosc::OscPacket::Message(osc_message) => {
-                if osc_message.args.len() > 1 {
-                    //seems to only be used by camerapos
+                if !unsafe{WHITELIST.iter().any(|s|**s==*osc_message.addr.as_str())}{
+                    //vrchat seems to be sending more then requested for example 
                     return;
-                    // unimplemented!("{:?}", osc_message);
+                }
+                if osc_message.args.len() > 1 {
+                    return;
                 }
                 let msg = osc_message
                     .args
