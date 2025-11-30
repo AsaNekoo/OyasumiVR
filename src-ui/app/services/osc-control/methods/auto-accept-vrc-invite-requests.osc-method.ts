@@ -1,6 +1,6 @@
 import { OscMethod } from '../osc-method';
 import { OscService } from '../../osc.service';
-import { OSCBoolValue, OSCMessage } from '../../../models/osc-message';
+import { OSCBoolValue, OSCMessage, OSCValueTypeE } from '../../../models/osc-message';
 import { info } from '@tauri-apps/plugin-log';
 import { distinctUntilChanged, map, switchMap } from 'rxjs';
 import { AutomationConfigService } from '../../automation-config.service';
@@ -15,7 +15,7 @@ export class AutoAcceptVRCInviteRequestsOscMethod extends OscMethod<boolean> {
         'Enabled status of the automation for automatically accepting VRChat invite requests',
       address: '/OyasumiVR/Automation/AutoAcceptVRCInviteRequests',
       addressAliases: ['/Oyasumi/AutoAcceptInviteRequests'],
-      type: 'Bool',
+      type: OSCValueTypeE.Boolean,
       initialValue: false,
       isVRCAvatarParameter: true,
       access: 'ReadWrite',

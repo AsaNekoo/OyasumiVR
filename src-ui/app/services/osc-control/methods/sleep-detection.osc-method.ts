@@ -1,6 +1,6 @@
 import { OscMethod } from '../osc-method';
 import { OscService } from '../../osc.service';
-import { OSCBoolValue, OSCMessage } from '../../../models/osc-message';
+import { OSCBoolValue, OSCMessage, OSCValueTypeE } from '../../../models/osc-message';
 import { info } from '@tauri-apps/plugin-log';
 import { distinctUntilChanged, map, switchMap } from 'rxjs';
 import { AutomationConfigService } from '../../automation-config.service';
@@ -14,7 +14,7 @@ export class SleepDetectionOscMethod extends OscMethod<boolean> {
       description: 'Enabled status of the sleep detection automation',
       address: '/OyasumiVR/Automation/SleepDetection',
       addressAliases: ['/Oyasumi/SleepDetection'],
-      type: 'Bool',
+      type: OSCValueTypeE.Boolean,
       initialValue: false,
       isVRCAvatarParameter: true,
       access: 'ReadWrite',

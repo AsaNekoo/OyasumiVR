@@ -20,6 +20,7 @@ import { OscAddressSelection } from './osc-address-autocomplete/osc-address-auto
 import { AvatarContext, VRChatAvatarParameter } from '../../models/avatar-context';
 import { VRChatService } from 'src-ui/app/services/vrchat-api/vrchat.service';
 import { AppSettingsService } from '../../services/app-settings.service';
+import { OSCValueTypeE } from 'src-ui/app/models/osc-message';
 
 interface ValidationError {
   actionIndex: number;
@@ -150,7 +151,7 @@ export class OscScriptSimpleEditorComponent implements OnInit {
           address: '',
           parameters: [
             {
-              type: 'Boolean',
+              type: OSCValueTypeE.Boolean,
               value: 'true',
             },
           ],
@@ -169,7 +170,7 @@ export class OscScriptSimpleEditorComponent implements OnInit {
   addParameter(commandIndex: number) {
     const command = this._script.commands[commandIndex] as OscScriptCommandAction;
     command.parameters.push({
-      type: 'Boolean',
+      type: OSCValueTypeE.Boolean,
       value: 'true',
     });
   }
@@ -223,20 +224,20 @@ export class OscScriptSimpleEditorComponent implements OnInit {
         let oscType: OscParameterType;
         switch (param.type) {
           case 'Bool':
-            oscType = 'Boolean';
+            oscType = OSCValueTypeE.Boolean;
             break;
           case 'Float':
-            oscType = 'Float';
+            oscType = OSCValueTypeE.Float;
             break;
           case 'Int':
-            oscType = 'Int';
+            oscType = OSCValueTypeE.Int;
             break;
           case 'String':
-            oscType = 'String';
+            oscType = OSCValueTypeE.String;
             break;
           default:
             // Default to INT if unknown type (shouldn't happen)
-            oscType = 'Int';
+            oscType = OSCValueTypeE.Int;
             break;
         }
 
@@ -262,16 +263,16 @@ export class OscScriptSimpleEditorComponent implements OnInit {
 
       // Set appropriate default value based on type
       switch (newType) {
-        case 'Int':
+        case OSCValueTypeE.Int:
           command.parameters[parameterIndex].value = '1';
           break;
-        case 'Float':
+        case OSCValueTypeE.Float:
           command.parameters[parameterIndex].value = '1.0';
           break;
-        case 'Boolean':
+        case OSCValueTypeE.Boolean:
           command.parameters[parameterIndex].value = 'true';
           break;
-        case 'String':
+        case OSCValueTypeE.String:
           command.parameters[parameterIndex].value = '';
           break;
       }
@@ -297,7 +298,7 @@ export class OscScriptSimpleEditorComponent implements OnInit {
     parameterIndex: number
   ): SelectBoxItem | undefined {
     return this.parameterTypeSelectItems.find(
-      (item) => item.id === command.parameters[parameterIndex].type
+      (item) => item.id === command.parameters[parameterIndex].type.toString()
     );
   }
 
@@ -307,18 +308,19 @@ export class OscScriptSimpleEditorComponent implements OnInit {
     item: SelectBoxItem
   ) {
     const parameter = command.parameters[parameterIndex];
-    parameter.type = item.id as OscParameterType;
+    parameter.type = OSCValueTypeE[ item.id as keyof typeof OSCValueTypeE];
+    // parameter.type = OSCValueTypeE[item.id];
     switch (parameter.type) {
-      case 'Int':
+      case OSCValueTypeE.Int:
         parameter.value = '1';
         break;
-      case 'Float':
+      case OSCValueTypeE.Float:
         parameter.value = '1.0';
         break;
-      case 'Boolean':
+      case OSCValueTypeE.Boolean:
         parameter.value = 'true';
         break;
-      case 'String':
+      case OSCValueTypeE.String:
         parameter.value = '';
         break;
     }
@@ -358,7 +360,7 @@ export class OscScriptSimpleEditorComponent implements OnInit {
           }
           command.parameters.forEach((parameter) => {
             switch (parameter.type) {
-              case 'Int': {
+              case OSCValueTypeE.Int: {
                 const intValue = parseInt(parameter.value);
                 if (isNaN(intValue) || intValue < 0 || intValue > 255) {
                   this.errors.push({
@@ -368,7 +370,7 @@ export class OscScriptSimpleEditorComponent implements OnInit {
                 }
                 break;
               }
-              case 'Float': {
+              case OSCValueTypeE.Float: {
                 const floatValue = parseFloat(parameter.value);
                 if (isNaN(floatValue) || floatValue < -1.0 || floatValue > 1.0) {
                   this.errors.push({
@@ -383,7 +385,7 @@ export class OscScriptSimpleEditorComponent implements OnInit {
                 }
                 break;
               }
-              case 'String': {
+              case OSCValueTypeE.String: {
                 if (parameter.value.length > this.MAX_STRING_VALUE_LENGTH) {
                   this.errors.push({
                     actionIndex,

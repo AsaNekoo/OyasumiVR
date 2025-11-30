@@ -1,4 +1,4 @@
-import { OSCMessage } from 'src-ui/app/models/osc-message';
+import { OSCMessage, OSCValueTypeE } from 'src-ui/app/models/osc-message';
 import { OscService } from '../osc.service';
 import { warn } from '@tauri-apps/plugin-log';
 
@@ -7,7 +7,7 @@ export interface OscMethodOptions<T> {
   address: string;
   addressAliases: string[];
   isVRCAvatarParameter?: boolean;
-  type: 'Float' | 'Int' | 'Bool' | 'String';
+  type: OSCValueTypeE.Float | OSCValueTypeE.Int | OSCValueTypeE.Boolean | OSCValueTypeE.String;
   access: 'Read' | 'Write' | 'ReadWrite';
   initialValue: T;
 }
@@ -45,15 +45,15 @@ export abstract class OscMethod<T> {
     }
     for (const address of addresses) {
       switch (this.options.type) {
-        case 'Float': {
+        case OSCValueTypeE.Float: {
           await this.osc.send_float(address, this.value as number);
           break;
         }
-        case 'Int': {
+        case OSCValueTypeE.Int: {
           await this.osc.send_int(address, this.value as number);
           break;
         }
-        case 'Bool': {
+        case OSCValueTypeE.Boolean: {
           await this.osc.send_bool(address, this.value as boolean);
           break;
         }

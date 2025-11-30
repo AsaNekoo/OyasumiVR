@@ -1,6 +1,6 @@
 import { OscService } from '../../osc.service';
 import { OscMethod } from '../osc-method';
-import { OSCMessage, OSCStringValue } from '../../../models/osc-message';
+import { OSCMessage, OSCStringValue, OSCValueTypeE } from '../../../models/osc-message';
 import { OscControlService } from '../osc-control.service';
 import { AvatarContextService } from '../../avatar-context.service';
 
@@ -14,7 +14,7 @@ export class AvatarChangeOscMethod extends OscMethod<string> {
       description: 'Notify OyasumiVR of the user switching avatar in VRChat',
       address: '/avatar/change',
       addressAliases: [],
-      type: 'String',
+      type: OSCValueTypeE.String,
       initialValue: '',
       isVRCAvatarParameter: false,
       access: 'Write',

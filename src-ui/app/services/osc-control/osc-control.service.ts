@@ -8,7 +8,7 @@ import { SleepService } from '../sleep.service';
 import { SleepDetectionOscMethod } from './methods/sleep-detection.osc-method';
 import { VRCPlayerCountStatusAutomationOscMethod } from './methods/vrc-player-count-status-automation.osc-method';
 import { VRCSleepingAnimationsOscMethod } from './methods/vrc-sleeping-animations.osc-method';
-import { OSCMessage, OSCValue } from '../../models/osc-message';
+import { OSCMessage, OSCValue, OSCValueTypeE } from '../../models/osc-message';
 import { AvatarChangeOscMethod } from './methods/avatar-change.osc-method';
 import { CommandOscMethod } from './methods/command.osc-method';
 import { OpenVRService } from '../openvr.service';
@@ -91,14 +91,14 @@ export class OscControlService {
 
   private messageValuesValidForMethod(values: OSCValue[], method: OscMethod<unknown>): boolean {
     switch (method.options.type) {
-      case 'Float':
-        return values.length > 0 && values[0].kind === 'float';
-      case 'Int':
-        return values.length > 0 && values[0].kind === 'int';
-      case 'Bool':
-        return values.length > 0 && values[0].kind === 'bool';
-      case 'String':
-        return values.length > 0 && values[0].kind === 'string';
+      case OSCValueTypeE.Float:
+        return values.length > 0 && values[0].kind === OSCValueTypeE.Float;
+      case OSCValueTypeE.Int:
+        return values.length > 0 && values[0].kind === OSCValueTypeE.Int;
+      case OSCValueTypeE.Boolean:
+        return values.length > 0 && values[0].kind === OSCValueTypeE.Boolean;
+      case OSCValueTypeE.String:
+        return values.length > 0 && values[0].kind === OSCValueTypeE.String;
       default:
         return false;
     }

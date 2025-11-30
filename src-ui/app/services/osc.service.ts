@@ -5,7 +5,7 @@ import { flatten } from 'lodash';
 import { TaskQueue } from '../utils/task-queue';
 import { debug, error, info } from '@tauri-apps/plugin-log';
 import { listen } from '@tauri-apps/api/event';
-import { OSCMessage, OSCMessageRaw, parseOSCMessage } from '../models/osc-message';
+import { OSCMessage, OSCMessageRaw, OSCValueTypeE, parseOSCMessage } from '../models/osc-message';
 import {
   asyncScheduler,
   BehaviorSubject,
@@ -150,7 +150,7 @@ export class OscService {
   async send_float(address: string, value: number) {
     await this.send_command(address, [
       {
-        type: 'Float',
+        type:  OSCValueTypeE.Float,
         value: value + '',
       },
     ]);
@@ -159,7 +159,7 @@ export class OscService {
   async send_int(address: string, value: number) {
     await this.send_command(address, [
       {
-        type: 'Int',
+        type:  OSCValueTypeE.Int,
         value: value + '',
       },
     ]);
@@ -168,7 +168,7 @@ export class OscService {
   async send_bool(address: string, value: boolean) {
     await this.send_command(address, [
       {
-        type: 'Boolean',
+        type:  OSCValueTypeE.Boolean,
         value: value + '',
       },
     ]);
@@ -177,7 +177,7 @@ export class OscService {
   async send_string(address: string, value: string) {
     await this.send_command(address, [
       {
-        type: 'String',
+        type:  OSCValueTypeE.String,
         value: value,
       },
     ]);
@@ -192,7 +192,7 @@ export class OscService {
       const _parameters = structuredClone(parameters); // copy parameter array because some parameters may be modified before sending
       _parameters.forEach((parameter) => {
         // handle "\n" in string values to insert newlines
-        if (parameter.type === 'String') {
+        if (parameter.type ===  OSCValueTypeE.String) {
           parameter.value = parameter.value.replace(/\\n/g, '\n');
         }
       });
@@ -260,7 +260,7 @@ export class OscService {
   private mapToOscMethod(method: OscMethod<unknown>): {
     address: string;
     adType: 'Write' | 'Read' | 'ReadWrite';
-    valueType: 'Bool' | 'Int' | 'Float' | 'String';
+    valueType: OSCValueTypeE.Boolean | OSCValueTypeE.Int | OSCValueTypeE.Float | OSCValueTypeE.String;
     value?: string;
     description?: string;
   } {

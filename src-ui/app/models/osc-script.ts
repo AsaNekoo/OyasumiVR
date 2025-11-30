@@ -1,3 +1,4 @@
+import { OSCValueTypeE } from './osc-message';
 import { TString } from './translatable-string';
 
 export const OSC_SCRIPT_VERSION = 3;
@@ -25,7 +26,7 @@ export type OscParameter = {
   value: string;
 };
 
-export type OscParameterType = 'Int' | 'Float' | 'Boolean' | 'String';
+export type OscParameterType = OSCValueTypeE.Int |  OSCValueTypeE.Float |  OSCValueTypeE.Boolean |  OSCValueTypeE.String;
 
 export interface OscScriptCodeValidationError {
   line: number;

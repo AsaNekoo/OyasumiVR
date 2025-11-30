@@ -11,7 +11,7 @@ use vrchat_osc::{
 
 use crate::{
     osc::models::{OSCMessage, OSCMethod, OSCValue, SupportedOscType},
-    utils,
+    utils, warn_unimplemented,
 };
 static VRCHAT_OSC_ADDR: std::sync::Mutex<Option<SocketAddr>> = std::sync::Mutex::new(None);
 static VRCHAT_OSCQUERY_ADDR: std::sync::Mutex<Option<SocketAddr>> = std::sync::Mutex::new(None);
@@ -151,19 +151,19 @@ pub async fn set_osc_receive_address_whitelist(whitelist: Vec<String>) {
                     .into_iter()
                     .map(|arg| match arg {
                         OscType::Int(v) => OSCValue {
-                            kind: "int".into(),
+                            kind: SupportedOscType::Int,
                             value: Some(v.to_string()),
                         },
                         OscType::Float(v) => OSCValue {
-                            kind: "float".into(),
+                            kind: SupportedOscType::Float,
                             value: Some(v.to_string()),
                         },
                         OscType::String(v) => OSCValue {
-                            kind: "string".into(),
+                            kind: SupportedOscType::String,
                             value: Some(v.to_string()),
                         },
                         OscType::Bool(v) => OSCValue {
-                            kind: "bool".into(),
+                            kind: SupportedOscType::Boolean,
                             value: Some(v.to_string()),
                         },
                         _ => unimplemented!("{:?}", arg),
@@ -177,7 +177,7 @@ pub async fn set_osc_receive_address_whitelist(whitelist: Vec<String>) {
                     },
                 ));
             }
-            rosc::OscPacket::Bundle(_osc_bundle) => unimplemented!(),
+            rosc::OscPacket::Bundle(_osc_bundle) => warn_unimplemented!("osc bundle"),
         })
         .await
         .ok()

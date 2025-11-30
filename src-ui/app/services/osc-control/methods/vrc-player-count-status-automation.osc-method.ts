@@ -1,6 +1,6 @@
 import { OscMethod } from '../osc-method';
 import { OscService } from '../../osc.service';
-import { OSCBoolValue, OSCMessage } from '../../../models/osc-message';
+import { OSCBoolValue, OSCMessage, OSCValueTypeE } from '../../../models/osc-message';
 import { info } from '@tauri-apps/plugin-log';
 import { distinctUntilChanged, map, switchMap } from 'rxjs';
 import { AutomationConfigService } from '../../automation-config.service';
@@ -15,7 +15,7 @@ export class VRCPlayerCountStatusAutomationOscMethod extends OscMethod<boolean> 
         'Enabled status of the automation of the VRChat status based on the current player count',
       address: '/OyasumiVR/Automation/VRCPlayerCountStatusAutomation',
       addressAliases: ['/Oyasumi/StatusAutomations'],
-      type: 'Bool',
+      type: OSCValueTypeE.Boolean,
       initialValue: false,
       isVRCAvatarParameter: true,
       access: 'ReadWrite',

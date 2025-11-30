@@ -1,4 +1,11 @@
-export type OSCValueType = 'int' | 'float' | 'string' | 'bool' | 'unsupported';
+export type OSCValueType = OSCValueTypeE.Int |  OSCValueTypeE.Float |  OSCValueTypeE.String |  OSCValueTypeE.Boolean;
+export enum OSCValueTypeE{
+  Int=1,
+  Float=2,
+  Boolean=3,
+  String=4,
+  // unsupported=5
+}
 
 export interface OSCValueRaw {
   kind: OSCValueType;
@@ -15,28 +22,28 @@ export interface OSCValue {
 }
 
 export interface OSCIntValue extends OSCValue {
-  kind: 'int';
+  kind: OSCValueTypeE.Int;
   value: number;
 }
 
 export interface OSCFloatValue extends OSCValue {
-  kind: 'float';
+  kind: OSCValueTypeE.Float;
   value: number;
 }
 
 export interface OSCStringValue extends OSCValue {
-  kind: 'string';
+  kind: OSCValueTypeE.String;
   value: string;
 }
 
 export interface OSCBoolValue extends OSCValue {
-  kind: 'bool';
+  kind: OSCValueTypeE.Boolean;
   value: boolean;
 }
 
-export interface OSCUnsupportedValue extends OSCValue {
-  kind: 'unsupported';
-}
+// export interface OSCUnsupportedValue extends OSCValue {
+//   kind: OSCValueTypeE.unsupported;
+// }
 
 export interface OSCMessage {
   address: string;
@@ -53,21 +60,21 @@ export function parseOSCMessage(message: OSCMessageRaw): OSCMessage {
 export function parseOSCValue(value: OSCValueRaw): OSCValue {
   let parsedValue: unknown;
   switch (value.kind) {
-    case 'int':
+    case OSCValueTypeE.Int:
       parsedValue = parseInt(value.value);
       break;
-    case 'float':
+    case OSCValueTypeE.Float:
       parsedValue = parseFloat(value.value);
       break;
-    case 'string':
+    case OSCValueTypeE.String:
       parsedValue = value.value;
       break;
-    case 'bool':
+    case OSCValueTypeE.Boolean:
       parsedValue = value.value === 'true';
       break;
-    case 'unsupported':
-      parsedValue = undefined;
-      break;
+    // case OSCValueTypeE.unsupported:
+    //   parsedValue = undefined;
+    //   break;
   }
   return {
     kind: value.kind,

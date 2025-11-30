@@ -10,12 +10,13 @@ import {
   ViewChild,
 } from '@angular/core';
 import { BehaviorSubject, debounceTime, map, Observable, tap } from 'rxjs';
-import { OscParameterType, OscScript, OscScriptCodeValidationError } from '../../models/osc-script';
+import { OscScript, OscScriptCodeValidationError } from '../../models/osc-script';
 import { fade, hshrink, noop } from '../../utils/animations';
 import { isEqual } from 'lodash';
 import { OscService } from '../../services/osc.service';
 import { parseOscScriptFromCode } from '../../utils/osc-script-utils';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { OSCValueTypeE } from 'src-ui/app/models/osc-message';
 
 @Component({
   selector: 'app-osc-script-code-editor',
@@ -120,15 +121,27 @@ export class OscScriptCodeEditorComponent implements OnInit, AfterViewInit {
           case 'COMMAND': {
             let commandParametersString = '';
             command.parameters.forEach((parameter) => {
-              const type = { Float: 'f', Int: 'i', Boolean: 'b', String: 's' }[
-                parameter.type
-              ] as OscParameterType;
-              const value = {
-                Float: (v: string) => parseFloat(v),
-                Int: (v: string) => parseInt(v),
-                Boolean: (v: string) => (v === 'true' ? 'true' : 'false'),
-                String: (v: string) => `"${v.replace(/"/g, '\\"')}"`, // put string into quotes and escape all inner quoutes
-              }[parameter.type](parameter.value);
+              let type:string
+               let value:string|number|boolean;
+              switch (parameter.type){
+                case OSCValueTypeE.Float:
+                  type="f";
+                  value=parseFloat(parameter.value);
+                  break;
+                case OSCValueTypeE.Int:
+                  type="i";
+                   value=parseInt(parameter.value)
+                  break;
+                case OSCValueTypeE.Boolean:
+                  type="b";
+                  value=(parameter.value === 'true' ? 'true' : 'false');
+                  break;
+                case OSCValueTypeE.String:
+                  type="s";
+                  value= '"'+parameter.value.replace('"', '\\"')+'"';
+                  break;
+
+              }
               commandParametersString += `${type} ${value} `;
             });
             return commandParametersString + command.address;

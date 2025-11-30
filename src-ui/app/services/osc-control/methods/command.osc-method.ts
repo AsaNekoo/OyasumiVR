@@ -1,5 +1,5 @@
 import { OscMethod } from '../osc-method';
-import { OSCIntValue, OSCMessage } from '../../../models/osc-message';
+import { OSCIntValue, OSCMessage, OSCValueTypeE } from '../../../models/osc-message';
 import { OscService } from '../../osc.service';
 import { OscControlService } from '../osc-control.service';
 import { firstValueFrom } from 'rxjs';
@@ -24,7 +24,7 @@ export class CommandOscMethod extends OscMethod<number> {
       description: 'Trigger various actions in OyasumiVR from a single address (See documentation)',
       address: '/OyasumiVR/Command',
       addressAliases: ['/Oyasumi/Cmd'],
-      type: 'Int',
+      type: OSCValueTypeE.Int,
       initialValue: 0,
       isVRCAvatarParameter: true,
       access: 'ReadWrite',

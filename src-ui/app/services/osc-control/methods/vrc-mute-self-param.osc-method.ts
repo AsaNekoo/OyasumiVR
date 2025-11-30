@@ -1,6 +1,6 @@
 import { OscService } from '../../osc.service';
 import { OscMethod } from '../osc-method';
-import { OSCBoolValue, OSCMessage } from '../../../models/osc-message';
+import { OSCBoolValue, OSCMessage, OSCValueTypeE } from '../../../models/osc-message';
 
 export class VRCMuteSelfParamOscMethod extends OscMethod<boolean> {
   constructor(osc: OscService) {
@@ -8,7 +8,7 @@ export class VRCMuteSelfParamOscMethod extends OscMethod<boolean> {
       description: 'Notify OyasumiVR of the current voice mute state in VRChat',
       address: '/MuteSelf',
       addressAliases: [],
-      type: 'Bool',
+      type: OSCValueTypeE.Boolean,
       initialValue: false,
       isVRCAvatarParameter: true,
       access: 'Write',

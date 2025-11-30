@@ -11,7 +11,7 @@ import {
   skip,
   switchMap,
 } from 'rxjs';
-import { OSCBoolValue } from '../../models/osc-message';
+import { OSCBoolValue, OSCValueTypeE } from '../../models/osc-message';
 import { AutomationConfigService } from '../automation-config.service';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
@@ -54,7 +54,7 @@ export class VRChatMicMuteAutomationService {
     this.osc.messages.subscribe((message) => {
       if (message.address === READ_ADDR) {
         const value = message.values[0];
-        if (value.kind === 'bool') {
+        if (value.kind === OSCValueTypeE.Boolean) {
           const muted = (value as OSCBoolValue).value;
           this._muted.next(muted);
         }

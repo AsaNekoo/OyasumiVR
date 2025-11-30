@@ -1,3 +1,4 @@
+import { OSCValueTypeE } from '../models/osc-message';
 import {
   OscParameter,
   OscScript,
@@ -98,7 +99,7 @@ export function parseOscScriptFromCode(code: string): {
             const floatValue = parseFloat(match.groups!['FLOAT_VALUE']);
             if (!isNaN(floatValue)) {
               parameters.push({
-                type: 'Float',
+                type: OSCValueTypeE.Float,
                 value: floatValue + '',
               });
             } else {
@@ -113,7 +114,7 @@ export function parseOscScriptFromCode(code: string): {
             const intValue = parseInt(match.groups!['INT_VALUE'], 10);
             if (!isNaN(intValue)) {
               parameters.push({
-                type: 'Int',
+                type: OSCValueTypeE.Int,
                 value: intValue + '',
               });
             } else {
@@ -129,7 +130,7 @@ export function parseOscScriptFromCode(code: string): {
               match.groups!['BOOL_VALUE'].toLowerCase()
             );
             parameters.push({
-              type: 'Boolean',
+              type: OSCValueTypeE.Boolean,
               value: boolValue + '',
             });
           }
@@ -139,7 +140,7 @@ export function parseOscScriptFromCode(code: string): {
 
             if (stringValue.length < MAX_STRING_VALUE_LENGTH) {
               parameters.push({
-                type: 'String',
+                type: OSCValueTypeE.String,
                 value: stringValue.replace(/\\"/g, '"'), // un-escape escaped quotes when adding to array
               });
             } else {
