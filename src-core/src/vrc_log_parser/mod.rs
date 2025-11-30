@@ -28,9 +28,20 @@ static MUTE_LOG_DIR_NO_EXIST_WARNINGS: AtomicBool = AtomicBool::new(false);
 
 fn get_latest_log_path() -> Option<String> {
     // Get all files in the log directory
-    let home_dir = dirs::home_dir()?;
-    let dir = read_dir(home_dir.join("AppData\\LocalLow\\VRChat\\VRChat"));
-    // If log directory doesn't exist, return no path
+    let dir = {
+        #[cfg(windows)]
+        {
+        let home_dir = dirs::home_dir()?;
+        read_dir(home_dir.join("AppData\\LocalLow\\VRChat\\VRChat"))
+        }
+        #[cfg(unix)]
+        {
+            let mut path=steamlocate::SteamDir::locate().ok()?.find_app(438100).ok()??.1.path().to_path_buf();
+            path.push("steamapps/compatdata/438100/pfx/drive_c/users/steamuser/AppData/LocalLow/VRChat/VRChat");
+            read_dir(path)
+        }
+    };
+    // If log directory doesn't exist, return no path   q
     if dir.is_err() {
         if !MUTE_LOG_DIR_NO_EXIST_WARNINGS.load(Ordering::Relaxed) {
             warn!("[Core] VRChat log directory doesn't exist (yet)");
