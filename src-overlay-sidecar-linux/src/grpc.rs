@@ -95,7 +95,7 @@ impl OyasumiOverlaySidecar for GrpcServer {
 pub async fn start_grpc_server() -> u16 {
     let port: u16 = match ARGS.get().as_ref().unwrap().core_pid == 0 {
         true => crate::globals::OVERLAY_SIDECAR_GRPC_DEV_PORT,
-        false => 0,
+        false => portpicker::pick_unused_port().unwrap(),
     };
     let addr: SocketAddr = format!("127.0.0.1:{}", port).parse().unwrap();
     info!("Starting gRPC server on {}", addr);
@@ -115,7 +115,7 @@ pub async fn start_grpc_server() -> u16 {
 pub async fn start_grpc_web_server() -> u16 {
     let port: u16 = match ARGS.get().as_ref().unwrap().core_pid == 0 {
         true => crate::globals::OVERLAY_SIDECAR_GRPC_WEB_DEV_PORT,
-        false => 0,
+        false => portpicker::pick_unused_port().unwrap(),
     };
     let addr: SocketAddr = format!("127.0.0.1:{}", port).parse().unwrap();
     info!("Starting gRPC web server on {}", addr);

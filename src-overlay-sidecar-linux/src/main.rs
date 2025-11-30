@@ -172,6 +172,8 @@ async fn tokio_main() {
         })
         .await
         .unwrap();
+    assert_ne!(grpc_web_server_pos,0);
+    assert_ne!(grpc_server_port,0);
     let ws_port = start_websocket_server().await;
     OVERLAY.wait().inject_ipc(ws_port);
     tokio::time::sleep(Duration::from_millis(2000)).await;
