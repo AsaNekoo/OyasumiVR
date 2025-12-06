@@ -256,7 +256,6 @@ impl SidecarManager {
                         { self_guard.sidecar_pid.lock().await.as_ref().map(|pid| *pid) };
                     s.refresh_processes_specifics(
                         sysinfo::ProcessesToUpdate::Some(&[
-                            Pid::from_u32(pid),
                             Pid::from_u32(current_sidecar_pid.unwrap_or_default()),
                         ]),
                         true,
