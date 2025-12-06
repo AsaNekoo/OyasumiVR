@@ -3,11 +3,12 @@ use super::audio_devices::device::AudioDeviceDto;
 #[cfg(windows)]
 use super::get_friendly_name_for_windows_power_policy;
 use super::models::WindowsPowerPolicy;
-use super::{models::Output, VRCHAT_ACTIVE};
+use super::{models::Output};
 use crate::globals::TAURI_APP_HANDLE;
 use crate::os::audio_devices::AudioDeviceDto;
 #[cfg(unix)]
 use crate::os::linux::audio::LINUX_AUDIO_DEVICE_MANAGER;
+use crate::utils::VRCHAT_ACTIVE;
 #[cfg(unix)]
 use crate::warn_unimplemented;
 use log::error;
@@ -23,6 +24,7 @@ use uuid::Uuid;
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn play_sound(name: String, volume: f32) {
+    log::debug!("[core] playing: {} volume:{}",name,volume);
     if volume == 0.0 {
         return;
     }

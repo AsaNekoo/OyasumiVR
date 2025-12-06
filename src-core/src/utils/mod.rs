@@ -1,26 +1,23 @@
-use log::error;
+use log::{error, info};
 use serde::Serialize;
-use sysinfo::{Pid, ProcessRefreshKind, ProcessesToUpdate, Signal};
-use tokio::sync::Mutex;
 use std::ffi::OsStr;
-use std::sync::LazyLock;
-use std::time::{SystemTime, UNIX_EPOCH};
 #[cfg(windows)]
 use std::os::raw::c_char;
+use std::sync::LazyLock;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 #[cfg(windows)]
-use std::{
-    ffi::OsStr,
-    sync::LazyLock,
-    time::Duration,
-};
+use std::{ffi::OsStr, sync::LazyLock, time::Duration};
+use sysinfo::{Pid, ProcessRefreshKind, ProcessesToUpdate, Signal};
 #[cfg(windows)]
 use sysinfo::{ProcessesToUpdate, RefreshKind, Signal, System};
 use tauri::Emitter;
+use tokio::sync::Mutex;
 #[cfg(windows)]
 use tokio::sync::Mutex;
 
 use crate::globals::{TAURI_APP_HANDLE, TAURI_CLI_MATCHES};
-static SYSINFO: LazyLock<Mutex<sysinfo::System>> = LazyLock::new(|| Mutex::new(sysinfo::System::new()));
+static SYSINFO: LazyLock<Mutex<sysinfo::System>> =
+    LazyLock::new(|| Mutex::new(sysinfo::System::new()));
 
 pub mod models;
 pub mod profiling;
@@ -41,6 +38,29 @@ impl TrackedProcess {
             Self::Steamvr => "vrmonitor",
             Self::Vrchat => "VRChat.exe",
         })
+    }
+}
+pub async fn init() {
+    tokio::task::spawn(watch_vrchat_process());
+}
+pub static VRCHAT_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
+
+async fn watch_vrchat_process() {
+    loop {
+        {
+            let res = crate::utils::is_process_active(crate::utils::TrackedProcess::Vrchat).await;
+            let mut vrc_active = VRCHAT_ACTIVE.lock().await;
+            if *vrc_active != res {
+                *vrc_active = res;
+                crate::utils::send_event("VRCHAT_PROCESS_ACTIVE", res).await;
+                if res {
+                    info!("[Core] Detected VRChat process has started");
+                } else {
+                    info!("[Core] Detected VRChat process has stopped");
+                }
+            }
+        }
+        tokio::time::sleep(Duration::from_secs(1)).await;
     }
 }
 pub async fn is_process_active(process: TrackedProcess) -> bool {

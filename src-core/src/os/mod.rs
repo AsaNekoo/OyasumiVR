@@ -21,6 +21,7 @@ use std::os::windows::ffi::OsStringExt;
 #[cfg(windows)]
 use std::slice;
 use std::sync::LazyLock;
+use std::time::Duration;
 #[cfg(windows)]
 use std::time::Duration;
 use tokio::sync::mpsc::Sender;
@@ -41,7 +42,6 @@ static PLAY_SOUND_TX: PlaySoundSender = LazyLock::new(Mutex::default);
 #[cfg(windows)]
 static AUDIO_DEVICE_MANAGER: LazyLock<Mutex<Option<AudioDeviceManager>>> =
     LazyLock::new(Mutex::default);
-static VRCHAT_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 pub async fn init_audio_device_manager() {
     #[cfg(windows)]
     {
@@ -60,28 +60,9 @@ pub async fn init_audio_device_manager() {
         if let Err(e) = manager.as_ref().unwrap().refresh_audio_devices().await {
             error!("[Core] Failed to refresh audio devices: {}", e);
         }
-        tokio::task::spawn(watch_processes());
     }
 }
-#[cfg(windows)]
-async fn watch_processes() {
-    loop {
-        {
-            let res = crate::utils::is_process_active(crate::utils::TrackedProcess::Vrchat).await;
-            let mut vrc_active = VRCHAT_ACTIVE.lock().await;
-            if *vrc_active != res {
-                *vrc_active = res;
-                crate::utils::send_event("VRCHAT_PROCESS_ACTIVE", res).await;
-                if res {
-                    info!("[Core] Detected VRChat process has started");
-                } else {
-                    info!("[Core] Detected VRChat process has stopped");
-                }
-            }
-        }
-        tokio::time::sleep(Duration::from_secs(1)).await;
-    }
-}
+
 
 pub async fn init_sound_playback() {
     // Create channels

@@ -263,6 +263,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
             error!("[Core] Failed to register deep link schemas: {}", e);
         }
     }
+    utils::init().await;
     // Initialize Steam module
     #[cfg(feature = "steam")]
     steam::init().await;
