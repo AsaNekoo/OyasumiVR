@@ -16,12 +16,12 @@ use xr_overlay::{
 use crate::{
     utils::send_event,
     vr::{
-        VR_STATE, gesture_detector::GestureDetector, model::VRStatus, sleep_detector::SleepDetector
+        gesture_detector::GestureDetector, model::VRStatus, sleep_detector::SleepDetector,
     },
 };
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
 pub static OXR_BRIGHTNES_OVERLAY_HANDLE: Mutex<Option<OverlayHandle>> = Mutex::const_new(None);
-
+pub static OXR_STATE: Mutex<VRStatus> = Mutex::const_new(VRStatus::Inactive);
 async fn get_ctx() -> AppContext<xr_overlay::openxr::Vulkan> {
     let ctx = loop {
             let ctx = xr_overlay::xr::Init::default()
@@ -84,7 +84,7 @@ pub async fn init() {
         OXR_HANDLE.set(Mutex::new(runner)).unwrap();
         tokio::task::spawn(async {
             loop {
-                if *VR_STATE.lock().await == VRStatus::Initialized {
+                if *OXR_STATE.lock().await == VRStatus::Initialized {
                     let mut xr_ctx = OXR_HANDLE.get().unwrap().lock().await;
                     match xr_ctx.run() {
                         xr_overlay::runner::PollResult::Success => (),
@@ -96,7 +96,7 @@ pub async fn init() {
                         xr_overlay::runner::PollResult::Exit => {
                             drop(xr_ctx);
                             tokio::time::sleep(Duration::from_secs(10)).await;
-                            debug_assert_eq!(*VR_STATE.lock().await, VRStatus::Inactive);
+                            debug_assert_eq!(*OXR_STATE.lock().await, VRStatus::Inactive);
                             continue;
                         }
                         xr_overlay::runner::PollResult::Starting => {
@@ -118,7 +118,7 @@ pub async fn init() {
 
         tokio::task::spawn(async move {
             loop {
-                if *VR_STATE.lock().await == VRStatus::Initialized {
+                if *OXR_STATE.lock().await == VRStatus::Initialized {
                     let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
                     if let Some(posef) = ctx.get_hmd_posef(ReferenceSpaceT::STAGE) {
                         let pos = posef.position;
@@ -174,10 +174,10 @@ fn openxr_callback(event: AppEvent) {
 }
 async fn update_status(new_status: VRStatus) {
     info!("[core] updating openxr status:{:?}",new_status);
-    if *VR_STATE.lock().await==VRStatus::Initialized && new_status==VRStatus::Initializing{
+    if *OXR_STATE.lock().await==VRStatus::Initialized && new_status==VRStatus::Initializing{
         unreachable!("possible race condition for update_status"); //panic instead of error since this is a logic error and need to be fixed
     }
-    *VR_STATE.lock().await = new_status.clone();
+    *OXR_STATE.lock().await = new_status.clone();
     send_event("VR_STATUS_UPDATE", new_status.to_string().to_uppercase()).await;
 }
 static ABORT_GESTURE_DETECTION: Mutex<bool> = Mutex::const_new(false);
@@ -188,7 +188,7 @@ pub async fn stop_head_shake_detection() {
     }
 }
 pub async fn start_head_shake_detection() {
-    if *VR_STATE.lock().await==VRStatus::Initialized{
+    if *OXR_STATE.lock().await==VRStatus::Initialized{
     let frame_time = (1000.
         / OXR_HANDLE
             .get()
@@ -203,7 +203,7 @@ pub async fn start_head_shake_detection() {
             if *ABORT_GESTURE_DETECTION.lock().await {
                 break;
             }
-            if *VR_STATE.lock().await == VRStatus::Initialized {
+            if *OXR_STATE.lock().await == VRStatus::Initialized {
                 let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
                 if let Some(posef) = ctx.get_hmd_posef(ReferenceSpaceT::STAGE) {
                     let pos = posef.position;
@@ -231,7 +231,7 @@ pub async fn start_head_shake_detection() {
 }
 
 pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gamma: Option<f64>) {
-    if *VR_STATE.lock().await != VRStatus::Initialized {
+    if *OXR_STATE.lock().await != VRStatus::Initialized {
         return;
     }
     let mut brightness = brightness.clamp(0.0, 1.0);

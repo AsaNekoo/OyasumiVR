@@ -3,8 +3,6 @@ use std::time::Duration;
 use sysinfo::{Pid, ProcessRefreshKind, System};
 use tokio::sync::{mpsc, Mutex};
 use std::sync::Arc;
-
-use crate::vr::{VR_STATE, model::VRStatus};
 const LAUNCH_RETRY_INTERVALS: [Duration; 9] = [
     Duration::from_millis(100),
     Duration::from_secs(1),
@@ -297,7 +295,7 @@ impl SidecarManager {
                     drop(self_guard);
                 }
                 // Automatically try restarting the sidecar if desired
-                if *VR_STATE.lock().await==VRStatus::Initialized &&self_arc.lock().await.auto_restart {
+                if self_arc.lock().await.auto_restart {
                     let retry_interval = LAUNCH_RETRY_INTERVALS[retries];
                     tokio::time::sleep(retry_interval).await;
                     retries += 1;

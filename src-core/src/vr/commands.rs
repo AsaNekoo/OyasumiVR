@@ -76,7 +76,7 @@ pub async fn vr_status() -> String {
        super::openvr::OVR_STATUS.lock().await.to_string().to_uppercase()
     }
     #[cfg(unix)]
-    crate::vr::VR_STATE.lock().await.to_string().to_uppercase()
+    super::openxr::OXR_STATE.lock().await.to_string().to_uppercase()
 }
 
 #[tauri::command]
