@@ -132,7 +132,10 @@ pub async fn init() {
                             )
                             .await;
                     } else {
-                        info!("[Core] Failed to get hmd Posef")
+                        #[cfg(windows)]
+                    info!("[Core] Failed to get hmd Posef");
+                    #[cfg(unix)]
+                    debug!("[Core] Failed to get hmd Posef");
                     }
                 }
                 tokio::time::sleep(Duration::from_secs(5)).await;
@@ -214,7 +217,10 @@ pub async fn start_head_shake_detection() {
                         )
                         .await;
                 } else {
-                    info!("[Core] Failed to get hmd Posef")
+                    #[cfg(windows)]
+                    info!("[Core] Failed to get hmd Posef");
+                    #[cfg(unix)]
+                    debug!("[Core] Failed to get hmd Posef");
                 }
             }
             tokio::time::sleep(Duration::from_millis(frame_time)).await;
