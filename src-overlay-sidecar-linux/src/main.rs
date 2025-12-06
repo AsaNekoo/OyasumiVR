@@ -99,7 +99,13 @@ fn main() {
     if !BINDING_FILE_PATH.is_file() {
         fs::write(&*BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG).unwrap();
     }
-    let vr_thread = start_vr();
+    let vr_thread = match start_vr() {
+        Some(v) => v,
+        None => {
+            log::trace!("early kill");
+            return;
+        }
+    };
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
@@ -127,8 +133,7 @@ async fn tokio_main() {
         }
         log::trace!("watching:{} pid", pid);
         loop {
-            if !PathBuf::from(format!("/proc/{}", pid)).exists() {
-                kill();
+            if killed() {
                 break;
             }
             tokio::time::sleep(Duration::from_secs(1)).await;
@@ -191,6 +196,11 @@ pub fn kill() {
     }
     unsafe { KILL = true };
 }
-pub fn killed()->bool{
-    unsafe {KILL}
+pub fn killed() -> bool {
+    let pid = ARGS.get().as_ref().unwrap().core_pid as u32;
+    if pid != 0 && !PathBuf::from(format!("/proc/{}", pid)).exists() {
+        unsafe { KILL = true };
+    }
+
+    unsafe { KILL }
 }

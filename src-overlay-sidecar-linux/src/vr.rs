@@ -17,12 +17,15 @@ use xr_overlay_cef::{CefOverlayCreateInfo, create_cef_overlay};
 pub const DEFAULT_BINDINGS_CONFIG: &str = include_str!("bindings_overwrite_default.toml");
 pub static BINDING_FILE_PATH: LazyLock<PathBuf> =
     LazyLock::new(|| PathBuf::from("../../bindings_overwrite.toml"));
-use crate::{KILL, input::get_controller_create_info, model::Overlay};
+use crate::{KILL, input::get_controller_create_info, killed, model::Overlay};
 pub static OVERLAY: OnceLock<Overlay> = OnceLock::new();
 pub static XR_CTX: OnceLock<Arc<RwLock<AppRunner>>> = OnceLock::new();
-pub fn start_vr() -> JoinHandle<()> {
+pub fn start_vr() -> Option<JoinHandle<()>> {
     trace!("start_vr");
     let ctx = loop {
+        if killed(){
+            return None;
+        }
         match xr_overlay::xr::Init::default()
             .enable_drm_support()
             .user_presence_support(true)
@@ -91,7 +94,7 @@ pub fn start_vr() -> JoinHandle<()> {
             .is_ok()
     );
 
-    std::thread::spawn(move || {
+    Some(std::thread::spawn(move || {
         let frame_time = (1000. / app.write().unwrap().current_refresh_rate() as f32) as u64;
         loop {
             if unsafe { KILL } {
@@ -119,7 +122,7 @@ pub fn start_vr() -> JoinHandle<()> {
                 }
             }
         }
-    })
+    }))
 }
 fn openxr_callback(event: AppEvent) {
     if event != AppEvent::ButtonsUpdated {
