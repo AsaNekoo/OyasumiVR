@@ -95,6 +95,7 @@ export interface AutomationConfigs {
   FRAME_LIMIT_AUTOMATIONS: FrameLimitAutomationsConfig;
   SHUTDOWN_AUTOMATIONS: ShutdownAutomationsConfig;
   RUN_AUTOMATIONS: RunAutomationsConfig;
+  LINUX_POWER_POLICY_PROVIDER: string;
 
   // HARDWARE SPECIFIC
   GPU_POWER_LIMITS: GPUPowerLimitsAutomationConfig;
@@ -967,4 +968,5 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
     onSleepPreparation: false,
     onSleepPreparationRgb: [128, 0, 0],
   },
+  LINUX_POWER_POLICY_PROVIDER: 'powerprofilesctl'
 };

@@ -1814,6 +1814,22 @@
         "description": "Set the following Windows Power Policy",
         "title": "When sleep mode is enabled"
       }
+    },
+    "linuxPowerPolicy": {
+      "automations": "Automations",
+      "description": "OyasumiVR can automatically change the active Power Policy when you go to sleep or wake up. This can be useful to reduce your power consumption while you are asleep, and restore a higher performance policy when you wake up again.",
+      "sleepModeDisable": {
+        "description": "Set the following Power Policy",
+        "title": "When sleep mode is disabled"
+      },
+      "sleepModeEnable": {
+        "description": "Set the following Power Policy",
+        "title": "When sleep mode is enabled"
+      },
+      "provider":{
+          "title":"provider",
+          "description": "Select which program should be used to controll system's power policy"
+      }
     }
   },
   "pulsoid": {

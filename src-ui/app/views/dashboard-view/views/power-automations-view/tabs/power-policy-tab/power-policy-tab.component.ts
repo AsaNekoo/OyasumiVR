@@ -11,18 +11,29 @@ import { WindowsService } from '../../../../../../services/windows.service';
 import { combineLatest, tap } from 'rxjs';
 
 @Component({
-  selector: 'app-windows-power-policy-tab',
-  templateUrl: './windows-power-policy-tab.component.html',
-  styleUrls: ['./windows-power-policy-tab.component.scss'],
+  selector: 'app-power-policy-tab',
+  templateUrl: './power-policy-tab.component.html',
+  styleUrls: ['./power-policy-tab.component.scss'],
   standalone: false,
 })
-export class WindowsPowerPolicyTabComponent implements OnInit {
+export class PowerPolicyTabComponent implements OnInit {
   protected policyOptions: SelectBoxItem[] = [
     {
       id: 'NONE',
       label: 'shared.common.none',
     },
   ];
+   protected policyProviders: SelectBoxItem[] = [
+    {
+      id: 'NONE',
+      label: 'shared.common.none',
+    },
+  ];
+ protected policyProvider: SelectBoxItem =
+    this.policyProviders.find(
+      (p) =>
+        p.id === AUTOMATION_CONFIGS_DEFAULT.LINUX_POWER_POLICY_PROVIDER
+    ) ?? this.policyOptions[0];
 
   protected onSleepModeEnablePolicy: SelectBoxItem =
     this.policyOptions.find(

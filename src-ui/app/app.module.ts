@@ -113,7 +113,7 @@ import { IPCService } from './services/ipc.service';
 import { AutomationConfigService } from './services/automation-config.service';
 import { FontLoaderService } from './services/font-loader.service';
 import { NotificationService } from './services/notification.service';
-import { WindowsPowerPolicyTabComponent } from './views/dashboard-view/views/power-automations-view/tabs/windows-power-policy-tab/windows-power-policy-tab.component';
+import { PowerPolicyTabComponent } from './views/dashboard-view/views/power-automations-view/tabs/power-policy-tab/power-policy-tab.component';
 import { SetWindowsPowerPolicyOnSleepModeAutomationService } from './services/power-automations/set-windows-power-policy-on-sleep-mode-automation.service';
 import { SteamService } from './services/steam.service';
 import { TooltipDirective } from './directives/tooltip.directive';
@@ -351,7 +351,7 @@ export function createTranslateLoader(http: HttpClient) {
     ShutdownAutomationsViewComponent,
     ShutdownSequenceOverlayComponent,
     DeveloperDebugModalComponent,
-    WindowsPowerPolicyTabComponent,
+    PowerPolicyTabComponent,
     DebugSleepDetectionDebuggerComponent,
     BrightnessControlModalComponent,
     BrightnessControlSliderComponent,
