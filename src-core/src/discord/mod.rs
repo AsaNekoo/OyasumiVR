@@ -1,4 +1,5 @@
 use std::{
+    path::PathBuf,
     sync::LazyLock,
     time::{Duration, SystemTime},
 };
@@ -16,11 +17,10 @@ static LAST_ACTIVITY_UPDATE: LazyLock<Mutex<Option<ActivityUpdate>>> =
     LazyLock::new(Default::default);
 
 pub async fn init() {
-    #[cfg(windows)]
     tokio::task::spawn(async {
         loop {
             {
-                let res = crate::utils::is_process_active("Discord.exe", false).await;
+                let res = is_discord_ipc_active().await;
                 let mut discord_active = DISCORD_ACTIVE.lock().await;
                 if *discord_active != res {
                     *discord_active = res;
@@ -35,21 +35,52 @@ pub async fn init() {
             tokio::time::sleep(Duration::from_secs(1)).await;
         }
     });
-      #[cfg(unix)]
-    tokio::task::spawn(async {
-        loop {
-            {
-                    if is_discord_running() {
-                        on_discord_started().await;
-                    } else {
-                        on_discord_stopped().await;
-                    }
-            }
-            tokio::time::sleep(Duration::from_secs(1)).await;
-        }
-    });
 }
+//based on discord's crate
+pub async fn is_discord_ipc_active()->bool {
+    #[cfg(unix)]
+    {
+        let tmp_path = std::env::var("XDG_RUNTIME_DIR")
+            .or_else(|_| std::env::var("TMPDIR"))
+            .or_else(|_| std::env::var("TMP"))
+            .or_else(|_| std::env::var("TEMP"))
+            .unwrap_or_else(|_| "/tmp".to_owned());
 
+        // Discord just uses a simple round robin approach to finding a socket to use
+        let mut socket_path = format!("{}/app/com.discordapp.Discord/discord-ipc-0", tmp_path);
+        // let mut socket_path = format!("{}/app/com.discordapp.Discord/discord-ipc-0", tmp_path);
+        let mut fallback_path = format!("{}/discord-ipc-0", tmp_path);
+
+        for seq in 0..10i32 {
+            for path in [&mut socket_path, &mut fallback_path] {
+                path.pop();
+                use std::{fmt::Write, str::FromStr};
+                write!(path, "{}", seq).unwrap();
+                let path = PathBuf::from_str(path.as_str()).unwrap();
+                if path.is_file() {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+    #[cfg(windows)]
+    {
+    let mut socket_path = "\\\\?\\pipe\\discord-ipc-0".to_owned();
+        for seq in 0..10i32 {
+            socket_path.pop();
+            use std::fmt::Write;
+            write!(&mut socket_path, "{}", seq).unwrap();
+            if  tokio::net::windows::named_pipe::ClientOptions::new().open(&socket_path).is_ok(){
+                return true;
+            }
+           
+        }
+        false
+    }
+
+
+}
 pub async fn on_discord_started() {
     tokio::time::sleep(Duration::from_secs(10)).await;
     // Attempt creating client
@@ -186,24 +217,6 @@ pub async fn update_activity(
             false
         }
     }
-}
-#[cfg(unix)]
-fn is_discord_running() ->bool {
-    let tmp_path = std::env::var("XDG_RUNTIME_DIR")
-        .or_else(|_| std::env::var("TMPDIR"))
-        .or_else(|_| std::env::var("TMP"))
-        .or_else(|_| std::env::var("TEMP"))
-        .unwrap_or_else(|_| "/tmp".to_owned());
-    let mut socket_path = format!("{}/app/com.discordapp.Discord/discord-ipc-0", tmp_path);
-    let mut fallback_path = format!("{}/discord-ipc-0", tmp_path);
-    for path in [&mut socket_path, &mut fallback_path] {
-        use std::path::PathBuf;
-
-        if PathBuf::from(path.as_str()).is_file() {
-          return true;  
-        }
-    }
-    false
 }
 struct Client {
     pub discord: ds::Discord,

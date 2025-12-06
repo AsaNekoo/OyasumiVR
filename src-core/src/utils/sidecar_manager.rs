@@ -1,9 +1,8 @@
 use log::{error, info, warn};
 use std::time::Duration;
-use std::{fs, sync::Arc};
 use sysinfo::{Pid, ProcessRefreshKind, System};
 use tokio::sync::{mpsc, Mutex};
-
+use std::sync::Arc;
 const LAUNCH_RETRY_INTERVALS: [Duration; 9] = [
     Duration::from_millis(100),
     Duration::from_secs(1),
@@ -140,6 +139,8 @@ impl SidecarManager {
         }
         #[cfg(unix)]
         {
+            use std::fs;
+
             exe_path = fs::canonicalize(exe_path).unwrap();
             exe_dir = fs::canonicalize(exe_dir).unwrap();
         }
@@ -252,16 +253,15 @@ impl SidecarManager {
                     let current_sidecar_pid =
                         { self_guard.sidecar_pid.lock().await.as_ref().map(|pid| *pid) };
                     s.refresh_processes_specifics(
-                        sysinfo::ProcessesToUpdate::Some(&[Pid::from_u32(
-                            current_sidecar_pid.unwrap_or_default(),
-                        )]),
+                        sysinfo::ProcessesToUpdate::Some(&[
+                            Pid::from_u32(pid),
+                            Pid::from_u32(current_sidecar_pid.unwrap_or_default()),
+                        ]),
                         true,
-                        ProcessRefreshKind::nothing(),
+                        ProcessRefreshKind::nothing().without_tasks(),
                     );
                     // Check if the child process is no longer found
                     if s.process(Pid::from(pid as usize)).is_none() {
-                        let current_sidecar_pid =
-                            { self_guard.sidecar_pid.lock().await.as_ref().map(|pid| *pid) };
                         // Check if the sidecar pid is still the same.
                         // If it is, then we can assume the sidecar stopped.
                         // If not, it likely got replaced by another instance of the sidecar.

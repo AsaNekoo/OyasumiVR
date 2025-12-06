@@ -1,5 +1,9 @@
 use log::error;
 use serde::Serialize;
+use sysinfo::{Pid, ProcessRefreshKind, ProcessesToUpdate, Signal};
+use tokio::sync::Mutex;
+use std::ffi::OsStr;
+use std::sync::LazyLock;
 use std::time::{SystemTime, UNIX_EPOCH};
 #[cfg(windows)]
 use std::os::raw::c_char;
@@ -16,53 +20,79 @@ use tauri::Emitter;
 use tokio::sync::Mutex;
 
 use crate::globals::{TAURI_APP_HANDLE, TAURI_CLI_MATCHES};
-#[cfg(windows)]
-static SYSINFO: LazyLock<Mutex<System>> = LazyLock::new(|| Mutex::new(System::new_all()));
-
+static SYSINFO: LazyLock<Mutex<sysinfo::System>> = LazyLock::new(|| Mutex::new(sysinfo::System::new()));
 
 pub mod models;
 pub mod profiling;
 pub mod serialization;
 pub mod sidecar_manager;
 
-pub fn init() {
-    #[cfg(windows)]
-    // Refresh processes at least every second
-    tokio::task::spawn(async {
-        loop {
-            {
-                let mut sysinfo_guard = SYSINFO.lock().await;
-                let sysinfo = &mut *sysinfo_guard;
-                //todo: there is no need to query all process just to check if steamvr or sidecard are running
-                //discord ipc can be checked without looking at process
-                sysinfo.refresh_processes_specifics(ProcessesToUpdate::All, true, RefreshKind::nothing());
-            }
-            tokio::time::sleep(Duration::from_secs(1)).await;
-        }
-    });
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum TrackedProcess {
+    Steamvr,
+    Vrchat,
 }
-#[cfg(windows)]
-pub async fn is_process_active(process_name: &str, refresh_processes: bool) -> bool {
-    let mut sysinfo_guard = SYSINFO.lock().await;
-    let sysinfo = &mut *sysinfo_guard;
-    if refresh_processes {
-        sysinfo.refresh_processes(ProcessesToUpdate::All, true);
+impl TrackedProcess {
+    pub fn name(&self) -> &OsStr {
+        OsStr::new(match self {
+            #[cfg(windows)]
+            Self::Steamvr => "vrmonitor.exe",
+            #[cfg(unix)]
+            Self::Steamvr => "vrmonitor",
+            Self::Vrchat => "VRChat.exe",
+        })
     }
-    let processes = sysinfo.processes_by_exact_name(OsStr::new(process_name));
-    processes.count() > 0
 }
-#[cfg(windows)]
-pub async fn stop_process(process_name: &str, kill: bool) {
+pub async fn is_process_active(process: TrackedProcess) -> bool {
+    static ACTIVE_PROCESS: Mutex<Vec<(TrackedProcess, Pid)>> = Mutex::const_new(Vec::new());
     let mut sysinfo_guard = SYSINFO.lock().await;
-    let sysinfo = &mut *sysinfo_guard;
-    sysinfo.refresh_processes(ProcessesToUpdate::All, true);
-    let processes = sysinfo.processes_by_exact_name(OsStr::new(process_name));
-    for process in processes {
-        if kill
-            || (process.kill_with(Signal::Term).is_none()
-                && process.kill_with(Signal::Quit).is_none())
+    let mut active_guard = ACTIVE_PROCESS.lock().await;
+    //first check if process which previously matches the name still exists
+    if let Some(p) = active_guard.iter().position(|p| p.0 == process) {
+        sysinfo_guard.refresh_processes_specifics(
+            ProcessesToUpdate::Some(&[active_guard[p].1]),
+            true,
+            ProcessRefreshKind::nothing().without_tasks(),
+        );
+        if sysinfo_guard
+            .processes_by_exact_name(active_guard[p].0.name())
+            .next()
+            .is_some()
         {
-            let _ = process.kill_with(Signal::Kill);
+            return true;
+        } else {
+            active_guard.swap_remove(p);
+            return false;
+        }
+    } else {
+        sysinfo_guard.refresh_processes_specifics(
+            ProcessesToUpdate::All,
+            true,
+            ProcessRefreshKind::nothing().without_tasks(),
+        );
+        let processes = sysinfo_guard
+            .processes_by_exact_name(process.name())
+            .collect::<Vec<_>>();
+        if processes.len() == 0 {
+            return false;
+        } else {
+            //even if there is multiple processes matching the name as long as one of them is running sysinfo would return something
+            active_guard.push((process, processes[0].pid()));
+            return true;
+        }
+    }
+}
+pub async fn quit_steamvr(kill: bool) {
+    let sysinfo_guard = SYSINFO.lock().await;
+    if is_process_active(TrackedProcess::Steamvr).await {
+        //is_process_active already refreshes processes
+        for process in sysinfo_guard.processes_by_exact_name(TrackedProcess::Steamvr.name()) {
+            if kill
+                || (process.kill_with(Signal::Term).is_none()
+                    && process.kill_with(Signal::Quit).is_none())
+            {
+                let _ = process.kill_with(Signal::Kill);
+            }
         }
     }
 }

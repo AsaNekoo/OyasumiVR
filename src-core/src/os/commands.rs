@@ -41,10 +41,7 @@ pub async fn play_sound(name: String, volume: f32) {
 #[oyasumivr_macros::command_profiling]
 #[cfg_attr(unix, allow(unused_variables))]
 pub async fn quit_steamvr(kill: bool) {
-    #[cfg(windows)]
-    crate::utils::stop_process("vrmonitor.exe", kill).await;
-    #[cfg(unix)]
-    {crate::vr::openxr::OXR_HANDLE.get().unwrap().lock().await.request_end_session();}
+    crate::utils::quit_steamvr(kill).await;
 }
 
 #[tauri::command]
