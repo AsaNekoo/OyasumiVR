@@ -34,6 +34,7 @@ unsafe impl Sync for LinuxPowerPolicyManager {}
 pub trait PowerPolicyProvider {
     fn which(&self) -> PowerPolicyProviderEnum;
     fn is_avalible(&self) -> bool;
+    //assume that capitalization is random
     fn set_power_profile(&mut self, profile: String) -> Result<(), ()>;
     fn get_avalible_profiles(&self)->Vec<String>;
 }

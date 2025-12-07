@@ -7,8 +7,9 @@ impl PowerPolicyProvider for PowerProfileDaemon {
     fn is_avalible(&self) -> bool {
         Command::new("powerprofilesctl").spawn().is_ok()
     }
-
-    fn set_power_profile(&mut self, profile: String) -> Result<(), ()> {
+    
+    fn set_power_profile(&mut self, mut profile: String) -> Result<(), ()> {
+        profile=profile.to_lowercase();
         if !PROFILES.contains(&profile.as_str()) {
             log::error!(
                 "incorrect power profile: {} correct values are:{:?}",
