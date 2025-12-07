@@ -51,7 +51,7 @@ pub struct Args {
 }
 fn main() {
     env_logger::Builder::from_default_env()
-        .filter_level(log::LevelFilter::Trace)
+        .filter_level(log::LevelFilter::Debug)
         .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
         .filter_module("xr_overlay", log::LevelFilter::Debug)
         .filter_module("tokio_tungstenite", log::LevelFilter::Warn)
