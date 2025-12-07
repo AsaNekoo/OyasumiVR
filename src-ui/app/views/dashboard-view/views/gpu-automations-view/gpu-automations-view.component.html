@@ -2,12 +2,15 @@
   <!-- TITLE-->
   <div class="pane-title" translate
     ><span translate>gpu-automations.title</span>
+    @if (is_windows){
     @if (!['DISABLED'].includes(panel)) {
       <button class="btn btn-secondary" (click)="gpuAutomations.disable()" translate @fade>
         gpu-automations.disable
       </button>
     }
+  }
   </div>
+  @if(is_windows){
   <!-- TAB BAR-->
   @if (panel === 'ENABLED') {
     <div class="tab-bar" @vshrink>
@@ -88,4 +91,7 @@
       }
     </div>
   }
+}@else {
+   <app-msi-afterburner-pane></app-msi-afterburner-pane>
+}
 </div>

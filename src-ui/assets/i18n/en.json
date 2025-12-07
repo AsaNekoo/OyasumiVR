@@ -1186,6 +1186,10 @@
         "title": "When sleep mode is enabled"
       }
     },
+    "lact": {
+      "description": "OyasumiVR can automatically tweak your GPU settings when you go to sleep or wake up, by applying profiles you've created in LACT. A use case for this functionality is to save electricity while you are asleep, and regain GPU power when you wake up.<br><br>You have to set up the profiles you want to apply in LACT.<br>You can download LACT <a href=\"https://github.com/ilya-zlobintsev/LACT\" target=\"_blank\">here</a>.<br>for compatibility reasons lact profile names have to start with 'number_' for example '2_sleep'",
+      "enabledWarning": "Please be aware that incorrectly configuring your GPU in LACT could result in your system becoming unstable. Disable this feature if you do not know what you are doing."
+    },
     "powerLimiting": {
       "activatingSleepMode": {
         "description": "Specify the power limit to set when sleep mode activates",

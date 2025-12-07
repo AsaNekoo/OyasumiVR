@@ -1,7 +1,12 @@
 <div class="setting-category">
   <div class="description">
     <p>
+      @if(is_windows){
       <span translate>power-automations.windowsPowerPolicy.description</span>
+    }@else {
+      
+      <span translate>power-automations.linuxPowerPolicy.description</span>
+      }
     </p>
     <i class="material-icons-outlined description-icon">energy_savings_leaf</i>
   </div>
@@ -10,7 +15,11 @@
     <div class="setting-row">
       <div class="setting-row-label" translate>
         <span translate>power-automations.windowsPowerPolicy.sleepModeEnable.title</span>
-        <span translate>power-automations.windowsPowerPolicy.sleepModeEnable.description</span>
+        @if (is_windows) {
+          <span translate>power-automations.windowsPowerPolicy.sleepModeEnable.description</span>
+        } @else {
+          <span translate>power-automations.linuxPowerPolicy.sleepModeEnable.description</span>
+        }
       </div>
       <div class="setting-row-action">
         <app-select-box
@@ -24,7 +33,11 @@
     <div class="setting-row">
       <div class="setting-row-label" translate>
         <span translate>power-automations.windowsPowerPolicy.sleepModeDisable.title</span>
-        <span translate>power-automations.windowsPowerPolicy.sleepModeDisable.description</span>
+        @if (is_windows) {
+          <span translate>power-automations.windowsPowerPolicy.sleepModeEnable.description</span>
+        } @else {
+          <span translate>power-automations.linuxPowerPolicy.sleepModeEnable.description</span>
+        }
       </div>
       <div class="setting-row-action">
         <app-select-box

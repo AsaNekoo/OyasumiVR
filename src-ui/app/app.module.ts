@@ -276,11 +276,13 @@ import { SPLASH_MIN_DURATION } from './globals';
   localeUK,
   localeDE,
 ].forEach((locale) => registerLocaleData(locale));
-
+export var is_windows:boolean=true;
+export async function check_windows(){
+  is_windows=await invoke("is_windows");
+}
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
-
 @NgModule({
   bootstrap: [AppComponent],
   declarations: [

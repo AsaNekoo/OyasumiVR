@@ -381,6 +381,7 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         hardware::beyond::commands::bigscreen_beyond_set_led_color,
         hardware::beyond::commands::bigscreen_beyond_set_fan_speed,
         hardware::beyond::commands::bigscreen_beyond_get_saved_preferences,
+        os::commands::is_windows,
         os::commands::run_command,
         os::commands::run_cmd_commands,
         os::commands::play_sound,

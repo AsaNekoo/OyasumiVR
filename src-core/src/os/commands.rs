@@ -22,6 +22,10 @@ use tokio::io::AsyncWriteExt;
 use uuid::Uuid;
 
 #[tauri::command]
+pub async fn is_windows()->bool{
+    cfg!(windows)
+}
+#[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn play_sound(name: String, volume: f32) {
     log::debug!("[core] playing: {} volume:{}",name,volume);

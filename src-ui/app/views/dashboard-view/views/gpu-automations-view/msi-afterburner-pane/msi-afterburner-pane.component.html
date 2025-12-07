@@ -1,9 +1,14 @@
 <div class="pane-content">
   <div class="setting-view-container">
     <div class="description-row">
+      @if(is_windows){
       <p [innerHtml]="'gpu-automations.msiAfterburner.description' | translate"></p>
       <img draggable="false" src="/assets/img/afterburner_icon.png" />
+      }@else {
+        <p [innerHtml]="'gpu-automations.lact.description' | translate"></p>
+      }
     </div>
+    @if(is_windows){
     <h3 translate>gpu-automations.msiAfterburner.executable.title</h3>
     <p [innerHtml]="'gpu-automations.msiAfterburner.executable.description' | translate"></p>
     <div class="file-path-bar">
@@ -38,6 +43,7 @@
         <div class="alert-content" [innerHTML]="msiAfterburnerPathAlert.text | translate"></div>
       </div>
     }
+  }
     <h3>Automations</h3>
     <div class="settings">
       <div class="setting-row">
@@ -75,10 +81,16 @@
         <i class="material-icons">warning</i>
       </div>
       <div class="alert-content flex-row">
+        @if(is_windows){
         <div translate>gpu-automations.msiAfterburner.enabledWarning</div>
+        }@else {
+          <div translate>gpu-automations.lact.enabledWarning</div>
+        }
+        @if(is_windows){
         <button class="btn btn-secondary" (click)="gpuAutomations.disable()" translate>
           gpu-automations.disable
         </button>
+      }
       </div>
     </div>
   </div>

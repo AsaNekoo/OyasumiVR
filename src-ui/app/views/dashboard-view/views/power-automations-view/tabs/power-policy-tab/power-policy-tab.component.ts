@@ -9,6 +9,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SelectBoxItem } from '../../../../../../components/select-box/select-box.component';
 import { WindowsService } from '../../../../../../services/windows.service';
 import { combineLatest, tap } from 'rxjs';
+import { is_windows } from 'src-ui/app/app.module';
 
 @Component({
   selector: 'app-power-policy-tab',
@@ -17,6 +18,7 @@ import { combineLatest, tap } from 'rxjs';
   standalone: false,
 })
 export class PowerPolicyTabComponent implements OnInit {
+  protected is_windows:boolean=false;
   protected policyOptions: SelectBoxItem[] = [
     {
       id: 'NONE',
@@ -55,6 +57,7 @@ export class PowerPolicyTabComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
+    this.is_windows=is_windows;
     combineLatest([
       this.automationConfigService.configs,
       // Update options when the windows power policies are updated
