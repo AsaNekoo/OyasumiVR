@@ -10,7 +10,7 @@ import { ConfirmModalComponent } from '../../../../components/confirm-modal/conf
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ExecutableReferenceStatus } from 'src-ui/app/models/settings';
 import { ActivatedRoute } from '@angular/router';
-import { is_windows } from 'src-ui/app/app.module';
+import { check_windows, is_windows } from 'src-ui/app/app.module';
 
 export type GpuAutomationsTab = 'POWER_LIMITS' | 'MSI_AFTERBURNER';
 
@@ -27,7 +27,7 @@ export class GpuAutomationsViewComponent implements OnInit {
   disabledMessage = '';
   nvmlErrors?: Observable<boolean>;
   msiAfterburnerErrors?: Observable<boolean>;
-  is_windows:boolean=true;
+  is_windows: boolean = true;
 
   constructor(
     private nvml: NvmlService,
@@ -40,19 +40,19 @@ export class GpuAutomationsViewComponent implements OnInit {
     combineLatest([sidecar.sidecarStarted, this.gpuAutomations.isEnabled()])
       .pipe(takeUntilDestroyed())
       .subscribe(([sidecarRunning, isEnabled]: [boolean, boolean]) => {
-        if (this.is_windows){
-        if (!isEnabled) {
-          this.disabledMessage = 'gpu-automations.disabled.disabled';
-          return (this.panel = 'DISABLED');
+        if (this.is_windows) {
+          if (!isEnabled) {
+            this.disabledMessage = 'gpu-automations.disabled.disabled';
+            return (this.panel = 'DISABLED');
+          }
+          if (!sidecarRunning) {
+            this.disabledMessage = 'gpu-automations.disabled.noSidecar';
+            return (this.panel = 'NO_SIDECAR');
+          }
+          return (this.panel = 'ENABLED');
+        } else {
+          return (this.panel = 'ENABLED');
         }
-        if (!sidecarRunning) {
-          this.disabledMessage = 'gpu-automations.disabled.noSidecar';
-          return (this.panel = 'NO_SIDECAR');
-        }
-        return (this.panel = 'ENABLED');
-      }else{
-        return(this.panel='ENABLED')
-      }
       });
     this.nvmlErrors = combineLatest([this.gpuAutomations.isEnabled(), this.nvml.status]).pipe(
       throttleTime(300, asyncScheduler, { trailing: true, leading: true }),
@@ -110,9 +110,14 @@ export class GpuAutomationsViewComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const fragment = await firstValueFrom(this.activatedRoute.fragment);
-    if (fragment) this.activeTab = fragment as GpuAutomationsTab;
-    this.is_windows=is_windows;
+    this.is_windows = is_windows;
+    await check_windows();
+    if (is_windows) {
+      const fragment = await firstValueFrom(this.activatedRoute.fragment);
+      if (fragment) this.activeTab = fragment as GpuAutomationsTab;
+    } else {
+      this.activeTab = 'MSI_AFTERBURNER';
+    }
   }
 
   async startSidecar() {

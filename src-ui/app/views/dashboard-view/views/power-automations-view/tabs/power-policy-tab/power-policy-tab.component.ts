@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SelectBoxItem } from '../../../../../../components/select-box/select-box.component';
 import { WindowsService } from '../../../../../../services/windows.service';
 import { combineLatest, tap } from 'rxjs';
-import { is_windows } from 'src-ui/app/app.module';
+import { check_windows, is_windows } from 'src-ui/app/app.module';
 import { invoke } from '@tauri-apps/api/core';
 
 @Component({
@@ -59,6 +59,7 @@ export class PowerPolicyTabComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
+    await check_windows();
     this.is_windows=is_windows;
     combineLatest([
       this.automationConfigService.configs,
