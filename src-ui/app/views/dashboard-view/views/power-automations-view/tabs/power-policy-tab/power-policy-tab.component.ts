@@ -59,7 +59,7 @@ export class PowerPolicyTabComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    await check_windows();
+    await check_windows
     this.is_windows=is_windows;
     combineLatest([
       this.automationConfigService.configs,
@@ -88,17 +88,21 @@ export class PowerPolicyTabComponent implements OnInit {
           this.policyOptions.find(
             (p) => p.id === configs.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_ENABLE.powerPolicy
           ) ?? this.policyOptions[0];
+           this.policyProvider =
+          this.policyProviders.find(
+            (p) => p.id === configs.LINUX_POWER_POLICY_PROVIDER.provider
+          ) ?? this.policyOptions[0];
         this.onSleepModeDisablePolicy =
           this.policyOptions.find(
             (p) => p.id === configs.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_DISABLE.powerPolicy
           ) ?? this.policyOptions[0];
       });
     // Fetch the current windows power policies when loading this view
-    await this.windowsService.getPowerPolicies();
     this.policyProviders=(await invoke<[string]>("get_power_policy_providers")).map((x)=> <SelectBoxItem>{
       id: x,
       label: x,
     });
+    await this.windowsService.getPowerPolicies();
   }
 
   async setPolicy(automation: 'ON_ENABLE' | 'ON_DISABLE', selectBoxItem: SelectBoxItem) {
