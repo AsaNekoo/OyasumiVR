@@ -20,9 +20,9 @@ serde = { version = "1.0.228", features = ["derive"] }
 tokio-tungstenite = "0.28.0"
 futures-util = { version = "0.3.31", default-features = false }
 base64 = "0.22.1"
-xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="7331cc7eb790225c169a813058a82df5a75b700f" }
+xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="6e51336cad3f8b71f1708f042e91968d04cdda3d" }
 # xr_overlay = { path="../../xr_overlay/core/" }
-xr_overlay_cef = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="7331cc7eb790225c169a813058a82df5a75b700f" }
+xr_overlay_cef = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="6e51336cad3f8b71f1708f042e91968d04cdda3d" }
 hyper = "1.8.1"
 axum = { version = "0.8.7", features = ["http1", "http2", "tokio"], default-features = false }
 portpicker = "0.1.1"
