@@ -2,6 +2,7 @@ import { Component, DestroyRef, OnInit } from '@angular/core';
 import { AutomationConfigService } from '../../../../../../services/automation-config.service';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
+  LinuxPowerPolicyProvider,
   WindowsPowerPolicyOnSleepModeAutomationConfig,
 } from '../../../../../../models/automations';
 import { Router } from '@angular/router';
@@ -10,6 +11,7 @@ import { SelectBoxItem } from '../../../../../../components/select-box/select-bo
 import { WindowsService } from '../../../../../../services/windows.service';
 import { combineLatest, tap } from 'rxjs';
 import { is_windows } from 'src-ui/app/app.module';
+import { invoke } from '@tauri-apps/api/core';
 
 @Component({
   selector: 'app-power-policy-tab',
@@ -34,7 +36,7 @@ export class PowerPolicyTabComponent implements OnInit {
  protected policyProvider: SelectBoxItem =
     this.policyProviders.find(
       (p) =>
-        p.id === AUTOMATION_CONFIGS_DEFAULT.LINUX_POWER_POLICY_PROVIDER
+        p.id === AUTOMATION_CONFIGS_DEFAULT.LINUX_POWER_POLICY_PROVIDER.provider
     ) ?? this.policyOptions[0];
 
   protected onSleepModeEnablePolicy: SelectBoxItem =
@@ -91,7 +93,11 @@ export class PowerPolicyTabComponent implements OnInit {
           ) ?? this.policyOptions[0];
       });
     // Fetch the current windows power policies when loading this view
-    await this.windowsService.getWindowsPowerPolicies();
+    await this.windowsService.getPowerPolicies();
+    this.policyProviders=(await invoke<[string]>("get_power_policy_providers")).map((x)=> <SelectBoxItem>{
+      id: x,
+      label: x,
+    });
   }
 
   async setPolicy(automation: 'ON_ENABLE' | 'ON_DISABLE', selectBoxItem: SelectBoxItem) {
@@ -115,5 +121,15 @@ export class PowerPolicyTabComponent implements OnInit {
         );
         break;
     }
+  }
+  async setProvider(item:SelectBoxItem){
+    this.automationConfigService.updateAutomationConfig<LinuxPowerPolicyProvider>(
+      'LINUX_POWER_POLICY_PROVIDER',
+      {
+        provider: item.label.toString()
+      }
+    );
+    await invoke("set_power_policy_provider",{name:item.label});
+
   }
 }

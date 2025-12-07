@@ -2,8 +2,8 @@
 use super::audio_devices::device::AudioDeviceDto;
 #[cfg(windows)]
 use super::get_friendly_name_for_windows_power_policy;
+use super::models::Output;
 use super::models::WindowsPowerPolicy;
-use super::{models::Output};
 use crate::globals::TAURI_APP_HANDLE;
 use crate::os::audio_devices::AudioDeviceDto;
 #[cfg(unix)]
@@ -14,21 +14,21 @@ use crate::warn_unimplemented;
 use log::error;
 #[cfg(windows)]
 use oyasumivr_shared::windows::is_elevated;
-use tauri_plugin_shell::ShellExt;
 use std::process::Command;
+use tauri_plugin_shell::ShellExt;
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 #[cfg(windows)]
 use uuid::Uuid;
 
 #[tauri::command]
-pub async fn is_windows()->bool{
+pub async fn is_windows() -> bool {
     cfg!(windows)
 }
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn play_sound(name: String, volume: f32) {
-    log::debug!("[core] playing: {} volume:{}",name,volume);
+    log::debug!("[core] playing: {} volume:{}", name, volume);
     if volume == 0.0 {
         return;
     }
@@ -295,15 +295,25 @@ pub async fn set_system_power_policy(guid: String) {
     }
     #[cfg(unix)]
     {
-        use crate::os::linux::power_managment::{PowerProfile, LINUX_POWER_POLICY_MANAGER};
+        use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
 
-        LINUX_POWER_POLICY_MANAGER
-            .lock()
-            .await
-            .set_policy(PowerProfile::from(guid));
+        LINUX_POWER_POLICY_MANAGER.lock().await.set_policy(guid);
     }
 }
+#[tauri::command]
+#[cfg(unix)]
+pub async fn set_power_policy_provider(name: String) {
+    use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
 
+    LINUX_POWER_POLICY_MANAGER.lock().await.set_provider(name);
+}
+#[tauri::command]
+#[cfg(unix)]
+pub async fn get_power_policy_providers()->Vec<String> {
+    use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
+
+    LINUX_POWER_POLICY_MANAGER.lock().await.get_providers()
+}
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn active_system_power_policy() -> Option<WindowsPowerPolicy> {
@@ -321,8 +331,14 @@ pub async fn active_system_power_policy() -> Option<WindowsPowerPolicy> {
     #[cfg(unix)]
     {
         use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
-        let current = LINUX_POWER_POLICY_MANAGER.lock().await.get_current();
-        Some(current.into())
+        let current = LINUX_POWER_POLICY_MANAGER
+            .lock()
+            .await
+            .get_current_profile();
+        Some(WindowsPowerPolicy {
+            guid: current.clone(),
+            name: current,
+        })
     }
 }
 
@@ -344,11 +360,17 @@ pub async fn get_system_power_policies() -> Vec<WindowsPowerPolicy> {
     }
     #[cfg(unix)]
     {
-        use crate::os::linux::power_managment::PowerProfile;
-        PowerProfile::all()
-            .to_vec()
+        use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
+
+        LINUX_POWER_POLICY_MANAGER
+            .lock()
+            .await
+            .get_avalible_profiles()
             .into_iter()
-            .map(|policy| policy.into())
+            .map(|p| WindowsPowerPolicy {
+                guid: p.clone(),
+                name:p,
+            })
             .collect()
     }
 }

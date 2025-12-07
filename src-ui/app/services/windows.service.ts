@@ -20,10 +20,10 @@ export class WindowsService {
   constructor(private eventLog: EventLogService) {}
 
   public async init() {
-    await this.getWindowsPowerPolicies();
+    await this.getPowerPolicies();
   }
 
-  public async getWindowsPowerPolicies() {
+  public async getPowerPolicies() {
     this._policies.next(await invoke<WindowsPowerPolicy[]>('get_system_power_policies'));
     return this._policies.value;
   }

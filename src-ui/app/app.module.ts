@@ -586,6 +586,7 @@ export class AppModule {
   }
 
   async init() {
+    await check_windows();
     try {
       await pMinDelay(
         (async () => {

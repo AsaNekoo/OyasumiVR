@@ -1,61 +1,29 @@
 use std::sync::LazyLock;
 
-use strum_macros::Display;
 use tokio::sync::Mutex;
 
-use crate::os::{
-    linux::power_managment::power_profile_daemon::PowerProfileDaemon, models::WindowsPowerPolicy,
-};
+use crate::os::linux::power_managment::power_profile_daemon::PowerProfileDaemon;
 pub static LINUX_POWER_POLICY_MANAGER: LazyLock<Mutex<LinuxPowerPolicyManager>> =
     LazyLock::new(|| Mutex::const_new(LinuxPowerPolicyManager::new()));
 mod power_profile_daemon;
 #[allow(dead_code)]
+#[derive(Debug)]
 enum PowerPolicyProviderEnum {
     PowerProfileDaemon,
-    ///to be used only by conflicts_with
-    #[allow(dead_code)]
-    All,
 }
-///since there is a many power managment methods on linux (https://wiki.archlinux.org/title/Power_management) and the is no "standard"
-#[derive(Display, Debug, PartialEq, Clone, Copy)]
-pub enum PowerProfile {
-    UltraPowerSave,
-    PowerSave,
-    Balanced,
-    Pefromance,
-    UltraPerformance,
-}
-impl PowerProfile {
-    pub const fn all() -> &'static [PowerProfile] {
-        &[
-            PowerProfile::UltraPowerSave,
-            PowerProfile::PowerSave,
-            PowerProfile::Balanced,
-            PowerProfile::Pefromance,
-            PowerProfile::UltraPerformance,
-        ]
-    }
-}
-impl From<PowerProfile> for WindowsPowerPolicy {
-    fn from(value: PowerProfile) -> Self {
-        WindowsPowerPolicy {
-            guid: value.to_string().to_uppercase(),
-            name: value.to_string(),
-        }
-    }
-}
-impl From<String> for PowerProfile {
+impl From<String> for PowerPolicyProviderEnum{
     fn from(value: String) -> Self {
-        match value.to_uppercase() {
-            val if val == PowerProfile::UltraPowerSave.to_string().to_uppercase() => PowerProfile::UltraPowerSave,
-            val if val == PowerProfile::PowerSave.to_string().to_uppercase() => PowerProfile::PowerSave,
-            val if val == PowerProfile::Balanced.to_string().to_uppercase() => PowerProfile::Balanced,
-            val if val == PowerProfile::Pefromance.to_string().to_uppercase() => PowerProfile::Pefromance,
-            val if val == PowerProfile::UltraPerformance.to_string().to_uppercase() => {
-                PowerProfile::UltraPerformance
-            }
-            _ => panic!("bad policy name:{}", value),
+        match value.as_str(){
+            "powerprofilesctl"=>Self::PowerProfileDaemon,
+            _=>panic!("unknown power policy provider: {}",value)
         }
+    }
+}
+impl From<PowerPolicyProviderEnum> for String{
+    fn from(value: PowerPolicyProviderEnum) -> Self {
+        match value{
+            PowerPolicyProviderEnum::PowerProfileDaemon => "powerprofilesctl",
+        }.to_string()
     }
 }
 unsafe impl Send for LinuxPowerPolicyManager {}
@@ -66,35 +34,47 @@ unsafe impl Sync for LinuxPowerPolicyManager {}
 pub trait PowerPolicyProvider {
     fn which(&self) -> PowerPolicyProviderEnum;
     fn is_avalible(&self) -> bool;
-    ///returns conflict with other PowerPolicyProviders
-    fn conflicts_with(&self) -> Vec<PowerPolicyProviderEnum>;
-    fn set_power_profile(&mut self, profile: PowerProfile) -> Result<(), ()>;
+    fn set_power_profile(&mut self, profile: String) -> Result<(), ()>;
+    fn get_avalible_profiles(&self)->Vec<String>;
 }
 //todo: multiple providers
 pub struct LinuxPowerPolicyManager {
-    state: PowerProfile,
-    providers: Vec<Box<dyn PowerPolicyProvider>>,
+    state: Option<String>,
+    provider: Box<dyn PowerPolicyProvider>,
 }
 impl LinuxPowerPolicyManager {
     pub fn new() -> Self {
-        let mut providers = Vec::new();
-        let power_profile_daemon = PowerProfileDaemon {};
-        if power_profile_daemon.is_avalible() {
-            let power_profile_daemon: Box<dyn PowerPolicyProvider> = Box::new(power_profile_daemon);
-            providers.push(power_profile_daemon);
-        }
         Self {
-            state: PowerProfile::Balanced,
-            providers,
+            state: None,
+            provider: Box::new(PowerProfileDaemon),
         }
     }
-    pub fn get_current(&self) -> PowerProfile {
-        self.state
+    pub fn get_current_profile(&self) -> String {
+        self.state.clone().unwrap_or_default()
     }
-    pub fn set_policy<T: Into<PowerProfile> + Copy>(&mut self, value: T) {
-        self.state=value.into();
-        for provider in &mut self.providers {
-            provider.set_power_profile(value.into()).ok();
+    pub fn get_avalible_profiles(&self)->Vec<String>{
+        self.provider.get_avalible_profiles()
+    }
+    pub fn get_providers(&self)->Vec<String>{
+        let mut providers=Vec::new();
+        if PowerProfileDaemon.is_avalible(){
+            providers.push(PowerPolicyProviderEnum::PowerProfileDaemon.into());
+        }
+        providers
+    }
+    pub fn set_provider(&mut self,name:String){
+        match PowerPolicyProviderEnum::from(name){
+            PowerPolicyProviderEnum::PowerProfileDaemon => {self.provider=Box::new(PowerProfileDaemon)},
+        }
+
+    }
+    pub fn set_policy(&mut self, value: String) {
+        if self.provider.set_power_profile(value.clone()).is_err() {
+            log::error!(
+                "failed to set power policy: {} using: {:?}",
+                value,
+                self.provider.which()
+            )
         }
     }
 }

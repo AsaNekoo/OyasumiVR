@@ -450,5 +450,9 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         grpc::commands::get_core_grpc_web_port,
         telemetry::commands::set_telemetry_enabled,
         vrcx::commands::vrcx_log,
+        #[cfg(unix)]
+        os::commands::set_power_policy_provider,
+        #[cfg(unix)]
+        os::commands::get_power_policy_providers,
     ]
 }

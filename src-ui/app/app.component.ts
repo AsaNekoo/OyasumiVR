@@ -8,7 +8,6 @@ import { debounceTime, distinctUntilChanged, map, skip, tap } from 'rxjs';
 import { fade } from './utils/animations';
 import { TelemetryService } from './services/telemetry.service';
 import { isHolidaysEventActive } from './utils/event-utils';
-import { check_windows } from './app.module';
 
 @Component({
   selector: 'app-root',
@@ -50,6 +49,5 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    await check_windows();
   }
 }
