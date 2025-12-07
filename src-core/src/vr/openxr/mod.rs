@@ -33,7 +33,7 @@ async fn get_ctx() -> AppContext<xr_overlay::openxr::Vulkan> {
             //     ctx=ctx.with_instance(&unsafe { app.get_ctx() }.xr.instance);
             // }
             let ctx = ctx.init_overlay();
-            if let Err(xr_overlay::error::Error::InitNotReady) = ctx {
+            if let Err(xr_overlay::error::Error::RuntimeUnavalible) = ctx {
                 drop(ctx);
                 tokio::time::sleep(Duration::from_secs(10)).await;
                 continue;
