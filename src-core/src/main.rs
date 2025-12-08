@@ -201,7 +201,7 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
             ))
             .level_for("xr_overlay", LevelFilter::Trace)
             .level(LevelFilter::Debug)
-            .level_for("vrchat_osc", LevelFilter::Warn);
+            // .level_for("vrchat_osc", LevelFilter::Warn);
     }
 
     builder.build()
