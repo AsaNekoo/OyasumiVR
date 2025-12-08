@@ -100,7 +100,7 @@ serde_repr = "0.1.20"
 [target.'cfg(target_os = "linux")'.dependencies]
 lact-client = { git = "https://github.com/ilya-zlobintsev/LACT", version = "0.8.3",rev="639c77b8f204789d567ff72283d451faedb4a5bd" }
 pulseaudio = "0.3.0"
-xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="6e51336cad3f8b71f1708f042e91968d04cdda3d" }
+xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="0344981b3c2656971bead33645007fd2ce407ffe" }
 [target.'cfg(target_os = "windows")'.dependencies]
 
 
