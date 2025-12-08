@@ -34,4 +34,9 @@ impl PowerPolicyProvider for PowerProfileDaemon {
     fn get_avalible_profiles(&self)->Vec<String> {
         PROFILES.iter().map(|x|x.to_string()).collect()
     }
+    
+    fn get_current_profile(&self)->String {
+        let out=Command::new("powerprofilesctl").arg("get").output().unwrap().stdout;
+        String::from_utf8_lossy(&out).to_uppercase().trim().to_string()
+    }
 }

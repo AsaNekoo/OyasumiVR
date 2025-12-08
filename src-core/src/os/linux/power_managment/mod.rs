@@ -34,9 +34,11 @@ unsafe impl Sync for LinuxPowerPolicyManager {}
 pub trait PowerPolicyProvider {
     fn which(&self) -> PowerPolicyProviderEnum;
     fn is_avalible(&self) -> bool;
-    //assume that capitalization is random
+    //capitalization is upperscae
     fn set_power_profile(&mut self, profile: String) -> Result<(), ()>;
     fn get_avalible_profiles(&self)->Vec<String>;
+    //return as upper case
+    fn get_current_profile(&self)->String;
 }
 //todo: multiple providers
 pub struct LinuxPowerPolicyManager {
@@ -51,7 +53,7 @@ impl LinuxPowerPolicyManager {
         }
     }
     pub fn get_current_profile(&self) -> String {
-        self.state.clone().unwrap_or_default()
+        self.provider.get_current_profile()
     }
     pub fn get_avalible_profiles(&self)->Vec<String>{
         self.provider.get_avalible_profiles()
