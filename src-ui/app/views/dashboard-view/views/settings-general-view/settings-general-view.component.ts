@@ -23,6 +23,7 @@ import {
   TelemetrySettings,
 } from '../../../../models/telemetry-settings';
 import { OVRInputEventAction } from 'src-ui/app/models/ovr-input-event';
+import { is_windows } from 'src-ui/app/app.module';
 
 @Component({
   selector: 'app-settings-general-view',
@@ -32,6 +33,7 @@ import { OVRInputEventAction } from 'src-ui/app/models/ovr-input-event';
   standalone: false,
 })
 export class SettingsGeneralViewComponent implements OnInit {
+  is_windows:boolean=true;
   appSettings: AppSettings = structuredClone(APP_SETTINGS_DEFAULT);
   languages = LANGUAGES;
   lighthouseConsoleStatus: ExecutableReferenceStatus = 'UNKNOWN';
@@ -98,6 +100,7 @@ export class SettingsGeneralViewComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.is_windows=is_windows;
     this.settingsService.settings
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((settings) => (this.appSettings = settings));

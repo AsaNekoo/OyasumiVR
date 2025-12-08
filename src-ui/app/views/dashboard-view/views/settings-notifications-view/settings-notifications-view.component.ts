@@ -37,7 +37,7 @@ export class SettingsNotificationsViewComponent implements OnInit {
     },
     {
       id: 'DESKTOP',
-      label: 'Windows',
+      label: 'System',
     },
   ];
   protected providerOption: SelectBoxItem = this.providerOptions[0];

@@ -14,6 +14,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { hshrink } from '../../../../utils/animations';
 import { TStringTranslatePipe } from '../../../../pipes/tstring-translate.pipe';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import { is_windows } from 'src-ui/app/app.module';
 
 @Component({
   selector: 'app-settings-status-info-view',
@@ -23,6 +24,7 @@ import { writeText } from '@tauri-apps/plugin-clipboard-manager';
   standalone: false,
 })
 export class SettingsStatusInfoViewComponent {
+  is_windows:boolean=true;
   categories: Array<{
     name: TString;
     entries: Array<{
@@ -43,6 +45,7 @@ export class SettingsStatusInfoViewComponent {
     fontLoader: FontLoaderService,
     private tsTranslate: TStringTranslatePipe
   ) {
+   this.is_windows=is_windows;
     this.categories = [
       {
         name: 'OyasumiVR Application',
@@ -68,10 +71,10 @@ export class SettingsStatusInfoViewComponent {
         ],
       },
       {
-        name: 'OpenVR',
+        name: this.is_windows?'OpenVR':'OpenXR',
         entries: [
           {
-            key: 'SteamVR',
+            key: this.is_windows?'SteamVR':'State',
             value: openvr.status.pipe(
               map((s) => {
                 switch (s) {

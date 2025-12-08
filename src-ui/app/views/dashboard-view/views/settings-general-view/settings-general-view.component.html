@@ -103,10 +103,12 @@
             </div>
           </div>
           <div class="setting-row">
+            @if(is_windows){
             <div class="setting-row-label" translate>
               <span translate>settings.general.overlay.binding.title</span>
               <span translate>settings.general.overlay.binding.description</span>
             </div>
+          }
             <div class="setting-row-action">
               <app-controller-binding
                 [actionKey]="OVRInputEventAction.OpenOverlay"
@@ -254,10 +256,12 @@
         <h2 translate>settings.general.adminPrivileges.title</h2>
         <div class="settings">
           <div class="setting-row">
+            @if(is_windows){
             <div class="setting-row-label" translate>
               <span translate>settings.general.adminPrivileges.label</span>
               <span translate>settings.general.adminPrivileges.description</span>
             </div>
+          }
             <div class="setting-row-action">
               <label class="switch-toggle">
                 <input
