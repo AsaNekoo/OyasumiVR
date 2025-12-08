@@ -23,7 +23,7 @@ pub static XR_CTX: OnceLock<Arc<RwLock<AppRunner>>> = OnceLock::new();
 pub fn start_vr() -> Option<JoinHandle<()>> {
     trace!("start_vr");
     let ctx = loop {
-        if killed(){
+        if killed() {
             return None;
         }
         match xr_overlay::xr::Init::default()
@@ -76,7 +76,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
                 rot: None,
             },
             name: Some("oyasumi".into()),
-            disable_dragging:true,
+            disable_dragging: true,
             ..Default::default()
         },
     );

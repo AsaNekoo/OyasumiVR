@@ -96,11 +96,9 @@ fn main() {
     if *NO_VR.get().unwrap() {
         disable_vr();
     }
-    if ARGS.get().as_ref().unwrap().core_pid!=0{
-    if !BINDING_FILE_PATH.is_file() {
+    if ARGS.get().as_ref().unwrap().core_pid != 0 && !BINDING_FILE_PATH.is_file() {
         fs::write(&*BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG).unwrap();
     }
-}
     let vr_thread = match start_vr() {
         Some(v) => v,
         None => {

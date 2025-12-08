@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use base64::{Engine, prelude::BASE64_STANDARD};
 use futures_util::{SinkExt, StreamExt};
-use log::{debug, error, info, trace};
+use log::{debug, error, info};
 use prost::Message;
 use rand::distr::{Alphabetic, SampleString};
 use serde::{Deserialize, Serialize};
@@ -11,7 +11,14 @@ use tokio_tungstenite::tungstenite;
 use xr_overlay_cef::cef::{ImplBrowser, ImplFrame};
 
 use crate::{
-    CORE_CLIENT, core_grpc::EventParams, globals::STATE, kill, killed, model::Overlay, overlay_grpc::OyasumiSidecarState, vr::{OVERLAY, hide_dashboard}, warn_unimplemented
+    CORE_CLIENT,
+    core_grpc::EventParams,
+    globals::STATE,
+    kill, killed,
+    model::Overlay,
+    overlay_grpc::OyasumiSidecarState,
+    vr::{OVERLAY, hide_dashboard},
+    warn_unimplemented,
 };
 pub const IPC_SCRIPT: &str = include_str!(concat!(env!("OUT_DIR"), "/bundle.js"));
 pub struct OverlayIPCAddNotification<'a> {
@@ -100,10 +107,10 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
     while let Some(message) = receiver.next().await {
         match message {
             Ok(msg) => {
-                if killed(){
+                if killed() {
                     break;
                 }
-                if matches!(msg,tungstenite::Message::Close(_)){
+                if matches!(msg, tungstenite::Message::Close(_)) {
                     log::debug!("recived close frame, shutting down");
                     kill();
                     break;
