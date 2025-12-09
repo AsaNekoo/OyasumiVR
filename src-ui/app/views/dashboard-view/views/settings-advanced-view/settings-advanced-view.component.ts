@@ -32,6 +32,7 @@ import { AppSettingsService } from '../../../../services/app-settings.service';
 import { FLAVOUR } from '../../../../../build';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
+import { is_windows } from 'src-ui/app/app.module';
 
 @Component({
   selector: 'app-settings-advanced-view',
@@ -41,6 +42,7 @@ import { firstValueFrom } from 'rxjs';
   standalone: false,
 })
 export class SettingsAdvancedViewComponent {
+  is_windows:boolean=true;
   persistentStorageItems: Array<{
     key: string;
   }> = [
@@ -68,6 +70,7 @@ export class SettingsAdvancedViewComponent {
     private settingsService: AppSettingsService,
     protected openvr: OpenVRService
   ) {
+    this.is_windows=is_windows;
     this.settingsService.settings.pipe(takeUntilDestroyed()).subscribe((settings) => {
       this.overlayGpuAcceleration = settings.overlayGpuAcceleration;
       this.openVrInitDelayFix = settings.openVrInitDelayFix;

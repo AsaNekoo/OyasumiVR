@@ -42,13 +42,11 @@ pub trait PowerPolicyProvider {
 }
 //todo: multiple providers
 pub struct LinuxPowerPolicyManager {
-    state: Option<String>,
     provider: Box<dyn PowerPolicyProvider>,
 }
 impl LinuxPowerPolicyManager {
     pub fn new() -> Self {
         Self {
-            state: None,
             provider: Box::new(PowerProfileDaemon),
         }
     }
