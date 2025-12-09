@@ -7,3 +7,4 @@ very much work in progress (i'm yet to met someone who would care about the port
 
 if you find a bug in overlay or other linux specific stuff open a bug report in this repo
 
+todo: https://github.com/sofoxe1/OyasumiVR/issues/1
