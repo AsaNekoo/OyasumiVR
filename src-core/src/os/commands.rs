@@ -264,15 +264,34 @@ pub async fn run_cmd_commands(commands: String) {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn show_in_folder(path: String) {
-    let handle = TAURI_APP_HANDLE.lock().await;
-    handle
-        .as_ref()
-        .unwrap()
-        .shell()
-        .command("explorer")
-        .args(["/select,", &path]) // The comma after select is not a typo
-        .spawn()
-        .unwrap();
+    #[cfg(windows)]
+    {
+        let handle = TAURI_APP_HANDLE.lock().await;
+        if let Err(err) = handle
+            .as_ref()
+            .unwrap()
+            .shell()
+            .command("explorer")
+            .args(["/select,", &path]) // The comma after select is not a typo
+            .spawn()
+        {
+            log::error!(
+                "Failed to spawn file explorer with path:{} : {:?}",
+                path,
+                err
+            );
+        }
+    }
+    #[cfg(unix)]
+    {
+        if let Err(err) = Command::new("xdg-open").arg(&path).spawn() {
+            log::error!(
+                "Failed to spawn file explorer with path:{} : {:?}",
+                path,
+                err
+            );
+        }
+    }
 }
 
 #[tauri::command]
@@ -310,7 +329,7 @@ pub async fn set_power_policy_provider(name: String) {
 }
 #[tauri::command]
 #[cfg(unix)]
-pub async fn get_power_policy_providers()->Vec<String> {
+pub async fn get_power_policy_providers() -> Vec<String> {
     use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
 
     LINUX_POWER_POLICY_MANAGER.lock().await.get_providers()
@@ -370,7 +389,7 @@ pub async fn get_system_power_policies() -> Vec<WindowsPowerPolicy> {
             .into_iter()
             .map(|p| WindowsPowerPolicy {
                 guid: p.clone(),
-                name:p,
+                name: p,
             })
             .collect()
     }
