@@ -1,11 +1,18 @@
-use std::fs;
+use std::{fs, path::PathBuf};
 
 use axum::{Router, routing::get_service};
 use hyper::StatusCode;
 use tower_http::services::ServeDir;
 
+use crate::ARGS;
+
 pub async fn serve_ui() -> u16 {
-    let path = fs::canonicalize("ui").unwrap();
+    let mut path = PathBuf::from("ui");
+    if ARGS.get().as_ref().unwrap().core_pid==0{
+        log::trace!("debug ui");
+        path=PathBuf::from("../src-overlay-ui/build/");
+    }
+    let path=fs::canonicalize(path).unwrap();
     log::trace!("using ui path:{:?}", path);
     assert!(path.is_dir());
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();

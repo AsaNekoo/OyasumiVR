@@ -100,15 +100,20 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             if unsafe { KILL } {
                 break;
             }
-            match app.write().unwrap().run() {
-                xr_overlay::runner::PollResult::Success => {
+            let mut guard=app.write().unwrap();
+            match guard.run() {
+                xr_overlay::runner::PollResult::Success(v) => {
                     //it already waits for next frame
+                    drop(guard);
+                    std::thread::sleep(v.saturating_sub(Duration::from_micros(700)));
                     // std::thread::sleep(Duration::from_millis(frame_time))
                 }
                 xr_overlay::runner::PollResult::SuccessNoRender => {
+                    drop(guard);
                     std::thread::sleep(Duration::from_millis(frame_time))
                 }
                 xr_overlay::runner::PollResult::UserNotPresent => {
+                    drop(guard);
                     std::thread::sleep(Duration::from_secs(1))
                 }
                 xr_overlay::runner::PollResult::Starting => (),

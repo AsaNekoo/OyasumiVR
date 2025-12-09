@@ -111,8 +111,6 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
                     break;
                 }
                 if matches!(msg, tungstenite::Message::Close(_)) {
-                    log::debug!("recived close frame, shutting down");
-                    kill();
                     break;
                 }
                 if !msg.is_text() {
