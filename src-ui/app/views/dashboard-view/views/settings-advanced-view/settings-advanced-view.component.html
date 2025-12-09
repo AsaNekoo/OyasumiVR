@@ -166,6 +166,7 @@
         <h2 translate>settings.advanced.troubleshooting.title</h2>
         <p translate>settings.advanced.troubleshooting.description</p>
         <div class="settings">
+          @if(is_windows){
           <div class="setting-row">
             <div class="setting-row-label" translate>
               <span translate>settings.advanced.troubleshooting.vrManifestReregister.title</span>
@@ -183,6 +184,7 @@
               </button>
             </div>
           </div>
+        }
           <div class="setting-row">
             <div class="setting-row-label" translate>
               <span translate>settings.advanced.troubleshooting.devTools.title</span>
