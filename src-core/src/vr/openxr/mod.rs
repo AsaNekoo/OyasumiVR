@@ -47,7 +47,6 @@ async fn get_ctx() -> AppContext<xr_overlay::openxr::Vulkan> {
 fn get_overlay_info() -> OverlayCreateInfo {
     OverlayCreateInfo {
         type_: xr_overlay::runner::OverlayCreateInfoType::Unmanaged {
-            space: None,
             size: [1., 1.],
         },
         spawn_visible: true,
@@ -86,8 +85,8 @@ pub async fn init() {
             loop {
                 if *OXR_STATE.lock().await == VRStatus::Initialized {
                     let mut xr_ctx = OXR_HANDLE.get().unwrap().lock().await;
-                    match xr_ctx.run() {
-                        xr_overlay::runner::PollResult::Success => (),
+                    match xr_ctx.run(false) {
+                        xr_overlay::runner::PollResult::Success(_) => (),
                         xr_overlay::runner::PollResult::UserNotPresent => {
                             drop(xr_ctx);
                             tokio::time::sleep(Duration::from_secs(1)).await;
@@ -151,7 +150,7 @@ async fn session_restart() {
     unsafe { handle.replace_ctx(xr_overlay::runner::SessionRestartInfo::NoInput { ctx }) };
     let overlay_handle = handle.add_overlay(get_overlay_info());
     OXR_BRIGHTNES_OVERLAY_HANDLE.lock().await.replace(overlay_handle);
-    let _ =handle.run();
+    let _ =handle.run(false);
     update_status(VRStatus::Initialized).await;
 }
 fn openxr_callback(event: AppEvent) {
@@ -252,7 +251,7 @@ pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gam
         // RgbaTexture::new(1, 1, [brightness, 0, 0, 255].to_vec()),
         RgbaTexture::new(1, 1, [0, 0, 0, brightness].to_vec()),
     );
-    let _ = ctx.run();
+    let _ = ctx.run(false);
 }
 
 fn adjust_for_perceived_brightness(linear_percent: f64, gamma: f64) -> f64 {
