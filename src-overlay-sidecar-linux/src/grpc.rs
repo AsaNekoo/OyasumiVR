@@ -1,4 +1,4 @@
-use std::net::SocketAddr;
+use std::{net::SocketAddr, time::Duration};
 
 use log::{error, info};
 use tonic::transport::Server;
@@ -14,7 +14,8 @@ use crate::{
         SetMicrophoneActiveRequest,
         oyasumi_overlay_sidecar_server::{OyasumiOverlaySidecar, OyasumiOverlaySidecarServer},
     },
-    vr::{DASBOARD_VISIBLE, OVERLAY, hide_dashboard, show_dashboard},
+    overlay_ipc::OverlayIPCAddNotification,
+    vr::{DASBOARD_VISIBLE, NOTIFICATION_OVERLAY, OVERLAY, hide_dashboard, show_dashboard},
 };
 #[derive(Debug, Default, Clone)]
 pub struct GrpcServer {}
@@ -25,9 +26,15 @@ impl OyasumiOverlaySidecar for GrpcServer {
         &self,
         request: tonic::Request<AddNotificationRequest>,
     ) -> Result<tonic::Response<AddNotificationResponse>, tonic::Status> {
-        //core calls this to spawn notification overlay
+        let req=request.into_inner();
+        let id = NOTIFICATION_OVERLAY
+            .wait()
+            .add_notification(OverlayIPCAddNotification {
+                message: &req.message,
+                duration: Duration::from_millis(req.duration as u64),
+            });
         Ok(AddNotificationResponse {
-            notification_id: None,
+            notification_id: Some(id),
         }
         .into())
     }
@@ -36,6 +43,7 @@ impl OyasumiOverlaySidecar for GrpcServer {
         &self,
         request: tonic::Request<ClearNotificationRequest>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
+        NOTIFICATION_OVERLAY.wait().clear_notification(&request.into_inner().notification_id);
         Ok(Empty {}.into())
     }
 

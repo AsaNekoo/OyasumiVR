@@ -22,8 +22,8 @@ use crate::{
 };
 pub const IPC_SCRIPT: &str = include_str!(concat!(env!("OUT_DIR"), "/bundle.js"));
 pub struct OverlayIPCAddNotification<'a> {
-    message: &'a str,
-    duration: Duration,
+    pub message: &'a str,
+    pub duration: Duration,
 }
 fn get_ipc_script(port: u16) -> String {
     let mut f = IPC_SCRIPT.splitn(2, "WS_ADDR");
@@ -36,7 +36,7 @@ fn get_ipc_script(port: u16) -> String {
 //OyasumiOverlayIPCIn
 impl Overlay {
     pub fn execute_js(&self, js: &str) {
-        // trace!("running javascript:\n {}", js);
+        log::trace!("running javascript:\n {}", js);
         self.browser
             .main_frame()
             .unwrap()
@@ -57,7 +57,7 @@ impl Overlay {
     pub fn add_notification(&self, notification: OverlayIPCAddNotification) -> String {
         let id = Alphabetic.sample_string(&mut rand::rng(), 16);
         let args = format!(
-            "{{id:{},message:{},duration:{}}}",
+            "{{id:\"{}\",message:\"{}\",duration:{}}}",
             id,
             notification.message,
             notification.duration.as_millis()
@@ -66,7 +66,7 @@ impl Overlay {
         id
     }
     pub fn clear_notification(&self, id: &str) {
-        self.execute_js(&format!("window.OyasumiIPCIn.clearNotification({});", id));
+        self.execute_js(&format!("window.OyasumiIPCIn.clearNotification(\"{}\");", id));
     }
     pub fn inject_ipc(&self, port: u16) {
         self.execute_js(&get_ipc_script(port));

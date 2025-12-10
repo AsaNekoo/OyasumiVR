@@ -11,7 +11,7 @@ use xr_overlay::{
     runner::{
         AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, ShowMode,
         events::AppEvent,
-    },
+    }, xr::ReferenceSpaceT,
 };
 use xr_overlay_cef::{CefOverlayCreateInfo, create_cef_overlay};
 pub const DEFAULT_BINDINGS_CONFIG: &str = include_str!("bindings_overwrite_default.toml");
@@ -19,6 +19,7 @@ pub static BINDING_FILE_PATH: LazyLock<PathBuf> =
     LazyLock::new(|| PathBuf::from("../../bindings_overwrite.toml"));
 use crate::{KILL, input::get_controller_create_info, killed, model::Overlay};
 pub static OVERLAY: OnceLock<Overlay> = OnceLock::new();
+pub static NOTIFICATION_OVERLAY: OnceLock<Overlay> = OnceLock::new();
 pub static XR_CTX: OnceLock<Arc<RwLock<AppRunner>>> = OnceLock::new();
 pub fn start_vr() -> Option<JoinHandle<()>> {
     trace!("start_vr");
@@ -58,6 +59,11 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
         y: -0.2,
         z: -0.8,
     };
+    let notifica_pos = Vector3f {
+        x: 0.,
+        y: -0.3,
+        z: -0.6,
+    };
     let framerate = app.read().unwrap().current_refresh_rate() as u32;
     let overlay = create_cef_overlay(
         app.clone(),
@@ -80,6 +86,21 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             ..Default::default()
         },
     );
+    let noti_overlay = create_cef_overlay(
+        app.clone(),
+        CefOverlayCreateInfo {
+            movable:false,
+            interactable:false,
+            size: [0.5, 0.5],
+            spawn_visible: true,
+            pos:notifica_pos,
+            framerate,
+            resolution: [1024, 1024],
+            name: Some("notifications".into()),
+            reference_space:Some(ReferenceSpaceT::VIEW),
+            ..Default::default()
+        },
+    );
     let delay = Duration::from_millis(500).as_millis() as f32
         / (1000. / app.read().unwrap().current_refresh_rate() as f32);
     app.write()
@@ -90,6 +111,14 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             .set(Overlay {
                 browser: overlay.browser.clone(),
                 xr_handle: overlay.overlay_handle
+            })
+            .is_ok()
+    );
+    assert!(
+        NOTIFICATION_OVERLAY
+            .set(Overlay {
+                browser: noti_overlay.browser.clone(),
+                xr_handle: noti_overlay.overlay_handle
             })
             .is_ok()
     );

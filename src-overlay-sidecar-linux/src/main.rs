@@ -15,9 +15,12 @@ use xr_overlay_cef::{
 use crate::{
     core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
     grpc::{start_grpc_server, start_grpc_web_server},
-    overlay_ipc::start_websocket_server,
+    overlay_ipc::{OverlayIPCAddNotification, start_websocket_server},
     ui::serve_ui,
-    vr::{BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, OVERLAY, show_dashboard, start_vr},
+    vr::{
+        BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard,
+        start_vr,
+    },
 };
 pub mod globals;
 pub mod grpc;
@@ -51,7 +54,7 @@ pub struct Args {
 }
 fn main() {
     env_logger::Builder::from_default_env()
-        .filter_level(log::LevelFilter::Debug)
+        .filter_level(log::LevelFilter::Trace)
         .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
         .filter_module("xr_overlay", log::LevelFilter::Debug)
         .filter_module("tokio_tungstenite", log::LevelFilter::Warn)
@@ -161,7 +164,13 @@ async fn tokio_main() {
         "http://localhost:{}/dashboard?corePort={}",
         ui_port, http_port
     );
+    let url_noti = format!(
+        "http://localhost:{}/notifications?corePort={}",
+        ui_port, http_port
+    );
+    // let url_noti="https://google.com".to_string();
     trace!("navigating to:{}", url);
+    let ws_port = start_websocket_server().await;
     OVERLAY
         .get()
         .as_ref()
@@ -170,6 +179,9 @@ async fn tokio_main() {
         .main_frame()
         .unwrap()
         .load_url(Some(&(url.as_str()).into()));
+    std::thread::sleep(Duration::from_millis(20)); //this whole aplication is a one big race condition :3
+    OVERLAY.wait().inject_ipc(ws_port);
+
     let grpc_server_port = start_grpc_server().await;
     let grpc_web_server_pos = start_grpc_web_server().await;
     core_client
@@ -182,11 +194,19 @@ async fn tokio_main() {
         .unwrap();
     assert_ne!(grpc_web_server_pos, 0);
     assert_ne!(grpc_server_port, 0);
-    let ws_port = start_websocket_server().await;
-    OVERLAY.wait().inject_ipc(ws_port);
-    tokio::time::sleep(Duration::from_millis(2000)).await;
-    println!("showing");
+
     show_dashboard();
+    tokio::time::sleep(Duration::from_millis(400)).await;
+    NOTIFICATION_OVERLAY
+        .get()
+        .as_ref()
+        .unwrap()
+        .browser
+        .main_frame()
+        .unwrap()
+        .load_url(Some(&(url_noti.as_str()).into()));
+    NOTIFICATION_OVERLAY.wait().inject_ipc(ws_port);
+    tokio::time::sleep(Duration::from_secs(2)).await;
 }
 static mut KILL: bool = false;
 // #[allow(dead_code)]
