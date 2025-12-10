@@ -118,7 +118,7 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
                     continue;
                 }
                 let msg = msg.into_text().unwrap();
-                info!("[websocket] ipc:{}", msg.as_str());
+                debug!("[websocket] ipc:{}", msg.as_str());
                 let mut msg = msg.splitn(2, ":");
                 let call_id = msg.next().unwrap().parse::<u8>().unwrap();
                 let funtion = unsafe { *(&raw const call_id as *const FuntionCall) };
