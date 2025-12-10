@@ -224,6 +224,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     info!("[Core] Setting working directory to: {:?}", executable_path);
     std::env::set_current_dir(&executable_path).unwrap();
     // Clean up old batch files from previous runs
+    #[cfg(windows)]
     os::cleanup_batch_files().await;
     // Run any migrations first
     #[cfg(windows)]
@@ -286,10 +287,12 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     // Initialize Lighthouse Bluetooth
     lighthouse::init().await;
     // Initialize Hardware modules
+    #[cfg(windows)]
     hardware::init().await;
     // Initialize log commands
     commands::log_utils::init(app_handle.path().app_log_dir().unwrap()).await;
     // Initialize elevated sidecar module
+    #[cfg(windows)]
     elevated_sidecar::init().await;
     // Initialize overlay sidecar module
     overlay_sidecar::init().await;
