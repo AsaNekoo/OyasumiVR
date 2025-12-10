@@ -157,7 +157,7 @@ pub fn show_dashboard() {
         .wait()
         .write()
         .unwrap()
-        .show(OVERLAY.wait().xr_handle, true);
+        .set_visible(OVERLAY.wait().xr_handle, true);
     OVERLAY.wait().show_dashboard();
 }
 pub async fn hide_dashboard() {
@@ -169,5 +169,5 @@ pub async fn hide_dashboard() {
         .wait()
         .write()
         .unwrap()
-        .show(OVERLAY.wait().xr_handle, false);
+        .set_visible(OVERLAY.wait().xr_handle, false);
 }
