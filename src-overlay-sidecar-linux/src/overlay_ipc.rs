@@ -118,7 +118,7 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
                     continue;
                 }
                 let msg = msg.into_text().unwrap();
-                debug!("[websocket] ipc:{}", msg.as_str());
+                log::trace!("[websocket] ipc:{}", msg.as_str());
                 let mut msg = msg.splitn(2, ":");
                 let call_id = msg.next().unwrap().parse::<u8>().unwrap();
                 let funtion = unsafe { *(&raw const call_id as *const FuntionCall) };
@@ -176,6 +176,7 @@ async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::
                     FuntionCall::Close => {
                         hide_dashboard().await;
                     }
+                    FuntionCall::Dispose=>{},
                     FuntionCall::SendEventBool => {
                         let args =
                             serde_json::from_str::<Event<bool>>(msg.next().unwrap()).unwrap();
