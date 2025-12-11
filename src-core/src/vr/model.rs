@@ -94,9 +94,9 @@ pub enum VRStatus {
 #[serde(rename_all = "camelCase")]
 pub struct SleepDetectorStateReport {
     pub distance_in_last_15_minutes: f32,
-    pub distance_in_last_10_minutes: f32,
-    pub distance_in_last_5_minutes: f32,
-    pub distance_in_last_1_minute: f32,
+    // pub distance_in_last_10_minutes: f32,
+    // pub distance_in_last_5_minutes: f32,
+    // pub distance_in_last_1_minute: f32,
     pub distance_in_last_10_seconds: f32,
     // pub rotation_in_last_15_minutes: f32,
     // pub rotation_in_last_10_minutes: f32,

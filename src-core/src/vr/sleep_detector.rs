@@ -32,9 +32,9 @@ impl PoseEvent {
 pub struct SleepDetector {
     events: Vec<PoseEvent>,
     distance_in_last_15_minutes: f32,
-    distance_in_last_10_minutes: f32,
-    distance_in_last_5_minutes: f32,
-    distance_in_last_1_minute: f32,
+    // distance_in_last_10_minutes: f32,
+    // distance_in_last_5_minutes: f32,
+    // distance_in_last_1_minute: f32,
     distance_in_last_10_seconds: f32,
     // rotation_in_last_15_minutes: f32,
     // rotation_in_last_10_minutes: f32,
@@ -54,9 +54,9 @@ impl SleepDetector {
                 (Duration::from_millis(MAX_EVENT_AGE_MS as u64).as_secs_f32() / Duration::from_millis(250).as_secs_f32()) as usize+100,
             ),
             distance_in_last_10_seconds: 0.0,
-            distance_in_last_1_minute: 0.0,
-            distance_in_last_5_minutes: 0.0,
-            distance_in_last_10_minutes: 0.0,
+            // distance_in_last_1_minute: 0.0,
+            // distance_in_last_5_minutes: 0.0,
+            // distance_in_last_10_minutes: 0.0,
             distance_in_last_15_minutes: 0.0,
             // rotation_in_last_10_seconds: 0.0,
             // rotation_in_last_1_minute: 0.0,
@@ -104,14 +104,14 @@ impl SleepDetector {
                 self.start_time = now;
             }
             self.distance_in_last_10_seconds = self.distance_in_window(10000, 0, 0.);
-            self.distance_in_last_1_minute =
-                self.distance_in_window(60000, 10000, self.distance_in_last_10_seconds);
-            self.distance_in_last_5_minutes =
-                self.distance_in_window(300000, 60000, self.distance_in_last_1_minute);
-            self.distance_in_last_10_minutes =
-                self.distance_in_window(600000, 300000, self.distance_in_last_5_minutes);
+            // self.distance_in_last_1_minute =
+            //     self.distance_in_window(60000, 10000, self.distance_in_last_10_seconds);
+            // self.distance_in_last_5_minutes =
+            //     self.distance_in_window(300000, 60000, self.distance_in_last_1_minute);
+            // self.distance_in_last_10_minutes =
+            //     self.distance_in_window(600000, 300000, self.distance_in_last_5_minutes);
             self.distance_in_last_15_minutes =
-                self.distance_in_window(900000, 600000, self.distance_in_last_10_minutes);
+                self.distance_in_window(900000, 10000, self.distance_in_last_10_seconds);
 
             self.last_log = event.timestamp;
             self.next_state_report = now + 1000;
@@ -176,15 +176,7 @@ impl SleepDetector {
             "SLEEP_DETECTOR_STATE_REPORT",
             SleepDetectorStateReport {
                 distance_in_last_15_minutes: self.distance_in_last_15_minutes,
-                distance_in_last_10_minutes: self.distance_in_last_10_minutes,
-                distance_in_last_5_minutes: self.distance_in_last_5_minutes,
-                distance_in_last_1_minute: self.distance_in_last_1_minute,
                 distance_in_last_10_seconds: self.distance_in_last_10_seconds,
-                // rotation_in_last_15_minutes: self.rotation_in_last_15_minutes,
-                // rotation_in_last_10_minutes: self.rotation_in_last_10_minutes,
-                // rotation_in_last_5_minutes: self.rotation_in_last_5_minutes,
-                // rotation_in_last_1_minute: self.rotation_in_last_1_minute,
-                // rotation_in_last_10_seconds: self.rotation_in_last_10_seconds,
                 start_time: self.start_time,
                 last_log: self.last_log,
             },
