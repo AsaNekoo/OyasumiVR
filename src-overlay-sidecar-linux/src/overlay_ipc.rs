@@ -21,6 +21,7 @@ use crate::{
     warn_unimplemented,
 };
 pub const IPC_SCRIPT: &str = include_str!(concat!(env!("OUT_DIR"), "/bundle.js"));
+#[derive(Debug)]
 pub struct OverlayIPCAddNotification<'a> {
     pub message: &'a str,
     pub duration: Duration,
@@ -55,6 +56,7 @@ impl Overlay {
         ));
     }
     pub fn add_notification(&self, notification: OverlayIPCAddNotification) -> String {
+        log::info!("add_notification: {:?}",notification);
         let id = Alphabetic.sample_string(&mut rand::rng(), 16);
         let args = format!(
             "{{id:\"{}\",message:\"{}\",duration:{}}}",
