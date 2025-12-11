@@ -90,7 +90,7 @@ pub enum VRStatus {
     Initializing,
     Initialized,
 }
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize,Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct SleepDetectorStateReport {
     pub distance_in_last_15_minutes: f64,

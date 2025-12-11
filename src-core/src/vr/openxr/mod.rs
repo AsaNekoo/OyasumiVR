@@ -131,13 +131,10 @@ pub async fn init() {
                             )
                             .await;
                     } else {
-                        #[cfg(windows)]
-                    info!("[Core] Failed to get hmd Posef");
-                    #[cfg(unix)]
-                    debug!("[Core] Failed to get hmd Posef");
+                    info!("[Core] Failed to get hmd Posef,sleep");
                     }
                 }
-                tokio::time::sleep(Duration::from_secs(5)).await;
+                tokio::time::sleep(Duration::from_millis(33)).await;
             }
         });
         debug!("[Init] openxr start (2)");
@@ -216,10 +213,7 @@ pub async fn start_head_shake_detection() {
                         )
                         .await;
                 } else {
-                    #[cfg(windows)]
-                    info!("[Core] Failed to get hmd Posef");
-                    #[cfg(unix)]
-                    debug!("[Core] Failed to get hmd Posef");
+                    info!("[Core] Failed to get hmd Posef, head shake");
                 }
             }
             tokio::time::sleep(Duration::from_millis(frame_time)).await;

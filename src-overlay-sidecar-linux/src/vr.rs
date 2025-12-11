@@ -130,7 +130,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
                 break;
             }
             let mut guard=app.write().unwrap();
-            match guard.run() {
+            match guard.run(false) {
                 xr_overlay::runner::PollResult::Success(v) => {
                     //it already waits for next frame
                     drop(guard);

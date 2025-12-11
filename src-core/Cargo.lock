@@ -5263,6 +5263,7 @@ dependencies = [
  "enumset",
  "futures",
  "futures-util",
+ "glam",
  "hidapi",
  "hyper 0.14.32",
  "ipgeolocate",
