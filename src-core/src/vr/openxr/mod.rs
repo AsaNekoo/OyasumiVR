@@ -6,11 +6,7 @@ use std::{
 use log::{debug, info};
 use tokio::{spawn, sync::Mutex, task::spawn_blocking};
 use xr_overlay::{
-    model::AppContext,
-    openxr::Vector3f,
-    runner::{events::AppEvent, AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle},
-    xr::ReferenceSpaceT,
-    RgbaTexture,
+    RgbaTexture, model::AppContext, openxr::Vector3f, runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent}, utils::QuaternionfExt, xr::ReferenceSpaceT
 };
 
 use crate::{
@@ -127,7 +123,7 @@ pub async fn init() {
                             .await
                             .log_pose(
                                 [pos.x, pos.y, pos.z],
-                                [quat.x as f64, quat.y as f64, quat.z as f64, quat.w as f64],
+                                quat.to_quat(),
                             )
                             .await;
                     } else {

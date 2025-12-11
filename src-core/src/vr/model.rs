@@ -93,16 +93,16 @@ pub enum VRStatus {
 #[derive(Clone, Serialize, Deserialize,Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct SleepDetectorStateReport {
-    pub distance_in_last_15_minutes: f64,
-    pub distance_in_last_10_minutes: f64,
-    pub distance_in_last_5_minutes: f64,
-    pub distance_in_last_1_minute: f64,
-    pub distance_in_last_10_seconds: f64,
-    pub rotation_in_last_15_minutes: f64,
-    pub rotation_in_last_10_minutes: f64,
-    pub rotation_in_last_5_minutes: f64,
-    pub rotation_in_last_1_minute: f64,
-    pub rotation_in_last_10_seconds: f64,
+    pub distance_in_last_15_minutes: f32,
+    pub distance_in_last_10_minutes: f32,
+    pub distance_in_last_5_minutes: f32,
+    pub distance_in_last_1_minute: f32,
+    pub distance_in_last_10_seconds: f32,
+    pub rotation_in_last_15_minutes: f32,
+    pub rotation_in_last_10_minutes: f32,
+    pub rotation_in_last_5_minutes: f32,
+    pub rotation_in_last_1_minute: f32,
+    pub rotation_in_last_10_seconds: f32,
     pub start_time: u128,
     pub last_log: u128,
 }

@@ -1,3 +1,5 @@
+use glam::{Quat, Vec3};
+
 use crate::{utils::{get_time, send_event}, vr::model::SleepDetectorStateReport};
 
 // use super::models::SleepDetectorStateReport;
@@ -9,39 +11,33 @@ struct PoseEvent {
     x: f32,
     y: f32,
     z: f32,
-    quaternion: [f64; 4],
+    quaternion:Quat,
     timestamp: u128, // in milliseconds
 }
 
 impl PoseEvent {
-    fn distance_to(&self, other: &PoseEvent) -> f64 {
-        let dx: f64 = (self.x - other.x).into();
-        let dy: f64 = (self.y - other.y).into();
-        let dz: f64 = (self.z - other.z).into();
-        (dx * dx + dy * dy + dz * dz).sqrt()
+    fn distance_to(&self, other: &PoseEvent) -> f32 {
+        Vec3::new(self.x,self.y,self.z).distance(Vec3::new(other.x, other.y , other.z))
     }
-    fn angular_distance_degrees(&self, other: &PoseEvent) -> f64 {
-        let q1 = self.quaternion;
-        let q2 = other.quaternion;
-        let dot_product = q1[0] * q2[0] + q1[1] * q2[1] + q1[2] * q2[2] + q1[3] * q2[3];
+    fn angular_distance_degrees(&self, other: &PoseEvent) -> f32 {
+        let dot_product = self.quaternion.dot(other.quaternion);
         let angle = 2.0 * dot_product.abs().clamp(-1.0, 1.0).acos();
-
-        angle * 180.0 / std::f64::consts::PI
+        angle.to_degrees()
     }
 }
 
 pub struct SleepDetector {
     events: Vec<PoseEvent>,
-    distance_in_last_15_minutes: f64,
-    distance_in_last_10_minutes: f64,
-    distance_in_last_5_minutes: f64,
-    distance_in_last_1_minute: f64,
-    distance_in_last_10_seconds: f64,
-    rotation_in_last_15_minutes: f64,
-    rotation_in_last_10_minutes: f64,
-    rotation_in_last_5_minutes: f64,
-    rotation_in_last_1_minute: f64,
-    rotation_in_last_10_seconds: f64,
+    distance_in_last_15_minutes: f32,
+    distance_in_last_10_minutes: f32,
+    distance_in_last_5_minutes: f32,
+    distance_in_last_1_minute: f32,
+    distance_in_last_10_seconds: f32,
+    rotation_in_last_15_minutes: f32,
+    rotation_in_last_10_minutes: f32,
+    rotation_in_last_5_minutes: f32,
+    rotation_in_last_1_minute: f32,
+    rotation_in_last_10_seconds: f32,
     // reqwest_client: reqwest::Client,
     start_time: u128,
     last_log: u128,
@@ -69,7 +65,7 @@ impl SleepDetector {
         }
     }
 
-    pub async fn log_pose(&mut self, position: [f32; 3], quaternion: [f64; 4]) {
+    pub async fn log_pose(&mut self, position: [f32; 3], quaternion: Quat) {
         // Add the event
         let event = PoseEvent {
             x: position[0],
@@ -111,7 +107,7 @@ impl SleepDetector {
         }
     }
 
-    fn distance_in_window(&mut self, window_ms: u128) -> f64 {
+    fn distance_in_window(&mut self, window_ms: u128) -> f32 {
         let start_time = get_time() - window_ms;
         let start_index = self
             .events
@@ -131,7 +127,7 @@ impl SleepDetector {
         total_distance
     }
 
-    fn rotation_in_window(&mut self, window_ms: u128) -> f64 {
+    fn rotation_in_window(&mut self, window_ms: u128) -> f32 {
         let start_time = get_time() - window_ms;
         let start_index = self
             .events
