@@ -3,10 +3,11 @@ use std::{
     time::Duration,
 };
 
+use glam::Vec3;
 use log::{debug, info};
 use tokio::{spawn, sync::Mutex, task::spawn_blocking};
 use xr_overlay::{
-    RgbaTexture, model::AppContext, openxr::Vector3f, runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent}, utils::QuaternionfExt, xr::ReferenceSpaceT
+    RgbaTexture, model::AppContext, openxr::Vector3f, runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent}, utils::{QuaternionfExt, VecFExt}, xr::ReferenceSpaceT
 };
 
 use crate::{
@@ -121,14 +122,14 @@ pub async fn init() {
                             .lock()
                             .await
                             .log_pose(
-                                [pos.x, pos.y, pos.z],
+                                pos.to_vec3a().to_vec3(),
                             )
                             .await;
                     } else {
                     info!("[Core] Failed to get hmd Posef,sleep");
                     }
                 }
-                tokio::time::sleep(Duration::from_millis(33)).await;
+                tokio::time::sleep(Duration::from_millis(300)).await;
             }
         });
         debug!("[Init] openxr start (2)");

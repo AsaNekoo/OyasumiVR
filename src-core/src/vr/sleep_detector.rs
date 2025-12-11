@@ -1,6 +1,11 @@
-use glam::{Quat, Vec3};
+use std::time::Duration;
 
-use crate::{utils::{get_time, get_time_u64, send_event}, vr::model::SleepDetectorStateReport};
+use glam::{Quat, Vec3, Vec3A};
+
+use crate::{
+    utils::{get_time, get_time_u64, send_event},
+    vr::model::SleepDetectorStateReport,
+};
 
 // use super::models::SleepDetectorStateReport;
 
@@ -8,16 +13,14 @@ const MAX_EVENT_AGE_MS: u128 = 900000; // 15 minutes
 
 #[derive(Clone, Copy)]
 struct PoseEvent {
-    x: f32,
-    y: f32,
-    z: f32,
+    value: Vec3,
     // quaternion:Quat,
     timestamp: u64, // in milliseconds
 }
 
 impl PoseEvent {
     fn distance_to(&self, other: &PoseEvent) -> f32 {
-        Vec3::new(self.x,self.y,self.z).distance(Vec3::new(other.x, other.y , other.z))
+        self.value.distance(other.value)
     }
     // fn angular_distance_degrees(&self, other: &PoseEvent) -> f32 {
     //     let dot_product = self.quaternion.dot(other.quaternion);
@@ -47,7 +50,9 @@ pub struct SleepDetector {
 impl SleepDetector {
     pub fn new() -> Self {
         Self {
-            events: Vec::new(),
+            events: Vec::with_capacity(
+                (Duration::from_millis(MAX_EVENT_AGE_MS as u64).as_secs_f32() / Duration::from_millis(250).as_secs_f32()) as usize+100,
+            ),
             distance_in_last_10_seconds: 0.0,
             distance_in_last_1_minute: 0.0,
             distance_in_last_5_minutes: 0.0,
@@ -65,65 +70,85 @@ impl SleepDetector {
         }
     }
 
-    pub async fn log_pose(&mut self, position: [f32; 3]) {
+    pub async fn log_pose(&mut self, position: Vec3) {
+        let now = get_time_u64();
         // Add the event
         let event = PoseEvent {
-            x: position[0],
-            y: position[1],
-            z: position[2],
-            timestamp: get_time_u64(),
-        }; 
+            value: position,
+            timestamp: now,
+        };
         self.events.push(event);
         // Remove old events
-        let oldest_time = event.timestamp - MAX_EVENT_AGE_MS as u64;
-        let old_event_count = self
-            .events
-            .iter()
-            .take_while(|e| e.timestamp < oldest_time)
-            .count();
-        self.events.drain(..old_event_count);
+
         // Calculate new distances
-        self.distance_in_last_15_minutes = self.distance_in_window(900000);
-        self.distance_in_last_10_minutes = self.distance_in_window(600000);
-        self.distance_in_last_5_minutes = self.distance_in_window(300000);
-        self.distance_in_last_1_minute = self.distance_in_window(60000);
-        self.distance_in_last_10_seconds = self.distance_in_window(10000);
+
         // self.rotation_in_last_15_minutes = self.rotation_in_window(900000);
         // self.rotation_in_last_10_minutes = self.rotation_in_window(600000);
         // self.rotation_in_last_5_minutes = self.rotation_in_window(300000);
         // self.rotation_in_last_1_minute = self.rotation_in_window(60000);
         // self.rotation_in_last_10_seconds = self.rotation_in_window(10000);
         // Set new start time if there hasn't been any data in over a minute
-        if get_time_u64().saturating_sub(self.last_log) > 60000 {
-            self.start_time = get_time_u64();
-        }
+
         // Update the last log time
-        self.last_log = event.timestamp;
+
         // Send a state report if it's been over a second since the last one
-        if get_time_u64() > self.next_state_report {
-            self.next_state_report = get_time_u64() + 1000;
+        if now > self.next_state_report {
+            let oldest_time = event.timestamp - MAX_EVENT_AGE_MS as u64;
+            let old_event_count = self
+                .events
+                .iter()
+                .take_while(|e| e.timestamp < oldest_time)
+                .count();
+            self.events.drain(..old_event_count);
+            if now.saturating_sub(self.last_log) > 60000 {
+                self.start_time = now;
+            }
+            self.distance_in_last_10_seconds = self.distance_in_window(10000, 0, 0.);
+            self.distance_in_last_1_minute =
+                self.distance_in_window(60000, 10000, self.distance_in_last_10_seconds);
+            self.distance_in_last_5_minutes =
+                self.distance_in_window(300000, 60000, self.distance_in_last_1_minute);
+            self.distance_in_last_10_minutes =
+                self.distance_in_window(600000, 300000, self.distance_in_last_5_minutes);
+            self.distance_in_last_15_minutes =
+                self.distance_in_window(900000, 600000, self.distance_in_last_10_minutes);
+
+            self.last_log = event.timestamp;
+            self.next_state_report = now + 1000;
             self.send_state_report().await;
         }
     }
 
-    fn distance_in_window(&mut self, window_ms: u64) -> f32 {
+    fn distance_in_window(&mut self, window_ms: u64, prev_ms: u64, mut prev_v: f32) -> f32 {
         let start_time = get_time_u64() - window_ms;
-        let start_index = self
+        let start_index = match self
             .events
             .iter()
-            .position(|e| e.timestamp >= start_time)
-            .unwrap_or(0);
+            .enumerate()
+            .skip_while(|(_, e)| e.timestamp < start_time)
+            .map(|e| e.0)
+            .next()
+        {
+            Some(v) => v,
+            None => return prev_v,
+        };
+
+        let previous_count = match prev_ms == 0 {
+            true => 0,
+            false => {
+                let start_time_previous = get_time_u64() - prev_ms;
+                self.events
+                    .iter()
+                    .skip_while(|e| e.timestamp < start_time_previous)
+                    .count()
+            }
+        };
         let events = &self.events[start_index..];
-        let mut total_distance = 0.0;
-        let mut i = 0;
-        while i < events.len() - 1 {
-            let event_a = &events[i];
-            let event_b = &events[i + 1];
-            let distance = event_a.distance_to(event_b);
-            total_distance += distance;
-            i += 1;
+        let events = &events[..(events.len() - previous_count)];
+        for events in events.windows(2) {
+            prev_v += events[0].distance_to(&events[1]);
         }
-        total_distance
+        prev_v
     }
 
     // fn rotation_in_window(&mut self, window_ms: u128) -> f32 {
@@ -147,20 +172,6 @@ impl SleepDetector {
     // }
 
     async fn send_state_report(&self) {
-        log::info!("{:?}",SleepDetectorStateReport {
-                distance_in_last_15_minutes: self.distance_in_last_15_minutes,
-                distance_in_last_10_minutes: self.distance_in_last_10_minutes,
-                distance_in_last_5_minutes: self.distance_in_last_5_minutes,
-                distance_in_last_1_minute: self.distance_in_last_1_minute,
-                distance_in_last_10_seconds: self.distance_in_last_10_seconds,
-                // rotation_in_last_15_minutes: self.rotation_in_last_15_minutes,
-                // rotation_in_last_10_minutes: self.rotation_in_last_10_minutes,
-                // rotation_in_last_5_minutes: self.rotation_in_last_5_minutes,
-                // rotation_in_last_1_minute: self.rotation_in_last_1_minute,
-                // rotation_in_last_10_seconds: self.rotation_in_last_10_seconds,
-                start_time: self.start_time,
-                last_log: self.last_log,
-            });
         send_event(
             "SLEEP_DETECTOR_STATE_REPORT",
             SleepDetectorStateReport {
