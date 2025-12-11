@@ -122,6 +122,11 @@ pub fn get_time() -> u128 {
     let since_the_epoch = now.duration_since(UNIX_EPOCH).expect("Time went backwards");
     since_the_epoch.as_millis()
 }
+pub fn get_time_u64() -> u64 {
+    let now = SystemTime::now();
+    let since_the_epoch = now.duration_since(UNIX_EPOCH).expect("Time went backwards");
+    since_the_epoch.as_millis() as u64
+}
 
 pub async fn send_event<S: Serialize + Clone>(event: &str, payload: S) {
     profiling::register_event(event).await;

@@ -1,6 +1,6 @@
 use glam::{Quat, Vec3};
 
-use crate::{utils::{get_time, send_event}, vr::model::SleepDetectorStateReport};
+use crate::{utils::{get_time, get_time_u64, send_event}, vr::model::SleepDetectorStateReport};
 
 // use super::models::SleepDetectorStateReport;
 
@@ -12,7 +12,7 @@ struct PoseEvent {
     y: f32,
     z: f32,
     // quaternion:Quat,
-    timestamp: u128, // in milliseconds
+    timestamp: u64, // in milliseconds
 }
 
 impl PoseEvent {
@@ -39,9 +39,9 @@ pub struct SleepDetector {
     // rotation_in_last_1_minute: f32,
     // rotation_in_last_10_seconds: f32,
     // reqwest_client: reqwest::Client,
-    start_time: u128,
-    last_log: u128,
-    next_state_report: u128,
+    start_time: u64,
+    last_log: u64,
+    next_state_report: u64,
 }
 
 impl SleepDetector {
@@ -71,11 +71,11 @@ impl SleepDetector {
             x: position[0],
             y: position[1],
             z: position[2],
-            timestamp: get_time(),
+            timestamp: get_time_u64(),
         }; 
         self.events.push(event);
         // Remove old events
-        let oldest_time = event.timestamp - MAX_EVENT_AGE_MS;
+        let oldest_time = event.timestamp - MAX_EVENT_AGE_MS as u64;
         let old_event_count = self
             .events
             .iter()
@@ -94,20 +94,20 @@ impl SleepDetector {
         // self.rotation_in_last_1_minute = self.rotation_in_window(60000);
         // self.rotation_in_last_10_seconds = self.rotation_in_window(10000);
         // Set new start time if there hasn't been any data in over a minute
-        if get_time().saturating_sub(self.last_log) > 60000 {
-            self.start_time = get_time();
+        if get_time_u64().saturating_sub(self.last_log) > 60000 {
+            self.start_time = get_time_u64();
         }
         // Update the last log time
         self.last_log = event.timestamp;
         // Send a state report if it's been over a second since the last one
-        if get_time() > self.next_state_report {
-            self.next_state_report = get_time() + 1000;
+        if get_time_u64() > self.next_state_report {
+            self.next_state_report = get_time_u64() + 1000;
             self.send_state_report().await;
         }
     }
 
-    fn distance_in_window(&mut self, window_ms: u128) -> f32 {
-        let start_time = get_time() - window_ms;
+    fn distance_in_window(&mut self, window_ms: u64) -> f32 {
+        let start_time = get_time_u64() - window_ms;
         let start_index = self
             .events
             .iter()

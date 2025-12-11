@@ -103,8 +103,8 @@ pub struct SleepDetectorStateReport {
     // pub rotation_in_last_5_minutes: f32,
     // pub rotation_in_last_1_minute: f32,
     // pub rotation_in_last_10_seconds: f32,
-    pub start_time: u128,
-    pub last_log: u128,
+    pub start_time: u64,
+    pub last_log: u64,
 }
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
