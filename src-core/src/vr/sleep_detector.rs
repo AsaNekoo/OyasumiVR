@@ -15,7 +15,6 @@ const MAX_EVENT_AGE_MS: u128 = 900000; // 15 minutes
 struct PoseEvent {
     value: Vec3,
     // quaternion:Quat,
-    timestamp: u64, // in milliseconds
 }
 
 impl PoseEvent {
@@ -31,6 +30,7 @@ impl PoseEvent {
 
 pub struct SleepDetector {
     events: Vec<PoseEvent>,
+    events_timestamps:Vec<u64>,
     distance_in_last_15_minutes: f32,
     // distance_in_last_10_minutes: f32,
     // distance_in_last_5_minutes: f32,
@@ -51,6 +51,9 @@ impl SleepDetector {
     pub fn new() -> Self {
         Self {
             events: Vec::with_capacity(
+                (Duration::from_millis(MAX_EVENT_AGE_MS as u64).as_secs_f32() / Duration::from_millis(250).as_secs_f32()) as usize+100,
+            ),
+            events_timestamps: Vec::with_capacity(
                 (Duration::from_millis(MAX_EVENT_AGE_MS as u64).as_secs_f32() / Duration::from_millis(250).as_secs_f32()) as usize+100,
             ),
             distance_in_last_10_seconds: 0.0,
@@ -75,9 +78,10 @@ impl SleepDetector {
         // Add the event
         let event = PoseEvent {
             value: position,
-            timestamp: now,
         };
         self.events.push(event);
+        self.events_timestamps.push(now);
+        assert_eq!(self.events.len(),self.events_timestamps.len());
         // Remove old events
 
         // Calculate new distances
@@ -93,11 +97,11 @@ impl SleepDetector {
 
         // Send a state report if it's been over a second since the last one
         if now > self.next_state_report {
-            let oldest_time = event.timestamp - MAX_EVENT_AGE_MS as u64;
+            let oldest_time = now - MAX_EVENT_AGE_MS as u64;
             let old_event_count = self
-                .events
+                .events_timestamps
                 .iter()
-                .take_while(|e| e.timestamp < oldest_time)
+                .take_while(|t| **t < oldest_time)
                 .count();
             self.events.drain(..old_event_count);
             if now.saturating_sub(self.last_log) > 60000 {
@@ -113,7 +117,7 @@ impl SleepDetector {
             self.distance_in_last_15_minutes =
                 self.distance_in_window(900000, 10000, self.distance_in_last_10_seconds);
 
-            self.last_log = event.timestamp;
+            self.last_log = now;
             self.next_state_report = now + 1000;
             self.send_state_report().await;
         }
@@ -122,10 +126,10 @@ impl SleepDetector {
     fn distance_in_window(&mut self, window_ms: u64, prev_ms: u64, mut prev_v: f32) -> f32 {
         let start_time = get_time_u64() - window_ms;
         let start_index = match self
-            .events
+            .events_timestamps
             .iter()
             .enumerate()
-            .skip_while(|(_, e)| e.timestamp < start_time)
+            .skip_while(|(_, t)| **t < start_time)
             .map(|e| e.0)
             .next()
         {
@@ -137,9 +141,9 @@ impl SleepDetector {
             true => 0,
             false => {
                 let start_time_previous = get_time_u64() - prev_ms;
-                self.events
+                self.events_timestamps
                     .iter()
-                    .skip_while(|e| e.timestamp < start_time_previous)
+                    .skip_while(|t| **t < start_time_previous)
                     .count()
             }
         };
