@@ -117,13 +117,11 @@ pub async fn init() {
                     let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
                     if let Some(posef) = ctx.get_hmd_posef(ReferenceSpaceT::STAGE) {
                         let pos = posef.position;
-                        let quat = posef.orientation;
                         SLEEP_DETECTOR
                             .lock()
                             .await
                             .log_pose(
                                 [pos.x, pos.y, pos.z],
-                                quat.to_quat(),
                             )
                             .await;
                     } else {
