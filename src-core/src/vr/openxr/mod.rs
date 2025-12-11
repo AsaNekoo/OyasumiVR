@@ -13,7 +13,7 @@ use xr_overlay::{
 use crate::{
     utils::send_event,
     vr::{
-        gesture_detector::GestureDetector, model::VRStatus, sleep_detector::SleepDetector,
+        SLEEP_DETECTION_ENABLED, gesture_detector::GestureDetector, model::VRStatus, sleep_detector::SleepDetector
     },
 };
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
@@ -113,6 +113,7 @@ pub async fn init() {
 
         tokio::task::spawn(async move {
             loop {
+                if unsafe{SLEEP_DETECTION_ENABLED}{
                 if *OXR_STATE.lock().await == VRStatus::Initialized {
                     let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
                     if let Some(posef) = ctx.get_hmd_posef(ReferenceSpaceT::STAGE) {
@@ -128,6 +129,7 @@ pub async fn init() {
                     info!("[Core] Failed to get hmd Posef,sleep");
                     }
                 }
+            }
                 tokio::time::sleep(Duration::from_millis(300)).await;
             }
         });

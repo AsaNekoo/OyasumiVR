@@ -10,6 +10,7 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { ModalService } from '../../../../../services/modal.service';
 import { TranslateService } from '@ngx-translate/core';
 import { OVRDeviceClass } from '../../../../../models/ovr-device';
+import { invoke } from '@tauri-apps/api/core';
 
 @Component({
   template: '',
@@ -32,6 +33,11 @@ export abstract class SleepDetectionTabComponent implements OnInit {
     await this.automationConfigService.updateAutomationConfig(automation, {
       [field]: !((this.automationConfigs[automation] as any)[field] as any),
     } as any);
+    if (automation == 'SLEEP_MODE_ENABLE_FOR_SLEEP_DETECTOR') {
+      await invoke('vr_sleep_detection_enabled', {
+        v: this.automationConfigs.SLEEP_MODE_ENABLE_FOR_SLEEP_DETECTOR.enabled,
+      });
+    }
   }
 
   protected getStringForDuration(duration: string): string {

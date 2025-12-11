@@ -5,7 +5,7 @@ use super::openvr::{
 };
 #[cfg(windows)]
 use crate::globals::STEAM_APP_KEY;
-use crate::{vr::model::{BindingOriginData, OVRDevice, OVRFrameLimits}, warn_unimplemented};
+use crate::{vr::{SLEEP_DETECTION_ENABLED, model::{BindingOriginData, OVRDevice, OVRFrameLimits}}, warn_unimplemented};
 #[cfg(windows)]
 use enumset::EnumSet;
 #[cfg(windows)]
@@ -47,7 +47,11 @@ pub async fn vr_sleep_mode_check(value:bool){
         false => super::openxr::stop_head_shake_detection().await,
     }}
 }
-
+#[tauri::command]
+pub async fn vr_sleep_detection_enabled(value:bool)
+{
+    unsafe{SLEEP_DETECTION_ENABLED=value;}
+}
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 #[cfg_attr(unix, expect(unused_variables))]
