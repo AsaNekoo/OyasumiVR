@@ -89,7 +89,7 @@ pub async fn init() {
                             tokio::time::sleep(Duration::from_secs(1)).await;
                             continue;
                         }
-                        xr_overlay::runner::PollResult::Exit => {
+                        xr_overlay::runner::PollResult::Exit|xr_overlay::runner::PollResult::SessionLost => {
                             drop(xr_ctx);
                             tokio::time::sleep(Duration::from_secs(10)).await;
                             debug_assert_eq!(*OXR_STATE.lock().await, VRStatus::Inactive);
@@ -104,7 +104,6 @@ pub async fn init() {
                             drop(xr_ctx);
                             tokio::time::sleep(Duration::from_secs(60)).await
                         }
-                        xr_overlay::runner::PollResult::SessionLost => unreachable!(),
                     }
                 } else {
                     tokio::time::sleep(Duration::from_secs(1)).await;
