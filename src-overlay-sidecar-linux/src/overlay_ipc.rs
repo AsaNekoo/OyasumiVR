@@ -61,7 +61,7 @@ impl Overlay {
         let args = format!(
             "{{id:\"{}\",message:\"{}\",duration:{}}}",
             id,
-            notification.message,
+            notification.message.replace('\n', "\\n"),
             notification.duration.as_millis()
         );
         self.execute_js(&format!("window.OyasumiIPCIn.addNotification({});", args));
