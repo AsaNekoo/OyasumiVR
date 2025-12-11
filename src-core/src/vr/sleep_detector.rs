@@ -81,7 +81,7 @@ impl SleepDetector {
         };
         self.events.push(event);
         self.events_timestamps.push(now);
-        assert_eq!(self.events.len(),self.events_timestamps.len());
+        debug_assert_eq!(self.events.len(),self.events_timestamps.len());
         // Remove old events
 
         // Calculate new distances
@@ -104,6 +104,7 @@ impl SleepDetector {
                 .take_while(|t| **t < oldest_time)
                 .count();
             self.events.drain(..old_event_count);
+            self.events_timestamps.drain(..old_event_count);
             if now.saturating_sub(self.last_log) > 60000 {
                 self.start_time = now;
             }
