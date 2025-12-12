@@ -68,11 +68,11 @@ export class SleepModeForSleepDetectorAutomationService {
     this._lastStateReportHandlingResult.asObservable();
 
   private calibrationFactors: { [key: string]: number } = {
-    LOWEST: 200,
-    LOW: 250,
-    MEDIUM: 300,
-    HIGH: 350,
-    HIGHEST: 400,
+    LOWEST: 240,
+    LOW: 300,
+    MEDIUM: 360,
+    HIGH: 430,
+    HIGHEST: 480,
   };
 
   constructor(
