@@ -3,7 +3,7 @@ use std::time::Duration;
 use glam::{Quat, Vec3, Vec3A};
 
 use crate::{
-    utils::{get_time, get_time_u64, send_event},
+    utils::{get_time, send_event},
     vr::model::SleepDetectorStateReport,
 };
 
@@ -74,7 +74,7 @@ impl SleepDetector {
     }
 
     pub async fn log_pose(&mut self, position: Vec3) {
-        let now = get_time_u64();
+        let now = get_time();
         // Add the event
         let event = PoseEvent {
             value: position,
@@ -108,7 +108,7 @@ impl SleepDetector {
             if now.saturating_sub(self.last_log) > 60000 {
                 self.start_time = now;
             }
-            self.distance_in_last_10_seconds = self.distance_in_window(10000, 0, 0.);
+            self.distance_in_last_10_seconds = self.distance_in_window(now,10000, 0, 0.);
             // self.distance_in_last_1_minute =
             //     self.distance_in_window(60000, 10000, self.distance_in_last_10_seconds);
             // self.distance_in_last_5_minutes =
@@ -116,7 +116,7 @@ impl SleepDetector {
             // self.distance_in_last_10_minutes =
             //     self.distance_in_window(600000, 300000, self.distance_in_last_5_minutes);
             self.distance_in_last_15_minutes =
-                self.distance_in_window(900000, 10000, self.distance_in_last_10_seconds);
+                self.distance_in_window(now,900000, 10000, self.distance_in_last_10_seconds);
 
             self.last_log = now;
             self.next_state_report = now + 1000;
@@ -124,8 +124,8 @@ impl SleepDetector {
         }
     }
 
-    fn distance_in_window(&mut self, window_ms: u64, prev_ms: u64, mut prev_v: f32) -> f32 {
-        let start_time = get_time_u64() - window_ms;
+    fn distance_in_window(&mut self,now_ms:u64, window_ms: u64, prev_ms: u64, mut prev_v: f32) -> f32 {
+        let start_time = now_ms - window_ms;
         let start_index = match self
             .events_timestamps
             .iter()
@@ -141,7 +141,7 @@ impl SleepDetector {
         let previous_count = match prev_ms == 0 {
             true => 0,
             false => {
-                let start_time_previous = get_time_u64() - prev_ms;
+                let start_time_previous = now_ms - prev_ms;
                 self.events_timestamps
                     .iter()
                     .skip_while(|t| **t < start_time_previous)

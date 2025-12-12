@@ -205,7 +205,7 @@ pub async fn start_head_shake_detection() {
                         .await
                         .log_pose(
                             [pos.x, pos.y, pos.z],
-                            [quat.x as f64, quat.y as f64, quat.z as f64, quat.w as f64],
+                            [quat.x as f32, quat.y as f32, quat.z as f32, quat.w as f32],
                         )
                         .await;
                 } else {

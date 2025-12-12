@@ -117,12 +117,7 @@ pub async fn quit_steamvr(kill: bool) {
     }
 }
 
-pub fn get_time() -> u128 {
-    let now = SystemTime::now();
-    let since_the_epoch = now.duration_since(UNIX_EPOCH).expect("Time went backwards");
-    since_the_epoch.as_millis()
-}
-pub fn get_time_u64() -> u64 {
+pub fn get_time() -> u64 {
     let now = SystemTime::now();
     let since_the_epoch = now.duration_since(UNIX_EPOCH).expect("Time went backwards");
     since_the_epoch.as_millis() as u64

@@ -106,8 +106,3 @@ pub struct SleepDetectorStateReport {
     pub start_time: u64,
     pub last_log: u64,
 }
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct GestureDetected {
-    pub gesture: String,
-}

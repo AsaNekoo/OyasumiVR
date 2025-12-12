@@ -12,13 +12,13 @@ use tokio::sync::Mutex;
 
 struct CommandInvocation {
     pub name: String,
-    pub time: u128,
+    pub time: u64,
 }
 
 static INVOCATION_COUNT: LazyLock<Mutex<HashMap<String, u64>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
 static INVOCATION_TIMES: LazyLock<Mutex<HashMap<String, CommandInvocation>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
 static PROFILING_ENABLED: LazyLock<AtomicBool> = LazyLock::new(|| AtomicBool::new(false));
-static EVENT_COUNTER: LazyLock<Mutex<HashMap<String, u128>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
+static EVENT_COUNTER: LazyLock<Mutex<HashMap<String, u64>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
 
 pub fn enable_profiling() {
     info!("[Core] [PROFILING] Profiling enabled!");
@@ -125,7 +125,7 @@ pub fn profile_command_finish(invocation_id: Option<String>) {
 
 async fn detect_dead_invocations() {
     let time = super::get_time();
-    let mut dead_invocations: Vec<(String, String, u128)> = Vec::new();
+    let mut dead_invocations: Vec<(String, String, u64)> = Vec::new();
     let mut invocation_times_guard = INVOCATION_TIMES.lock().await;
     {
         let invocation_times = &mut *invocation_times_guard;

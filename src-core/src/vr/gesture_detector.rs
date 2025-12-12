@@ -1,58 +1,58 @@
 use nalgebra::{Quaternion, UnitQuaternion};
 
-use crate::{
-    utils::{get_time, send_event},
-    vr::model::GestureDetected,
-};
+use crate::utils::{get_time, send_event};
 
-const MAX_EVENT_AGE_MS: u128 = 5000; // 5 seconds
+const MAX_EVENT_AGE_MS: u64 = 5000; // 5 seconds
 
 #[derive(Clone, Copy)]
 struct YawEvent {
-    yaw: f64,
-    timestamp: u128,
+    yaw: f32,
 }
 
 pub struct GestureDetector {
     events: Vec<YawEvent>,
-    last_detection: u128,
+    events_timestamps:Vec<u64>,
+    last_detection: u64,
 }
 
 impl GestureDetector {
     pub fn new() -> Self {
         Self {
+            events_timestamps: Vec::new(),
             events: Vec::new(),
             last_detection: 0,
         }
     }
 
-    pub async fn log_pose(&mut self, _position: [f32; 3], quaternion: [f64; 4]) {
+    pub async fn log_pose(&mut self, _position: [f32; 3], quaternion: [f32; 4]) {
         // Determine yaw
+        let now=get_time();
         let q = UnitQuaternion::from_quaternion(Quaternion::new(
             quaternion[3],
             quaternion[0],
             quaternion[1],
             quaternion[2],
         ));
-        let yaw = (2.0 * q.as_ref().imag().y.atan2(q.as_ref().scalar()))
-            * (180.0 / std::f64::consts::PI)
+        let yaw = (2.0 * q.as_ref().imag().y.atan2(q.as_ref().scalar())).to_radians()
             + 180.0;
         // Log yaw event
         let event = YawEvent {
             yaw,
-            timestamp: get_time(),
         };
+        debug_assert_eq!(self.events.len(),self.events_timestamps.len());
         self.events.push(event);
+        self.events_timestamps.push(now);
         // Remove old events
-        let oldest_time = event.timestamp - MAX_EVENT_AGE_MS;
+        let oldest_time = now - MAX_EVENT_AGE_MS;
         let old_event_count = self
-            .events
+            .events_timestamps
             .iter()
-            .take_while(|e| e.timestamp < oldest_time)
+            .take_while(|t| **t < oldest_time)
             .count();
         self.events.drain(..old_event_count);
+        self.events_timestamps.drain(..old_event_count);
         // Convert events to relative movements
-        let mut movements = Vec::new();
+        let mut movements = Vec::with_capacity(self.events.len());
         for i in 0..self.events.len() - 1 {
             let yaw1 = self.events[i].yaw;
             let yaw2 = self.events[i + 1].yaw;
@@ -67,25 +67,23 @@ impl GestureDetector {
             movements.push(yaw_diff);
         }
         // Detect head shake
-        if get_time() - self.last_detection >= 5000 && self.detect_head_shake(movements) {
-            self.last_detection = get_time();
+        if now - self.last_detection >= 5000 && self.detect_head_shake(movements) {
+            self.last_detection = now;
             log::info!("[core] head shake detected");
             send_event(
                 "GESTURE_DETECTED",
-                GestureDetected {
-                    gesture: "head_shake".to_string(),
-                },
+                "",
             )
             .await;
         }
     }
 
-    fn detect_head_shake(&self, movements: Vec<f64>) -> bool {
+    fn detect_head_shake(&self, movements: Vec<f32>) -> bool {
         let mut data = movements;
         let mut offset_dir = 1.0;
         let mut change: Option<usize>;
-        let change_dir_a = self.detect_angular_change(data.clone(), -15.0);
-        let change_dir_b = self.detect_angular_change(data.clone(), 15.0);
+        let change_dir_a = self.detect_angular_change(data.as_slice(), -15.0);
+        let change_dir_b = self.detect_angular_change(data.as_slice(), 15.0);
         if change_dir_a.is_some() {
             change = change_dir_a;
         } else if change_dir_b.is_some() {
@@ -95,28 +93,32 @@ impl GestureDetector {
             return false;
         }
         data = data[change.unwrap()..].to_vec();
-        change = self.detect_angular_change(data.clone(), 30.0 * offset_dir);
+        change = self.detect_angular_change(data.as_slice(), 30.0 * offset_dir);
         if change.is_none() {
             return false;
         }
         data = data[change.unwrap()..].to_vec();
-        change = self.detect_angular_change(data, -15.0 * offset_dir);
+        change = self.detect_angular_change(data.as_slice(), -15.0 * offset_dir);
         if change.is_none() {
             return false;
         }
         true
     }
 
-    fn detect_angular_change(&self, mut data: Vec<f64>, mut offset: f64) -> Option<usize> {
+    fn detect_angular_change(&self, data: &[f32], mut offset: f32) -> Option<usize> {
         let mut delta = 0.0;
+        let mut flip=1.0;
         // Flip data if we're looking for a negative offset
         if offset < 0.0 {
-            data = data.iter().map(|x| -x).collect();
+            flip=-1.0;
+            // data = data.iter().map(|x| -x).collect();
             offset *= -1.0;
         }
         // Loop over all data points
         for (i, item) in data.iter().enumerate() {
-            delta += item;
+            //compiler actually unrools it into two loops
+            //https://godbolt.org/z/ohfvf48PM
+            delta += item*flip;
             // if delta is negative, reset to 0
             if delta < 0.0 {
                 delta = 0.0;
