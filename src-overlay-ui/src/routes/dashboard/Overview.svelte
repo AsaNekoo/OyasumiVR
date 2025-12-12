@@ -205,7 +205,7 @@
 						</div>
 					{/if}
 					<div class="flex-1 flex flex-row items-center justify-end">
-						<span>{timeHours}</span><span class="blink">:</span><span>{timeMinutes}</span>
+						<span>{timeHours}</span>:<span>{timeMinutes}</span>
 						<i class="material-icons-round ml-2 opacity-60">access_time</i>
 					</div>
 				</div>
@@ -285,15 +285,3 @@
 		{/if}
 	</div>
 </div>
-
-<style lang="scss">
-	.blink {
-		animation: blinker 1s linear infinite;
-	}
-
-	@keyframes blinker {
-		50% {
-			opacity: 0;
-		}
-	}
-</style>
