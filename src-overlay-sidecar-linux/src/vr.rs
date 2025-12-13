@@ -11,7 +11,8 @@ use xr_overlay::{
     runner::{
         AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, ShowMode,
         events::AppEvent,
-    }, xr::ReferenceSpaceT,
+    },
+    xr::ReferenceSpaceT,
 };
 use xr_overlay_cef::{CefOverlayCreateInfo, create_cef_overlay};
 pub const DEFAULT_BINDINGS_CONFIG: &str = include_str!("bindings_overwrite_default.toml");
@@ -55,9 +56,9 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
     let app = Arc::new(RwLock::new(app));
     XR_CTX.set(app.clone()).unwrap();
     let pos = Vector3f {
-        x: 0.1,
-        y: -0.2,
-        z: -0.8,
+        x: 0.,
+        y: -0.,
+        z: -0.4,
     };
     let notifica_pos = Vector3f {
         x: 0.,
@@ -89,15 +90,15 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
     let noti_overlay = create_cef_overlay(
         app.clone(),
         CefOverlayCreateInfo {
-            movable:false,
-            interactable:false,
+            movable: false,
+            interactable: false,
             size: [0.5, 0.5],
             spawn_visible: true,
-            pos:notifica_pos,
+            pos: notifica_pos,
             framerate,
             resolution: [1024, 1024],
             name: Some("notifications".into()),
-            reference_space:Some(ReferenceSpaceT::VIEW),
+            reference_space: Some(ReferenceSpaceT::VIEW),
             ..Default::default()
         },
     );
@@ -129,7 +130,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             if unsafe { KILL } {
                 break;
             }
-            let mut guard=app.write().unwrap();
+            let mut guard = app.write().unwrap();
             match guard.run(false) {
                 xr_overlay::runner::PollResult::Success(v) => {
                     //it already waits for next frame
@@ -172,11 +173,18 @@ fn openxr_callback(event: AppEvent) {
             handle: _,
             frames_left: _,
         } => OVERLAY.get().as_ref().unwrap().hide_dashboard(),
+        AppEvent::OverlayVisibilityChangedLastInput { handle, visible, last_input }=>{
+            if visible && handle==OVERLAY.wait().xr_handle{
+                *SWITCH_HAND.lock().unwrap()=last_input.hand();
+            }
+        }
         _ => (),
     }
 }
+static SWITCH_HAND: std::sync::Mutex<xr_overlay::xr_input::Hand> =
+    std::sync::Mutex::new(xr_overlay::xr_input::Hand::Left);
 fn openxr_show_hand() -> DeviceRole {
-    DeviceRole::Hmd
+    (*SWITCH_HAND.lock().unwrap()).into()
 }
 pub static mut DASBOARD_VISIBLE: bool = false;
 pub fn show_dashboard() {

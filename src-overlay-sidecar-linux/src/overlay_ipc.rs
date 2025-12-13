@@ -13,8 +13,7 @@ use xr_overlay_cef::cef::{ImplBrowser, ImplFrame};
 use crate::{
     CORE_CLIENT,
     core_grpc::EventParams,
-    globals::STATE,
-    kill, killed,
+    globals::STATE, killed,
     model::Overlay,
     overlay_grpc::OyasumiSidecarState,
     vr::{OVERLAY, hide_dashboard},

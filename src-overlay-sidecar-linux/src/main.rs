@@ -15,7 +15,7 @@ use xr_overlay_cef::{
 use crate::{
     core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
     grpc::{start_grpc_server, start_grpc_web_server},
-    overlay_ipc::{OverlayIPCAddNotification, start_websocket_server},
+    overlay_ipc::start_websocket_server,
     ui::serve_ui,
     vr::{
         BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard,
