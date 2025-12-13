@@ -67,7 +67,7 @@ impl GestureDetector {
             movements.push(yaw_diff);
         }
         // Detect head shake
-        if now - self.last_detection >= 5000 && self.detect_head_shake(movements) {
+        if now - self.last_detection >= 5000 && self.detect_head_shake(&movements) {
             self.last_detection = now;
             log::info!("[core] head shake detected");
             send_event(
@@ -78,12 +78,12 @@ impl GestureDetector {
         }
     }
 
-    fn detect_head_shake(&self, movements: Vec<f32>) -> bool {
+    fn detect_head_shake(&self, movements:&[f32]) -> bool {
         let mut data = movements;
         let mut offset_dir = 1.0;
         let mut change: Option<usize>;
-        let change_dir_a = self.detect_angular_change(data.as_slice(), -15.0);
-        let change_dir_b = self.detect_angular_change(data.as_slice(), 15.0);
+        let change_dir_a = self.detect_angular_change(data, -15.0);
+        let change_dir_b = self.detect_angular_change(data, 15.0);
         if change_dir_a.is_some() {
             change = change_dir_a;
         } else if change_dir_b.is_some() {
@@ -92,13 +92,13 @@ impl GestureDetector {
         } else {
             return false;
         }
-        data = data[change.unwrap()..].to_vec();
-        change = self.detect_angular_change(data.as_slice(), 30.0 * offset_dir);
+        data = &data[change.unwrap()..];
+        change = self.detect_angular_change(data, 30.0 * offset_dir);
         if change.is_none() {
             return false;
         }
-        data = data[change.unwrap()..].to_vec();
-        change = self.detect_angular_change(data.as_slice(), -15.0 * offset_dir);
+        data = &data[change.unwrap()..];
+        change = self.detect_angular_change(data, -15.0 * offset_dir);
         if change.is_none() {
             return false;
         }

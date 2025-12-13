@@ -2,12 +2,11 @@ use std::{
     sync::{LazyLock, OnceLock},
     time::Duration,
 };
-
-use glam::Vec3;
+mod input;
 use log::{debug, info};
 use tokio::{spawn, sync::Mutex, task::spawn_blocking};
 use xr_overlay::{
-    RgbaTexture, model::AppContext, openxr::Vector3f, runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent}, utils::{QuaternionfExt, VecFExt}, xr::ReferenceSpaceT
+    RgbaTexture, input::InputHandler, model::AppContext, openxr::{Vector3f, Vulkan}, runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent}, utils::{QuaternionfExt, VecFExt}, xr::ReferenceSpaceT
 };
 
 use crate::{
@@ -19,6 +18,7 @@ use crate::{
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
 pub static OXR_BRIGHTNES_OVERLAY_HANDLE: Mutex<Option<OverlayHandle>> = Mutex::const_new(None);
 pub static OXR_STATE: Mutex<VRStatus> = Mutex::const_new(VRStatus::Inactive);
+
 async fn get_ctx() -> AppContext<xr_overlay::openxr::Vulkan> {
     let ctx = loop {
             let ctx = xr_overlay::xr::Init::default()
