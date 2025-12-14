@@ -123,7 +123,7 @@ pub fn get_input_handlers(
     Some((mic_actions, manager))
 }
 pub fn check_user_activity(handler:&mut InputHandler<Vulkan>)->Option<bool>{
-    let changed=handler.update_specfic(xr_overlay::input::ActionSetsToUpdate::Specific(&[DETECTION_SET])).ok()?;
+    let changed=handler.update_specfic(xr_overlay::input::ActionSetsToUpdate::All).ok()?;
     for c in changed{
         if c.action_type()==ActionType::Bool{
             if handler.get_bool(*c){

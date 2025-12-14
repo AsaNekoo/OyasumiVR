@@ -97,31 +97,30 @@ pub async fn init() {
                 if *OXR_STATE.lock().await == VRStatus::Initialized {
                     if check_user_activity(&mut INPUT_CONTEXT.lock().await.as_mut().unwrap().1).unwrap() {
                         send_event("GESTURE_DETECTED", "").await;
-                        break;
                     }
                     let mut xr_ctx = OXR_HANDLE.get().unwrap().lock().await;
-                    match xr_ctx.run(false) {
+                    match xr_ctx.run(true) {
                         xr_overlay::runner::PollResult::Success(_) => (),
                         xr_overlay::runner::PollResult::UserNotPresent => {
                             drop(xr_ctx);
-                            tokio::time::sleep(Duration::from_secs(1)).await;
+                            // tokio::time::sleep(Duration::from_secs(1)).await;
                             continue;
                         }
                         xr_overlay::runner::PollResult::Exit
                         | xr_overlay::runner::PollResult::SessionLost => {
                             drop(xr_ctx);
-                            tokio::time::sleep(Duration::from_secs(10)).await;
+                            // tokio::time::sleep(Duration::from_secs(10)).await;
                             debug_assert_eq!(*OXR_STATE.lock().await, VRStatus::Inactive);
                             continue;
                         }
                         xr_overlay::runner::PollResult::Starting => {
                             drop(xr_ctx);
-                            tokio::time::sleep(Duration::from_millis(100)).await;
+                            // tokio::time::sleep(Duration::from_millis(100)).await;
                             continue;
                         }
                         xr_overlay::runner::PollResult::SuccessNoRender => {
                             drop(xr_ctx);
-                            tokio::time::sleep(Duration::from_secs(60)).await
+                            // tokio::time::sleep(Duration::from_secs(60)).await
                         }
                     }
                 } else {
@@ -169,7 +168,7 @@ async fn session_restart() {
         .lock()
         .await
         .replace(overlay_handle);
-    let _ = handle.run(false);
+    let _ = handle.run(true);
     update_status(VRStatus::Initialized).await;
 }
 fn openxr_callback(event: AppEvent) {
@@ -271,7 +270,7 @@ pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gam
         // RgbaTexture::new(1, 1, [brightness, 0, 0, 255].to_vec()),
         RgbaTexture::new(1, 1, [0, 0, 0, brightness].to_vec()),
     );
-    let _ = ctx.run(false);
+    let _ = ctx.run(true);
 }
 
 fn adjust_for_perceived_brightness(linear_percent: f64, gamma: f64) -> f64 {
