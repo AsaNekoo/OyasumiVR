@@ -20,6 +20,7 @@ static SYSINFO: LazyLock<Mutex<sysinfo::System>> =
     LazyLock::new(|| Mutex::new(sysinfo::System::new()));
 
 pub mod models;
+#[cfg(feature = "profiling")]
 pub mod profiling;
 pub mod serialization;
 pub mod sidecar_manager;
@@ -124,6 +125,7 @@ pub fn get_time() -> u64 {
 }
 
 pub async fn send_event<S: Serialize + Clone>(event: &str, payload: S) {
+    #[cfg(feature = "profiling")]
     profiling::register_event(event).await;
     let app_handle_guard = TAURI_APP_HANDLE.lock().await;
     let app_handle = app_handle_guard.as_ref().unwrap();

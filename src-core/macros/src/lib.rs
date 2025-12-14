@@ -3,11 +3,15 @@ extern crate quote;
 extern crate syn;
 
 use proc_macro::TokenStream;
+#[cfg(feature="profiling")]
 use quote::quote;
+#[cfg(feature="profiling")]
 use syn::{parse_macro_input, parse_str, ItemFn};
 
 #[proc_macro_attribute]
 pub fn command_profiling(_args: TokenStream, input: TokenStream) -> TokenStream {
+    #[cfg(feature="profiling")]
+    {
     let input_fn = parse_macro_input!(input as ItemFn);
 
     let ItemFn {
@@ -44,4 +48,9 @@ pub fn command_profiling(_args: TokenStream, input: TokenStream) -> TokenStream 
     };
 
     output.into()
+}
+#[cfg(not(feature="profiling"))]
+{
+    input
+}
 }

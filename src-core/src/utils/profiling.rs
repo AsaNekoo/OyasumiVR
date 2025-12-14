@@ -17,15 +17,15 @@ struct CommandInvocation {
 
 static INVOCATION_COUNT: LazyLock<Mutex<HashMap<String, u64>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
 static INVOCATION_TIMES: LazyLock<Mutex<HashMap<String, CommandInvocation>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
-static PROFILING_ENABLED: LazyLock<AtomicBool> = LazyLock::new(|| AtomicBool::new(false));
+static mut PROFILING_ENABLED:bool=false;
 static EVENT_COUNTER: LazyLock<Mutex<HashMap<String, u64>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
-
+#[cfg_attr(debug_assertions, allow(dead_code))]
 pub fn enable_profiling() {
     info!("[Core] [PROFILING] Profiling enabled!");
-    PROFILING_ENABLED.store(true, Ordering::Relaxed);
+    unsafe { PROFILING_ENABLED=true };
     tokio::task::spawn(async {
         loop {
-            if !PROFILING_ENABLED.load(Ordering::Relaxed) {
+            if !unsafe { PROFILING_ENABLED } {
                 break;
             }
             detect_dead_invocations().await;
@@ -39,7 +39,7 @@ pub fn enable_profiling() {
 // }
 
 pub async fn register_event(name: &str) {
-    if !PROFILING_ENABLED.load(Ordering::Relaxed) {
+    if !unsafe { PROFILING_ENABLED }{
         return;
     }
     let mut event_counter_guard = EVENT_COUNTER.lock().await;
@@ -50,7 +50,7 @@ pub async fn register_event(name: &str) {
 }
 
 pub async fn profile_command_start(name: &str) -> Option<String> {
-    if !PROFILING_ENABLED.load(Ordering::Relaxed) {
+    if !unsafe { PROFILING_ENABLED } {
         return None;
     }
     let name: String = name.to_string();
@@ -82,7 +82,7 @@ pub async fn profile_command_start(name: &str) -> Option<String> {
 }
 
 pub fn profile_command_finish(invocation_id: Option<String>) {
-    if invocation_id.is_none() || !PROFILING_ENABLED.load(Ordering::Relaxed) {
+    if invocation_id.is_none() || !unsafe { PROFILING_ENABLED } {
         return;
     }
     let invocation_id = invocation_id.unwrap();

@@ -325,10 +325,10 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     }
 
     // Start profiling if we're in debug mode
-    #[cfg(debug_assertions)]
-    {
-        utils::profiling::enable_profiling();
-    }
+    // #[cfg(debug_assertions)]
+    // {
+    //     utils::profiling::enable_profiling();
+    // }
     // Start profiling if the flag for it is set
     #[cfg(not(debug_assertions))]
     if globals::is_flag_set("ENABLE_PROFILING").await {

@@ -13,3 +13,5 @@ quote = "1.0"
 [dependencies.syn]
 version = "2.0.43"
 features = ["full"]
+[features]
+profiling=[]
