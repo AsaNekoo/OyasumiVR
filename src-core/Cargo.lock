@@ -4160,7 +4160,7 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=cb43ca44c4ea2e983acdfa88c2c7e59d764ba266#cb43ca44c4ea2e983acdfa88c2c7e59d764ba266"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=d3dc74e017764a1fe99c58f64ac667f3f3f54ad5#d3dc74e017764a1fe99c58f64ac667f3f3f54ad5"
 
 [[package]]
 name = "markup5ever"
@@ -5075,7 +5075,7 @@ checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 [[package]]
 name = "one_or_many_thin"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/one_or_many_thin?rev=a165c4749ad56a6a7097ad3bafe8d48ce5e7931d#a165c4749ad56a6a7097ad3bafe8d48ce5e7931d"
+source = "git+https://codeberg.org/sofoxe1/one_or_many_thin?rev=02c164739d0de2c56d4037b4c7d47000bd0619f6#02c164739d0de2c56d4037b4c7d47000bd0619f6"
 dependencies = [
  "thin-vec",
 ]
@@ -10460,7 +10460,7 @@ checksum = "3ae8337f8a065cfc972643663ea4279e04e7256de865aa66fe25cec5fb912d3f"
 [[package]]
 name = "xr_input"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=cb43ca44c4ea2e983acdfa88c2c7e59d764ba266#cb43ca44c4ea2e983acdfa88c2c7e59d764ba266"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=d3dc74e017764a1fe99c58f64ac667f3f3f54ad5#d3dc74e017764a1fe99c58f64ac667f3f3f54ad5"
 dependencies = [
  "log",
  "macros",
@@ -10469,9 +10469,8 @@ dependencies = [
 [[package]]
 name = "xr_overlay"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=cb43ca44c4ea2e983acdfa88c2c7e59d764ba266#cb43ca44c4ea2e983acdfa88c2c7e59d764ba266"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=d3dc74e017764a1fe99c58f64ac667f3f3f54ad5#d3dc74e017764a1fe99c58f64ac667f3f3f54ad5"
 dependencies = [
- "anyhow",
  "ash",
  "glam",
  "libmonado",

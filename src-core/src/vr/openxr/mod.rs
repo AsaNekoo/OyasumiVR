@@ -6,13 +6,23 @@ mod input;
 use log::{debug, info};
 use tokio::{spawn, sync::Mutex, task::spawn_blocking};
 use xr_overlay::{
-    RgbaTexture, input::InputHandler, model::AppContext, openxr::{Vector3f, Vulkan}, runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent}, utils::{QuaternionfExt, VecFExt}, xr::ReferenceSpaceT
+    input::InputHandler,
+    model::AppContext,
+    openxr::{Vector3f, Vulkan},
+    runner::{events::AppEvent, AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle},
+    utils::{QuaternionfExt, VecFExt},
+    xr::ReferenceSpaceT,
+    RgbaTexture,
 };
 
 use crate::{
     utils::send_event,
     vr::{
-        SLEEP_DETECTION_ENABLED, gesture_detector::GestureDetector, model::VRStatus, sleep_detector::SleepDetector
+        gesture_detector::GestureDetector,
+        model::VRStatus,
+        openxr::input::{check_user_activity, INPUT_CONTEXT},
+        sleep_detector::SleepDetector,
+        SLEEP_DETECTION_ENABLED,
     },
 };
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
@@ -21,31 +31,29 @@ pub static OXR_STATE: Mutex<VRStatus> = Mutex::const_new(VRStatus::Inactive);
 
 async fn get_ctx() -> AppContext<xr_overlay::openxr::Vulkan> {
     let ctx = loop {
-            let ctx = xr_overlay::xr::Init::default()
-                .disable_hand_tracking()
-                .sort_order(u16::MAX as u32)
-                .user_presence_support(false)
-                .with_app_name("Oyasumi VR");
-            // if let Some(ref app)=app{
-            //     ctx=ctx.with_instance(&unsafe { app.get_ctx() }.xr.instance);
-            // }
-            let ctx = ctx.init_overlay();
-            if let Err(xr_overlay::error::Error::RuntimeUnavalible) = ctx {
-                drop(ctx);
-                tokio::time::sleep(Duration::from_secs(10)).await;
-                continue;
-            } else {
-                break ctx.unwrap();
-            }
-        };
+        let ctx = xr_overlay::xr::Init::default()
+            .disable_hand_tracking()
+            .sort_order(u16::MAX as u32)
+            .user_presence_support(false)
+            .with_app_name("Oyasumi VR");
+        // if let Some(ref app)=app{
+        //     ctx=ctx.with_instance(&unsafe { app.get_ctx() }.xr.instance);
+        // }
+        let ctx = ctx.init_overlay();
+        if let Err(xr_overlay::error::Error::RuntimeUnavalible) = ctx {
+            drop(ctx);
+            tokio::time::sleep(Duration::from_secs(10)).await;
+            continue;
+        } else {
+            break ctx.unwrap();
+        }
+    };
     update_status(VRStatus::Initializing).await;
     ctx
 }
 fn get_overlay_info() -> OverlayCreateInfo {
     OverlayCreateInfo {
-        type_: xr_overlay::runner::OverlayCreateInfoType::Unmanaged {
-            size: [1., 1.],
-        },
+        type_: xr_overlay::runner::OverlayCreateInfoType::Unmanaged { size: [1., 1.] },
         spawn_visible: true,
         interactable: false,
         movable: false,
@@ -66,7 +74,7 @@ pub async fn init() {
         info!("[Init] connected to openxr");
 
         let mut runner = xr_overlay::runner::AppRunner::new(AppRunnerCreateInfo {
-            ctx,
+            ctx: ctx.clone(),
             space_type: ReferenceSpaceT::VIEW,
             callback: openxr_callback,
             input: None,
@@ -78,9 +86,19 @@ pub async fn init() {
             .await
             .replace(brightness_overlay_handle);
         OXR_HANDLE.set(Mutex::new(runner)).unwrap();
+        match input::get_input_handlers(ctx.clone()) {
+            Some(v) => *INPUT_CONTEXT.lock().await = Some(v),
+            None => log::warn!(
+                "failed to create input context, button pressing and mic mute will not work"
+            ),
+        };
         tokio::task::spawn(async {
             loop {
                 if *OXR_STATE.lock().await == VRStatus::Initialized {
+                    if check_user_activity(&mut INPUT_CONTEXT.lock().await.as_mut().unwrap().1).unwrap() {
+                        send_event("GESTURE_DETECTED", "").await;
+                        break;
+                    }
                     let mut xr_ctx = OXR_HANDLE.get().unwrap().lock().await;
                     match xr_ctx.run(false) {
                         xr_overlay::runner::PollResult::Success(_) => (),
@@ -89,7 +107,8 @@ pub async fn init() {
                             tokio::time::sleep(Duration::from_secs(1)).await;
                             continue;
                         }
-                        xr_overlay::runner::PollResult::Exit|xr_overlay::runner::PollResult::SessionLost => {
+                        xr_overlay::runner::PollResult::Exit
+                        | xr_overlay::runner::PollResult::SessionLost => {
                             drop(xr_ctx);
                             tokio::time::sleep(Duration::from_secs(10)).await;
                             debug_assert_eq!(*OXR_STATE.lock().await, VRStatus::Inactive);
@@ -113,23 +132,21 @@ pub async fn init() {
 
         tokio::task::spawn(async move {
             loop {
-                if unsafe{SLEEP_DETECTION_ENABLED}{
-                if *OXR_STATE.lock().await == VRStatus::Initialized {
-                    let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
-                    if let Some(posef) = ctx.get_hmd_posef(ReferenceSpaceT::STAGE) {
-                        let pos = posef.position;
-                        SLEEP_DETECTOR
-                            .lock()
-                            .await
-                            .log_pose(
-                                pos.to_vec3a().to_vec3(),
-                            )
-                            .await;
-                    } else {
-                    info!("[Core] Failed to get hmd Posef,sleep");
+                if unsafe { SLEEP_DETECTION_ENABLED } {
+                    if *OXR_STATE.lock().await == VRStatus::Initialized {
+                        let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
+                        if let Some(posef) = ctx.get_hmd_posef(ReferenceSpaceT::STAGE) {
+                            let pos = posef.position;
+                            SLEEP_DETECTOR
+                                .lock()
+                                .await
+                                .log_pose(pos.to_vec3a().to_vec3())
+                                .await;
+                        } else {
+                            info!("[Core] Failed to get hmd Posef,sleep");
+                        }
                     }
                 }
-            }
                 tokio::time::sleep(Duration::from_millis(300)).await;
             }
         });
@@ -140,10 +157,19 @@ pub async fn init() {
 async fn session_restart() {
     let mut handle = OXR_HANDLE.get().as_ref().unwrap().lock().await;
     let ctx = get_ctx().await;
+    match input::get_input_handlers(ctx.clone()) {
+        Some(v) => *INPUT_CONTEXT.lock().await = Some(v),
+        None => {
+            log::warn!("failed to create input context, button pressing and mic mute will not work")
+        }
+    };
     unsafe { handle.replace_ctx(xr_overlay::runner::SessionRestartInfo::NoInput { ctx }) };
     let overlay_handle = handle.add_overlay(get_overlay_info());
-    OXR_BRIGHTNES_OVERLAY_HANDLE.lock().await.replace(overlay_handle);
-    let _ =handle.run(false);
+    OXR_BRIGHTNES_OVERLAY_HANDLE
+        .lock()
+        .await
+        .replace(overlay_handle);
+    let _ = handle.run(false);
     update_status(VRStatus::Initialized).await;
 }
 fn openxr_callback(event: AppEvent) {
@@ -159,14 +185,14 @@ fn openxr_callback(event: AppEvent) {
         }
         AppEvent::Started => {
             log::debug!("[core] openxr ready");
-            spawn(   update_status(VRStatus::Initialized));
+            spawn(update_status(VRStatus::Initialized));
         }
         _ => (),
     });
 }
 async fn update_status(new_status: VRStatus) {
-    info!("[core] updating openxr status:{:?}",new_status);
-    if *OXR_STATE.lock().await==VRStatus::Initialized && new_status==VRStatus::Initializing{
+    info!("[core] updating openxr status:{:?}", new_status);
+    if *OXR_STATE.lock().await == VRStatus::Initialized && new_status == VRStatus::Initializing {
         unreachable!("possible race condition for update_status"); //panic instead of error since this is a logic error and need to be fixed
     }
     *OXR_STATE.lock().await = new_status.clone();
@@ -180,43 +206,47 @@ pub async fn stop_head_shake_detection() {
     }
 }
 pub async fn start_head_shake_detection() {
-    if *OXR_STATE.lock().await==VRStatus::Initialized{
-    let frame_time = (1000.
-        / OXR_HANDLE
-            .get()
-            .unwrap()
-            .lock()
-            .await
-            .current_refresh_rate() as f32) as u64;
-    tokio::task::spawn(async move {
-        *GESTURE_DETECTION_RUNNING.lock().await = true;
-        *ABORT_GESTURE_DETECTION.lock().await = false;
-        loop {
-            if *ABORT_GESTURE_DETECTION.lock().await {
-                break;
-            }
-            if *OXR_STATE.lock().await == VRStatus::Initialized {
-                let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
-                if let Some(posef) = ctx.get_hmd_posef(ReferenceSpaceT::STAGE) {
-                    let pos = posef.position;
-                    let quat = posef.orientation;
-                    GESTURE_DETECTOR
-                        .lock()
-                        .await
-                        .log_pose(
-                            [pos.x, pos.y, pos.z],
-                            [quat.x as f32, quat.y as f32, quat.z as f32, quat.w as f32],
-                        )
-                        .await;
-                } else {
-                    info!("[Core] Failed to get hmd Posef, head shake");
+    if *OXR_STATE.lock().await == VRStatus::Initialized {
+        let frame_time = (1000.
+            / OXR_HANDLE
+                .get()
+                .unwrap()
+                .lock()
+                .await
+                .current_refresh_rate() as f32) as u64;
+        tokio::task::spawn(async move {
+            *GESTURE_DETECTION_RUNNING.lock().await = true;
+            *ABORT_GESTURE_DETECTION.lock().await = false;
+            loop {
+                if *ABORT_GESTURE_DETECTION.lock().await {
+                    break;
                 }
+                if *OXR_STATE.lock().await == VRStatus::Initialized {
+                    if check_user_activity(&mut INPUT_CONTEXT.lock().await.as_mut().unwrap().1).unwrap() {
+                        send_event("GESTURE_DETECTED", "").await;
+                        break;
+                    }
+                    let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
+                    if let Some(posef) = ctx.get_hmd_posef(ReferenceSpaceT::STAGE) {
+                        let pos = posef.position;
+                        let quat = posef.orientation;
+                        GESTURE_DETECTOR
+                            .lock()
+                            .await
+                            .log_pose(
+                                [pos.x, pos.y, pos.z],
+                                [quat.x as f32, quat.y as f32, quat.z as f32, quat.w as f32],
+                            )
+                            .await;
+                    } else {
+                        info!("[Core] Failed to get hmd Posef, head shake");
+                    }
+                }
+                tokio::time::sleep(Duration::from_millis(frame_time)).await;
             }
-            tokio::time::sleep(Duration::from_millis(frame_time)).await;
-        }
-        *GESTURE_DETECTION_RUNNING.lock().await = false;
-    });
-}
+            *GESTURE_DETECTION_RUNNING.lock().await = false;
+        });
+    }
 }
 
 pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gamma: Option<f64>) {

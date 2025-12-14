@@ -15,7 +15,7 @@ use xr_overlay::{
     xr::ReferenceSpaceT,
 };
 use xr_overlay_cef::{CefOverlayCreateInfo, create_cef_overlay};
-pub const DEFAULT_BINDINGS_CONFIG: &str = include_str!("bindings_overwrite_default.toml");
+pub const DEFAULT_BINDINGS_CONFIG: &str = include_str!("../../bindings_overwrite_default.toml");
 pub static BINDING_FILE_PATH: LazyLock<PathBuf> =
     LazyLock::new(|| PathBuf::from("../../bindings_overwrite.toml"));
 use crate::{KILL, input::get_controller_create_info, killed, model::Overlay};
