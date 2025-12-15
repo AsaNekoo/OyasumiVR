@@ -233,10 +233,11 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     load_configs().await;
     // Set up app reference
     *TAURI_APP_HANDLE.lock().await = Some(app_handle.clone());
-    let window = app_handle.get_webview_window("main").unwrap();
+    
     // Open devtools if we're in debug mode
     #[cfg(debug_assertions)]
     {
+        let window = app_handle.get_webview_window("main").unwrap();
         window.open_devtools();
     }
     // Disable swipe navigation in main window
@@ -330,7 +331,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     //     utils::profiling::enable_profiling();
     // }
     // Start profiling if the flag for it is set
-    #[cfg(not(debug_assertions))]
+    #[cfg(all(not(debug_assertions),feature = "profiling"))]
     if globals::is_flag_set("ENABLE_PROFILING").await {
         utils::profiling::enable_profiling();
     }
