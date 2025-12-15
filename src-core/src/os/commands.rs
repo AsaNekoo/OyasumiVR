@@ -4,7 +4,6 @@ use super::audio_devices::device::AudioDeviceDto;
 use super::get_friendly_name_for_windows_power_policy;
 use super::models::Output;
 use super::models::WindowsPowerPolicy;
-use crate::globals::TAURI_APP_HANDLE;
 use crate::os::audio_devices::AudioDeviceDto;
 #[cfg(unix)]
 use crate::os::linux::audio::LINUX_AUDIO_DEVICE_MANAGER;
@@ -15,7 +14,6 @@ use log::error;
 #[cfg(windows)]
 use oyasumivr_shared::windows::is_elevated;
 use std::process::Command;
-use tauri_plugin_shell::ShellExt;
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 #[cfg(windows)]

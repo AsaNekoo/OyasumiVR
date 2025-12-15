@@ -110,7 +110,7 @@ impl GestureDetector {
         let mut flip=1.0;
         // Flip data if we're looking for a negative offset
         if offset < 0.0 {
-            flip=-1.0;
+            flip = -1.0;
             // data = data.iter().map(|x| -x).collect();
             offset *= -1.0;
         }

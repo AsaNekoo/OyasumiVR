@@ -94,7 +94,7 @@ impl SidecarManager {
             self._start_internal(false).await;
         }
     }
-
+    #[allow(dead_code)]
     pub async fn start(&mut self) -> u32 {
         self._start_internal(false).await
     }
@@ -178,7 +178,7 @@ impl SidecarManager {
     pub async fn is_active(&self) -> bool {
         *self.active.lock().await
     }
-
+    #[allow(dead_code)]
     // The sidecar process is running, and the sidecar has signalled it has started
     pub async fn has_started(&self) -> bool {
         *self.started.lock().await

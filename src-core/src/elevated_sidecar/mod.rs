@@ -16,7 +16,7 @@ pub static SIDECAR_GRPC_CLIENT: LazyLock<Mutex<Option<OyasumiElevatedSidecarClie
     LazyLock::new(Default::default);
      #[cfg(windows)]
 static SIDECAR_MANAGER: LazyLock<Mutex<Option<SidecarManager>>> = LazyLock::new(Default::default);
-
+#[cfg(windows)]
 pub async fn init() {
     #[cfg(windows)]
     {

@@ -154,6 +154,5 @@ pub async fn limit_frame_rate(app_id: u32, limits: Option<OVRFrameLimits>) {
         fs::write(game_conf_path, data).unwrap();
     } else {
         error!("[core] Unabled to limit frame rate: Failed to get home directory");
-        return;
     };
 }

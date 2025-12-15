@@ -80,10 +80,10 @@ pub async fn is_process_active(process: TrackedProcess) -> bool {
             .next()
             .is_some()
         {
-            return true;
+            true
         } else {
             active_guard.swap_remove(p);
-            return false;
+            false
         }
     } else {
         sysinfo_guard.refresh_processes_specifics(
@@ -94,12 +94,12 @@ pub async fn is_process_active(process: TrackedProcess) -> bool {
         let processes = sysinfo_guard
             .processes_by_exact_name(process.name())
             .collect::<Vec<_>>();
-        if processes.len() == 0 {
-            return false;
+        if processes.is_empty() {
+            false
         } else {
             //even if there is multiple processes matching the name as long as one of them is running sysinfo would return something
             active_guard.push((process, processes[0].pid()));
-            return true;
+            true
         }
     }
 }
@@ -168,6 +168,7 @@ pub async fn cli_sidecar_overlay_mode() -> models::OverlaySidecarMode {
         None => default,
     };
     // Determine the correct mode
+
     match mode {
         "dev" => models::OverlaySidecarMode::Dev,
         "release" => models::OverlaySidecarMode::Release,

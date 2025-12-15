@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use glam::{Quat, Vec3, Vec3A};
+use glam::Vec3;
 
 use crate::{
     utils::{get_time, send_event},

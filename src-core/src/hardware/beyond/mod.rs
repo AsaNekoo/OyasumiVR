@@ -1,3 +1,4 @@
+#![cfg_attr(unix, allow(unused_imports))]
 use std::sync::{atomic::{AtomicBool, Ordering}, LazyLock};
 
 use hidapi::{HidApi, HidDevice};
@@ -9,13 +10,14 @@ use crate::utils::send_event;
 pub mod commands;
 #[cfg(windows)]
 mod detector;
-
+#[cfg(windows)]
 const BIGSCREEN_VID: u16 = 0x35bd;
+#[cfg(windows)]
 const BEYOND_PID: u16 = 0x0101;
 
 static BSB_CONNECTED: LazyLock<AtomicBool> = LazyLock::new(|| AtomicBool::new(false));
 static BSB_DEVICE: LazyLock<Mutex<Option<HidDevice>>> = LazyLock::new(|| Mutex::new(None));
-
+#[cfg(windows)]
 pub async fn init() {
     tokio::spawn(async move {
         let mut api = match HidApi::new() {
@@ -67,7 +69,7 @@ pub async fn init() {
         }
     });
 }
-
+#[cfg(windows)]
 async fn on_bsb_plugged(api: &HidApi) {
     let device = match api.open(BIGSCREEN_VID, BEYOND_PID) {
         Ok(d) => d,
@@ -84,7 +86,7 @@ async fn on_bsb_plugged(api: &HidApi) {
     info!("[Core] Bigscreen Beyond connected");
     send_event("BIGSCREEN_BEYOND_CONNECTED", true).await;
 }
-
+#[cfg(windows)]
 async fn on_bsb_unplugged() {
     *BSB_DEVICE.lock().await = None;
     BSB_CONNECTED.store(false, Ordering::Relaxed);

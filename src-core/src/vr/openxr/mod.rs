@@ -1,16 +1,17 @@
 use std::{
-    sync::{LazyLock, OnceLock},
+    sync::{
+        LazyLock, OnceLock,
+    },
     time::Duration,
 };
 mod input;
 use log::{debug, info};
 use tokio::{spawn, sync::Mutex, task::spawn_blocking};
 use xr_overlay::{
-    input::InputHandler,
     model::AppContext,
-    openxr::{Vector3f, Vulkan},
+    openxr::Vector3f,
     runner::{events::AppEvent, AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle},
-    utils::{QuaternionfExt, VecFExt},
+    utils::VecFExt,
     xr::ReferenceSpaceT,
     RgbaTexture,
 };
@@ -40,8 +41,10 @@ async fn get_ctx() -> AppContext<xr_overlay::openxr::Vulkan> {
         //     ctx=ctx.with_instance(&unsafe { app.get_ctx() }.xr.instance);
         // }
         let ctx = ctx.init_overlay();
-        if let Err(xr_overlay::error::Error::RuntimeUnavalible) = ctx {
-            drop(ctx);
+        if let Err(_e) = ctx {
+            if !matches!(xr_overlay::error::Error::RuntimeUnavalible, _e) {
+                log::warn!("get_ctx {:?}", _e);
+            }
             tokio::time::sleep(Duration::from_secs(10)).await;
             continue;
         } else {
@@ -68,7 +71,7 @@ fn get_overlay_info() -> OverlayCreateInfo {
     }
 }
 pub async fn init() {
-    let _ = tokio::task::spawn(async {
+    tokio::task::spawn(async {
         let ctx = get_ctx().await;
 
         info!("[Init] connected to openxr");
@@ -95,32 +98,29 @@ pub async fn init() {
         tokio::task::spawn(async {
             loop {
                 if *OXR_STATE.lock().await == VRStatus::Initialized {
-                    if check_user_activity(&mut INPUT_CONTEXT.lock().await.as_mut().unwrap().1).unwrap() {
-                        send_event("GESTURE_DETECTED", "").await;
-                    }
                     let mut xr_ctx = OXR_HANDLE.get().unwrap().lock().await;
                     match xr_ctx.run(true) {
                         xr_overlay::runner::PollResult::Success(_) => (),
                         xr_overlay::runner::PollResult::UserNotPresent => {
                             drop(xr_ctx);
-                            // tokio::time::sleep(Duration::from_secs(1)).await;
+                            tokio::time::sleep(Duration::from_secs(1)).await;
                             continue;
                         }
                         xr_overlay::runner::PollResult::Exit
                         | xr_overlay::runner::PollResult::SessionLost => {
                             drop(xr_ctx);
-                            // tokio::time::sleep(Duration::from_secs(10)).await;
+                            tokio::time::sleep(Duration::from_secs(10)).await;
                             debug_assert_eq!(*OXR_STATE.lock().await, VRStatus::Inactive);
                             continue;
                         }
                         xr_overlay::runner::PollResult::Starting => {
                             drop(xr_ctx);
-                            // tokio::time::sleep(Duration::from_millis(100)).await;
+                            tokio::time::sleep(Duration::from_millis(100)).await;
                             continue;
                         }
                         xr_overlay::runner::PollResult::SuccessNoRender => {
                             drop(xr_ctx);
-                            // tokio::time::sleep(Duration::from_secs(60)).await
+                            tokio::time::sleep(Duration::from_secs(60)).await
                         }
                     }
                 } else {
@@ -131,6 +131,7 @@ pub async fn init() {
 
         tokio::task::spawn(async move {
             loop {
+                #[allow(clippy::collapsible_if)] //no????
                 if unsafe { SLEEP_DETECTION_ENABLED } {
                     if *OXR_STATE.lock().await == VRStatus::Initialized {
                         let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
@@ -156,31 +157,45 @@ pub async fn init() {
 async fn session_restart() {
     let mut handle = OXR_HANDLE.get().as_ref().unwrap().lock().await;
     let ctx = get_ctx().await;
+    debug!("got ctx");
     match input::get_input_handlers(ctx.clone()) {
         Some(v) => *INPUT_CONTEXT.lock().await = Some(v),
         None => {
             log::warn!("failed to create input context, button pressing and mic mute will not work")
         }
     };
+    debug!("got input");
     unsafe { handle.replace_ctx(xr_overlay::runner::SessionRestartInfo::NoInput { ctx }) };
+    debug!("ctx replaced");
     let overlay_handle = handle.add_overlay(get_overlay_info());
     OXR_BRIGHTNES_OVERLAY_HANDLE
         .lock()
         .await
         .replace(overlay_handle);
-    let _ = handle.run(true);
-    update_status(VRStatus::Initialized).await;
+    set_brightness(1.0, None).await;
+    println!("run");
+    // update_status(VRStatus::Initialized).await;
+    debug!("session restarted");
+
+    unsafe { RESTARTING = false };
 }
+//no need for atomic since vr is running on single thread
+static mut RESTARTING: bool = false;
 fn openxr_callback(event: AppEvent) {
     spawn_blocking(move || match event {
         AppEvent::SessionEnded | AppEvent::Killed => {
-            log::debug!("[core] openxr disconnected");
-            spawn(async {
-                update_status(VRStatus::Inactive).await;
-                unsafe { OXR_HANDLE.get().as_ref().unwrap().lock().await.drop_ctx() };
-                OXR_BRIGHTNES_OVERLAY_HANDLE.lock().await.take();
-                tokio::task::spawn(session_restart());
-            });
+            if !unsafe { RESTARTING } {
+                unsafe { RESTARTING = true };
+
+                log::debug!("[core] openxr disconnected");
+                spawn(async {
+                    INPUT_CONTEXT.lock().await.take();
+                    update_status(VRStatus::Inactive).await;
+                    unsafe { OXR_HANDLE.get().as_ref().unwrap().lock().await.drop_ctx() };
+                    OXR_BRIGHTNES_OVERLAY_HANDLE.lock().await.take();
+                    tokio::task::spawn(session_restart());
+                });
+            }
         }
         AppEvent::Started => {
             log::debug!("[core] openxr ready");
@@ -194,7 +209,7 @@ async fn update_status(new_status: VRStatus) {
     if *OXR_STATE.lock().await == VRStatus::Initialized && new_status == VRStatus::Initializing {
         unreachable!("possible race condition for update_status"); //panic instead of error since this is a logic error and need to be fixed
     }
-    *OXR_STATE.lock().await = new_status.clone();
+    *OXR_STATE.lock().await = new_status;
     send_event("VR_STATUS_UPDATE", new_status.to_string().to_uppercase()).await;
 }
 static ABORT_GESTURE_DETECTION: Mutex<bool> = Mutex::const_new(false);
@@ -217,11 +232,19 @@ pub async fn start_head_shake_detection() {
             *GESTURE_DETECTION_RUNNING.lock().await = true;
             *ABORT_GESTURE_DETECTION.lock().await = false;
             loop {
+                if let Some(handler) = INPUT_CONTEXT.lock().await.as_mut() {
+                    if check_user_activity(&mut handler.1).unwrap_or(false) {
+                        send_event("GESTURE_DETECTED", "").await;
+                    }
+                    break;
+                }
                 if *ABORT_GESTURE_DETECTION.lock().await {
                     break;
                 }
                 if *OXR_STATE.lock().await == VRStatus::Initialized {
-                    if check_user_activity(&mut INPUT_CONTEXT.lock().await.as_mut().unwrap().1).unwrap() {
+                    if check_user_activity(&mut INPUT_CONTEXT.lock().await.as_mut().unwrap().1)
+                        .unwrap()
+                    {
                         send_event("GESTURE_DETECTED", "").await;
                         break;
                     }
@@ -234,7 +257,7 @@ pub async fn start_head_shake_detection() {
                             .await
                             .log_pose(
                                 [pos.x, pos.y, pos.z],
-                                [quat.x as f32, quat.y as f32, quat.z as f32, quat.w as f32],
+                                [quat.x,quat.y, quat.z, quat.w],
                             )
                             .await;
                     } else {

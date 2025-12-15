@@ -1,7 +1,6 @@
 pub mod commands;
 
 use crate::utils::send_event;
-use crate::warn_unimplemented;
 use chrono::{Local, NaiveDateTime, TimeZone};
 use log::{debug, info, trace, warn};
 use serde::{Deserialize, Serialize};

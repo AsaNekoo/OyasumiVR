@@ -1,10 +1,9 @@
 #[cfg(windows)]
 use crate::elevated_sidecar::SIDECAR_GRPC_CLIENT;
 use crate::Models::elevated_sidecar::{
-    Empty, NvmlDevice, NvmlPowerManagementLimitRequest, NvmlSetPowerManagementLimitError,
+    NvmlDevice, NvmlSetPowerManagementLimitError,
     NvmlStatus,
 };
-use log::error;
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
@@ -52,6 +51,7 @@ pub async fn nvml_get_devices() -> Vec<NvmlDevice> {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg_attr(unix, allow(unused_variables))]
 pub async fn nvml_set_power_management_limit(
     uuid: String,
     power_limit: u32,

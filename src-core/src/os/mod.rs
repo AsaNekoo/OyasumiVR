@@ -7,11 +7,10 @@ mod sounds_gen;
 pub mod linux;
 #[cfg(windows)]
 use self::audio_devices::manager::AudioDeviceManager;
-use log::{error, info, warn};
+use log::error;
 use rodio::{source::Source, Decoder};
 use rodio::{OutputStream, Sink};
 use std::collections::HashMap;
-use std::env;
 #[cfg(windows)]
 use std::ffi::OsString;
 use std::fs::File;
@@ -21,7 +20,6 @@ use std::os::windows::ffi::OsStringExt;
 #[cfg(windows)]
 use std::slice;
 use std::sync::LazyLock;
-use std::time::Duration;
 #[cfg(windows)]
 use std::time::Duration;
 use tokio::sync::mpsc::Sender;
@@ -140,7 +138,7 @@ pub async fn init_sound_playback() {
         }
     });
 }
-
+#[cfg(windows)]
 /// Cleanup old batch files created by run_cmd_commands
 pub async fn cleanup_batch_files() {
     let temp_dir = env::temp_dir();

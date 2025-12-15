@@ -33,10 +33,7 @@ pub async fn set_lact_profile(profile: u32) -> Result<bool, SetMsiAfterburnerPro
             .enable_all()
             .build()
             .unwrap();
-        rt.block_on((async move |profile: u32| -> Result<
-            bool,
-            SetMsiAfterburnerProfileError,
-        > {
+        rt.block_on(async {
             match DaemonClient::connect().await {
                 Ok(v) => {
                     // LACT.lock().await.replace(SendWapper { inner: v });
@@ -59,7 +56,7 @@ pub async fn set_lact_profile(profile: u32) -> Result<bool, SetMsiAfterburnerPro
                     Err(SetMsiAfterburnerProfileError::ExeCannotExecute)
                 }
             }
-        })(profile))
+        })
     }
     if profile==0{
         return Ok(true);
