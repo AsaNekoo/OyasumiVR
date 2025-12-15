@@ -1,7 +1,5 @@
 use std::{
-    sync::{
-        LazyLock, OnceLock,
-    },
+    sync::{LazyLock, OnceLock},
     time::Duration,
 };
 mod input;
@@ -99,6 +97,7 @@ pub async fn init() {
             loop {
                 if *OXR_STATE.lock().await == VRStatus::Initialized {
                     let mut xr_ctx = OXR_HANDLE.get().unwrap().lock().await;
+
                     match xr_ctx.run(true) {
                         xr_overlay::runner::PollResult::Success(_) => (),
                         xr_overlay::runner::PollResult::UserNotPresent => {
@@ -232,33 +231,26 @@ pub async fn start_head_shake_detection() {
             *GESTURE_DETECTION_RUNNING.lock().await = true;
             *ABORT_GESTURE_DETECTION.lock().await = false;
             loop {
-                if let Some(handler) = INPUT_CONTEXT.lock().await.as_mut() {
-                    if check_user_activity(&mut handler.1).unwrap_or(false) {
-                        send_event("GESTURE_DETECTED", "").await;
-                    }
-                    break;
-                }
                 if *ABORT_GESTURE_DETECTION.lock().await {
                     break;
                 }
-                if *OXR_STATE.lock().await == VRStatus::Initialized {
-                    if check_user_activity(&mut INPUT_CONTEXT.lock().await.as_mut().unwrap().1)
-                        .unwrap()
-                    {
+                let mut ctx=OXR_HANDLE.get().as_ref().unwrap().lock().await;
+                let _ = ctx.run(false);
+                if let Some(handler) = INPUT_CONTEXT.lock().await.as_mut() {
+                    if check_user_activity(&mut handler.1).unwrap() {
+                        log::info!("button press detected");
                         send_event("GESTURE_DETECTED", "").await;
                         break;
                     }
-                    let ctx: &mut AppRunner = &mut *OXR_HANDLE.get().unwrap().lock().await;
+                }
+                if *OXR_STATE.lock().await == VRStatus::Initialized {
                     if let Some(posef) = ctx.get_hmd_posef(ReferenceSpaceT::STAGE) {
                         let pos = posef.position;
                         let quat = posef.orientation;
                         GESTURE_DETECTOR
                             .lock()
                             .await
-                            .log_pose(
-                                [pos.x, pos.y, pos.z],
-                                [quat.x,quat.y, quat.z, quat.w],
-                            )
+                            .log_pose([pos.x, pos.y, pos.z], [quat.x, quat.y, quat.z, quat.w])
                             .await;
                     } else {
                         info!("[Core] Failed to get hmd Posef, head shake");

@@ -129,6 +129,7 @@ pub fn get_input_handlers(
             .to_vec(),
         )
         .unwrap();
+    debug_assert!(!manager.actions().is_empty());
 
     // String:
     Some((mic_actions, manager))

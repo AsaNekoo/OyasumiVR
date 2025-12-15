@@ -33,7 +33,7 @@ impl GestureDetector {
             quaternion[1],
             quaternion[2],
         ));
-        let yaw = (2.0 * q.as_ref().imag().y.atan2(q.as_ref().scalar())).to_radians()
+        let yaw = (2.0 * q.as_ref().imag().y.atan2(q.as_ref().scalar())).to_degrees()
             + 180.0;
         // Log yaw event
         let event = YawEvent {
