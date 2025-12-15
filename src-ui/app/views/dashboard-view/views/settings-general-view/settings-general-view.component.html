@@ -213,7 +213,7 @@
           </div>
         </div>
       </div>
-
+      @if(is_windows){
       <div class="setting-category">
         <h2 translate>settings.general.lighthouseConsole.title</h2>
         <p [innerHTML]="'settings.general.lighthouseConsole.description' | translate"></p>
@@ -255,6 +255,7 @@
           }
         </div>
       </div>
+    }
 
       @if(is_windows){
       <div class="setting-category">
