@@ -2,7 +2,7 @@ use std::{
     fs,
     path::PathBuf,
     sync::{LazyLock, Mutex, OnceLock},
-    time::Duration,
+    time::{Duration, SystemTime},
 };
 
 use log::{info, trace};
@@ -18,8 +18,7 @@ use crate::{
     overlay_ipc::start_websocket_server,
     ui::serve_ui,
     vr::{
-        BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard,
-        start_vr,
+        BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, set_mic_state, show_dashboard, start_vr
     },
 };
 pub mod globals;
@@ -85,7 +84,7 @@ fn main() {
         disable_gpu: args.get(3).cloned().unwrap_or_default() == "--disable-gpu-acceleration",
     };
     if args.disable_gpu {
-        panic!("software rendering no in implemented");
+        panic!("software rendering is not implemented");
     }
     if args.core_grpc_port == 0 && args.core_pid == 0 {
         args.core_grpc_port = globals::CORE_GRPC_DEV_PORT;
@@ -127,6 +126,7 @@ static HANDLES: LazyLock<Mutex<Vec<tokio::task::JoinHandle<()>>>> = LazyLock::ne
 
 static CORE_CLIENT: OnceLock<tokio::sync::Mutex<OyasumiCoreClient<Channel>>> = OnceLock::new();
 async fn tokio_main() {
+    
     trace!("tokio_main");
     tokio::task::spawn(async {
         let pid = ARGS.get().as_ref().unwrap().core_pid as u32;
@@ -179,7 +179,7 @@ async fn tokio_main() {
         .main_frame()
         .unwrap()
         .load_url(Some(&(url.as_str()).into()));
-    std::thread::sleep(Duration::from_millis(20)); //this whole aplication is a one big race condition :3
+    std::thread::sleep(Duration::from_millis(20)); //this is how you fix race conditions :3
     OVERLAY.wait().inject_ipc(ws_port);
 
     let grpc_server_port = start_grpc_server().await;

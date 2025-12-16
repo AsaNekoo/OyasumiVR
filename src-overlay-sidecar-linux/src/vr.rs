@@ -7,20 +7,22 @@ use std::{
 
 use log::trace;
 use xr_overlay::{
-    openxr::Vector3f,
+    openxr::{Posef, Vector3f},
     runner::{
-        AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, ShowMode,
-        events::AppEvent,
+        AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, OverlayCreateInfo,
+        OverlayHandle, ShowMode, events::AppEvent,
     },
     xr::ReferenceSpaceT,
 };
 use xr_overlay_cef::{CefOverlayCreateInfo, create_cef_overlay};
+
 pub const DEFAULT_BINDINGS_CONFIG: &str = include_str!("../../bindings_overwrite_default.toml");
 pub static BINDING_FILE_PATH: LazyLock<PathBuf> =
     LazyLock::new(|| PathBuf::from("../../bindings_overwrite.toml"));
-use crate::{KILL, input::get_controller_create_info, killed, model::Overlay};
+use crate::{KILL, globals::textures, input::get_controller_create_info, killed, model::Overlay};
 pub static OVERLAY: OnceLock<Overlay> = OnceLock::new();
 pub static NOTIFICATION_OVERLAY: OnceLock<Overlay> = OnceLock::new();
+pub static MIC_MUTE_OVERLAY: OnceLock<OverlayHandle> = OnceLock::new();
 pub static XR_CTX: OnceLock<Arc<RwLock<AppRunner>>> = OnceLock::new();
 pub fn start_vr() -> Option<JoinHandle<()>> {
     trace!("start_vr");
@@ -102,6 +104,19 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             ..Default::default()
         },
     );
+    let mic_overlay = app.write().unwrap().add_overlay(OverlayCreateInfo {
+        type_: xr_overlay::runner::OverlayCreateInfoType::Unmanaged { size: [0.04,0.04] },
+        pos:Vector3f { x: -0., y: -0.12, z: -0.2 },
+        spawn_visible: true,
+        show_mode: ShowMode::default(),
+        name: Some("mic_mute".to_owned()),
+        reference_space: Some(ReferenceSpaceT::VIEW),
+        allow_visibility_switch:false,
+        movable:false,
+        interactable:false,
+        ..Default::default()
+    });
+    MIC_MUTE_OVERLAY.set(mic_overlay).unwrap();
     let delay = Duration::from_millis(500).as_millis() as f32
         / (1000. / app.read().unwrap().current_refresh_rate() as f32);
     app.write()
@@ -123,7 +138,6 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             })
             .is_ok()
     );
-
 
     Some(std::thread::spawn(move || {
         let frame_time = (1000. / app.write().unwrap().current_refresh_rate() as f32) as u64;
@@ -157,7 +171,6 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
                     break;
                 }
             }
-                
         }
     }))
 }
@@ -175,9 +188,13 @@ fn openxr_callback(event: AppEvent) {
             handle: _,
             frames_left: _,
         } => OVERLAY.get().as_ref().unwrap().hide_dashboard(),
-        AppEvent::OverlayVisibilityChangedLastInput { handle, visible, last_input }=>{
-            if visible && handle==OVERLAY.wait().xr_handle{
-                *SWITCH_HAND.lock().unwrap()=last_input.hand();
+        AppEvent::OverlayVisibilityChangedLastInput {
+            handle,
+            visible,
+            last_input,
+        } => {
+            if visible && handle == OVERLAY.wait().xr_handle {
+                *SWITCH_HAND.lock().unwrap() = last_input.hand();
             }
         }
         _ => (),
@@ -209,4 +226,17 @@ pub async fn hide_dashboard() {
         .write()
         .unwrap()
         .set_visible(OVERLAY.wait().xr_handle, false);
+}
+pub fn set_mic_state(mute:bool,alpha:f32,visible:bool){
+    trace!("set_mic_state:{{mute:{},alpha:{},visible:{}}}",mute,alpha,visible);
+    let mut guard=XR_CTX.get().as_ref().unwrap().write().unwrap();
+    let handle=MIC_MUTE_OVERLAY.wait();
+    guard.set_visible(*handle, visible);
+    if visible{
+        guard.set_raw_texture(*handle, match mute{
+            true => textures::MIC_MUTE.clone(),
+            false => textures::MIC_UNMUTE.clone(),
+        }, alpha, false);
+        
+    }
 }
