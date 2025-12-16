@@ -124,6 +124,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             .is_ok()
     );
 
+
     Some(std::thread::spawn(move || {
         let frame_time = (1000. / app.write().unwrap().current_refresh_rate() as f32) as u64;
         loop {
@@ -156,6 +157,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
                     break;
                 }
             }
+                
         }
     }))
 }

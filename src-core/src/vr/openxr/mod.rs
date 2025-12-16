@@ -56,9 +56,6 @@ fn get_overlay_info() -> OverlayCreateInfo {
     OverlayCreateInfo {
         type_: xr_overlay::runner::OverlayCreateInfoType::Unmanaged { size: [1., 1.] },
         spawn_visible: true,
-        interactable: false,
-        movable: false,
-        allow_visibility_switch: false,
         //make sure it's in front of the user
         pos: Vector3f {
             x: 0.0,
@@ -78,7 +75,6 @@ pub async fn init() {
             ctx: ctx.clone(),
             space_type: ReferenceSpaceT::VIEW,
             callback: openxr_callback,
-            input: None,
         });
         let brightness_overlay_handle = runner.add_overlay(get_overlay_info());
 
@@ -98,7 +94,7 @@ pub async fn init() {
                 if *OXR_STATE.lock().await == VRStatus::Initialized {
                     let mut xr_ctx = OXR_HANDLE.get().unwrap().lock().await;
 
-                    match xr_ctx.run(true) {
+                    match xr_ctx.run() {
                         xr_overlay::runner::PollResult::Success(_) => (),
                         xr_overlay::runner::PollResult::UserNotPresent => {
                             drop(xr_ctx);
@@ -235,7 +231,7 @@ pub async fn start_head_shake_detection() {
                     break;
                 }
                 let mut ctx=OXR_HANDLE.get().as_ref().unwrap().lock().await;
-                let _ = ctx.run(false);
+                let _ = ctx.run();
                 if let Some(handler) = INPUT_CONTEXT.lock().await.as_mut() {
                     if check_user_activity(&mut handler.1).unwrap() {
                         log::info!("button press detected");
@@ -283,9 +279,9 @@ pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gam
     ctx.set_raw_texture(
         overlay_handle.unwrap(),
         // RgbaTexture::new(1, 1, [brightness, 0, 0, 255].to_vec()),
-        RgbaTexture::new(1, 1, [0, 0, 0, brightness].to_vec()),
+        RgbaTexture::new(1, 1, [0, 0, 0, brightness].to_vec()),false
     );
-    let _ = ctx.run(true);
+    let _ = ctx.run();
 }
 
 fn adjust_for_perceived_brightness(linear_percent: f64, gamma: f64) -> f64 {
