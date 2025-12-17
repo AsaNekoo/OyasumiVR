@@ -55,15 +55,16 @@ pub struct Args {
 fn main() {
     unsafe { std::env::set_var("RUST_BACKTRACE", "1") };
 
-    env_logger::Builder::from_default_env()
+    env_logger::Builder::new()
         .filter_level(log::LevelFilter::Trace)
         .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
         .filter_module("xr_overlay", log::LevelFilter::Debug)
         .filter_module("tokio_tungstenite", log::LevelFilter::Warn)
         .filter_module("tungstenite", log::LevelFilter::Warn)
+        .parse_default_env()
         .init();
     trace!("args: {:?}", std::env::args());
-    trace!(
+    trace!(  
         "thread_id:{:?},pid:{:?}",
         std::thread::current().id(),
         std::process::id()

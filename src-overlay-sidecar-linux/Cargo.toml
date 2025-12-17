@@ -30,10 +30,16 @@ image = { version = "0.25.9", default-features = false, features = ["png"] }
 [build-dependencies]
 tonic-prost-build = "*"
 [profile.release]
-panic = "abort"   # Strip expensive panic clean-up logic
-codegen-units = 1 # Compile crates one after another so the compiler can optimize better
-lto = true        # Enables link to optimizations
+codegen-units = 64
 debug = true
+[profile.production]
+inherits = "release"
+panic = "abort"
+codegen-units = 1
+lto = true
+debug = false
+strip = true
+
 [profile.dev]
 opt-level = 1
 
