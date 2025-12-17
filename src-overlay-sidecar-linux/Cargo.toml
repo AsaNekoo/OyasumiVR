@@ -19,9 +19,9 @@ serde = { version = "1.0.228", features = ["derive"] }
 tokio-tungstenite = "0.28.0"
 futures-util = { version = "0.3.31", default-features = false }
 base64 = "0.22.1"
-xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="334094ed6f382f337674fb1d48f6e7e6d303bbf2",features = ["binding_config","action_last_input","graphics_shaders","apprunner_input"],default-features = false }
+xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="200e9400993c0fb38c2eee76809db9050e55a4ec",features = ["binding_config","action_last_input","graphics_shaders","apprunner_input","debug_internal_asserts"],default-features = false }
 # xr_overlay = { path="../../xr_overlay/core/" }
-xr_overlay_cef = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="334094ed6f382f337674fb1d48f6e7e6d303bbf2" }
+xr_overlay_cef = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="200e9400993c0fb38c2eee76809db9050e55a4ec" }
 hyper = "1.8.1"
 axum = { version = "0.8.7", features = ["http1", "http2", "tokio"], default-features = false }
 portpicker = "0.1.1"
@@ -33,7 +33,7 @@ tonic-prost-build = "*"
 panic = "abort"   # Strip expensive panic clean-up logic
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
 lto = true        # Enables link to optimizations
-strip = true      # Remove debug symbols
+debug = true
 [profile.dev]
 opt-level = 1
 

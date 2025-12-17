@@ -18,7 +18,8 @@ use crate::{
     overlay_ipc::start_websocket_server,
     ui::serve_ui,
     vr::{
-        BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, set_mic_state, show_dashboard, start_vr
+        BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, set_mic_state,
+        show_dashboard, start_vr,
     },
 };
 pub mod globals;
@@ -52,6 +53,8 @@ pub struct Args {
     disable_gpu: bool,
 }
 fn main() {
+    unsafe { std::env::set_var("RUST_BACKTRACE", "1") };
+
     env_logger::Builder::from_default_env()
         .filter_level(log::LevelFilter::Trace)
         .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
@@ -67,6 +70,7 @@ fn main() {
     );
     fs::write("/proc/self/oom_score_adj", "1000").ok();
     pointless_cef_thread_spawner();
+
     trace!(
         "main thread_id:{:?},pid:{:?}",
         std::thread::current().id(),
@@ -126,7 +130,6 @@ static HANDLES: LazyLock<Mutex<Vec<tokio::task::JoinHandle<()>>>> = LazyLock::ne
 
 static CORE_CLIENT: OnceLock<tokio::sync::Mutex<OyasumiCoreClient<Channel>>> = OnceLock::new();
 async fn tokio_main() {
-    
     trace!("tokio_main");
     tokio::task::spawn(async {
         let pid = ARGS.get().as_ref().unwrap().core_pid as u32;
