@@ -29,7 +29,7 @@
     "build:sidecar:overlay:core": "cd src-overlay-sidecar && dotnet publish -r win-x64 -c Release && cd ..",
     "build:sidecar:overlay:post": "node scripts/overlay-sidecar-post-build.js",
     "build_linux:sidecar:overlay": "run-p build:sidecar:overlay:ui build_linux:sidecar:overlay:core && run-s build_linux:sidecar:overlay:post",
-    "build_linux:sidecar:overlay:core": "cd src-overlay-sidecar-linux/ && cargo build --release && cd .. ",
+    "build_linux:sidecar:overlay:core": "cd src-overlay-sidecar-linux/ && cargo build --profile production  && cd .. ",
     "build_linux:sidecar:overlay:post": "node scripts/overlay-sidecar-post-build-linux.js",
     "format": "run-s format:eslint format:prettier",
     "format:eslint": "eslint --no-error-on-unmatched-pattern --fix \"src-ui/**/*.ts\" \"src-shared-ts/**/*.ts\" \"src-overlay-ui/**/*.ts\" \"scripts/**/*.ts\"",

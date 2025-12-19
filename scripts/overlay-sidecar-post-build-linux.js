@@ -3,7 +3,7 @@ import copy from 'recursive-copy';
 import { rimraf } from 'rimraf';
 
 async function main() {
-  const coreSourceFile = 'src-overlay-sidecar-linux/target/release/src-overlay-sidecar-linux';
+  const coreSourceFile = 'src-overlay-sidecar-linux/target/production/src-overlay-sidecar-linux';
   const coreTargetDirectory = 'src-core/target/release/resources/sidecars';
   await mkdirp(coreTargetDirectory);
   const coreTargetFile = 'src-core/target/release/resources/sidecars/oyasumivr-overlay-sidecar';
