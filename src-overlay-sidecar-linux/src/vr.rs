@@ -7,7 +7,7 @@ use std::{
 
 use log::trace;
 use xr_overlay::{
-    openxr::{Posef, Vector3f},
+    openxr::Vector3f,
     runner::{
         AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, OverlayCreateInfo,
         OverlayHandle, ShowMode, events::AppEvent,
@@ -67,11 +67,11 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
         y: -0.3,
         z: -0.6,
     };
-    let framerate = app.read().unwrap().current_refresh_rate() as u32;
+    let framerate = app.read().unwrap().current_refresh_rate() as u32/2;
     let overlay = create_cef_overlay(
         app.clone(),
         CefOverlayCreateInfo {
-            size: [0.6, 0.6],
+            size: [0.6, 0.6].into(),
             spawn_visible: true,
             interactable: true,
             movable: true,
@@ -94,7 +94,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
         CefOverlayCreateInfo {
             movable: false,
             interactable: false,
-            size: [0.5, 0.5],
+            size: [0.5, 0.5].into(),
             spawn_visible: true,
             pos: notifica_pos,
             framerate,
@@ -105,7 +105,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
         },
     );
     let mic_overlay = app.write().unwrap().add_overlay(OverlayCreateInfo {
-        type_: xr_overlay::runner::OverlayCreateInfoType::Unmanaged { size: [0.04,0.04] },
+        type_: xr_overlay::runner::OverlayCreateInfoType::Unmanaged { size: [0.04,0.04].into() },
         pos:Vector3f { x: -0., y: -0.12, z: -0.2 },
         spawn_visible: true,
         show_mode: ShowMode::default(),

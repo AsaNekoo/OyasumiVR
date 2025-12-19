@@ -1,4 +1,4 @@
-use std::{f32::consts::E, net::SocketAddr, time::Duration};
+use std::{net::SocketAddr, time::Duration};
 
 use log::{error, info};
 use tokio::{sync::Mutex, task::JoinHandle};

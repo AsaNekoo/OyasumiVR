@@ -2,7 +2,7 @@ use std::{
     fs,
     path::PathBuf,
     sync::{LazyLock, Mutex, OnceLock},
-    time::{Duration, SystemTime},
+    time::Duration,
 };
 
 use log::{info, trace};
@@ -18,7 +18,7 @@ use crate::{
     overlay_ipc::start_websocket_server,
     ui::serve_ui,
     vr::{
-        BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, set_mic_state,
+        BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY,
         show_dashboard, start_vr,
     },
 };
