@@ -18,8 +18,8 @@ use crate::{
     overlay_ipc::start_websocket_server,
     ui::serve_ui,
     vr::{
-        BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY,
-        show_dashboard, start_vr,
+        BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard,
+        start_vr,
     },
 };
 pub mod globals;
@@ -54,7 +54,11 @@ pub struct Args {
 }
 fn main() {
     unsafe { std::env::set_var("RUST_BACKTRACE", "1") };
-
+    let hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |e| {
+        std::fs::write(format!("overlay_panic_{}_{:?}.log",std::process::id(),std::thread::current().id()), format!("{:?}",e)).ok();
+        hook(e);
+    }));
     env_logger::Builder::new()
         .filter_level(log::LevelFilter::Trace)
         .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
@@ -64,7 +68,7 @@ fn main() {
         .parse_default_env()
         .init();
     trace!("args: {:?}", std::env::args());
-    trace!(  
+    trace!(
         "thread_id:{:?},pid:{:?}",
         std::thread::current().id(),
         std::process::id()
