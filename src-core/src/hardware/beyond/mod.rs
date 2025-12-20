@@ -1,4 +1,5 @@
 #![cfg_attr(unix, allow(unused_imports))]
+#![cfg(windows)]
 use std::sync::{atomic::{AtomicBool, Ordering}, LazyLock};
 
 use hidapi::{HidApi, HidDevice};

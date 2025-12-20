@@ -12,6 +12,7 @@ import { APP_SETTINGS_DEFAULT, AppSettings } from '../../../../../../models/sett
 import { hshrink } from '../../../../../../utils/animations';
 import { SET_BRIGHTNESS_OR_CCT_OPTIONS_DEFAULTS } from '../../../../../../services/brightness-control/brightness-control-models';
 import { HardwareBrightnessControlService } from '../../../../../../services/brightness-control/hardware-brightness-control.service';
+import { is_windows } from 'src-ui/app/app.module';
 
 const MIN_SAFE_FAN_SPEED = 40;
 const AUTOMATION_ENABLE_KEYS = ['onSleepEnable', 'onSleepDisable', 'onSleepPreparation'];
@@ -46,6 +47,7 @@ export class HmdAutomationsBigscreenBeyondTabComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    if (is_windows){
     this.automationConfigService.configs
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((configs) => {
@@ -57,6 +59,7 @@ export class HmdAutomationsBigscreenBeyondTabComponent implements OnInit {
       .subscribe((settings) => {
         this.appSettings = settings;
       });
+    }
   }
 
   async toggleFanAutomation(key: keyof BigscreenBeyondFanControlAutomationsConfig) {

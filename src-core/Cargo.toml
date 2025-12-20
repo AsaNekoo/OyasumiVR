@@ -37,7 +37,7 @@ discord-sdk = "0.4.0"
 enumset = "1.1.6"
 futures = "0.3.31"
 futures-util = "0.3.31"
-hidapi = "2.6.3"
+
 hyper = { version = "0.14.26", features = ["full"] }
 log = { version = "0.4.27", features = [ "release_max_level_debug"] }
 md5 = "0.8.0"
@@ -104,6 +104,7 @@ lact-client = { git = "https://github.com/ilya-zlobintsev/LACT", version = "0.8.
 pulseaudio = "0.3.0"
 xr_overlay = { git = "https://codeberg.org/sofoxe1/xr_overlay", version = "0.1.0",rev="4e84566e0cc9b81699588607e8ea001370ee9b7a",default-features = false,features = ["graphics","binding_config"]}
 [target.'cfg(target_os = "windows")'.dependencies]
+hidapi = "2.6.3"
 
 
 tempfile = "3.20.0"

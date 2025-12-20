@@ -26,30 +26,55 @@
       <div class="menu-item-icon-prefix"> <i class="material-icons-round">bedtime</i> </div>
       <div class="menu-item-label" translate>comp.dashboard-navbar.sleepDetection</div>
     </div>
+    @if (is_windows) {
+      <div
+        class="menu-item"
+        (click)="openSubMenu('HARDWARE')"
+        [class.active]="
+          pathIsActive([
+            'brightnessAutomations',
+            'powerAutomations',
+            'gpuAutomations',
+            'resolutionAutomations',
+            'audioVolumeAutomations',
+            'systemMicMuteAutomations',
 
-    <div
-      class="menu-item"
-      (click)="openSubMenu('HARDWARE')"
-      [class.active]="
-        pathIsActive([
-          'brightnessAutomations',
-          'powerAutomations',
-          'gpuAutomations',
-          'resolutionAutomations',
-          'audioVolumeAutomations',
-          'systemMicMuteAutomations',
-          'hmdAutomations',
-        ])
-      "
-    >
-      <div class="menu-item-icon-prefix">
-        <i class="material-symbols-outlined">head_mounted_device</i>
-      </div>
-      <div class="menu-item-label" translate>comp.dashboard-navbar.hardwareAutomations</div>
-      <div class="menu-item-submenu-icon"
-        ><i class="material-icons-round">arrow_forward_ios</i></div
+            'hmdAutomations',
+          ])
+        "
       >
-    </div>
+        <div class="menu-item-icon-prefix">
+          <i class="material-symbols-outlined">head_mounted_device</i>
+        </div>
+        <div class="menu-item-label" translate>comp.dashboard-navbar.hardwareAutomations</div>
+        <div class="menu-item-submenu-icon"
+          ><i class="material-icons-round">arrow_forward_ios</i></div
+        >
+      </div>
+    } @else {
+      <div
+        class="menu-item"
+        (click)="openSubMenu('HARDWARE')"
+        [class.active]="
+          pathIsActive([
+            'brightnessAutomations',
+            'powerAutomations',
+            'gpuAutomations',
+            'resolutionAutomations',
+            'audioVolumeAutomations',
+            'systemMicMuteAutomations',
+          ])
+        "
+      >
+        <div class="menu-item-icon-prefix">
+          <i class="material-symbols-outlined">head_mounted_device</i>
+        </div>
+        <div class="menu-item-label" translate>comp.dashboard-navbar.hardwareAutomations</div>
+        <div class="menu-item-submenu-icon"
+          ><i class="material-icons-round">arrow_forward_ios</i></div
+        >
+      </div>
+    }
 
     <div
       class="menu-item"
@@ -241,18 +266,25 @@
           <div class="active-effect" @fade></div>
         }
       </div>
-      <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'hmdAutomations'">
-        <div class="menu-item-icon-prefix">
-          <i class="material-symbols-outlined">head_mounted_device</i>
+      @if (is_windows) {
+        <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'hmdAutomations'">
+          <div class="menu-item-icon-prefix">
+            <i class="material-symbols-outlined">head_mounted_device</i>
+          </div>
+          <div class="menu-item-label" translate>comp.dashboard-navbar.hmdAutomations</div>
         </div>
-        <div class="menu-item-label" translate>comp.dashboard-navbar.hmdAutomations</div>
-      </div>
-      <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'audioVolumeAutomations'">
-        <div class="menu-item-icon-prefix">
-          <i class="material-icons-round">volume_up</i>
+        <div
+          class="menu-item"
+          [routerLinkActive]="'active'"
+          [routerLink]="'audioVolumeAutomations'"
+        >
+          <div class="menu-item-icon-prefix">
+            <i class="material-icons-round">volume_up</i>
+          </div>
+          <div class="menu-item-label" translate>comp.dashboard-navbar.audioVolumeAutomations</div>
         </div>
-        <div class="menu-item-label" translate>comp.dashboard-navbar.audioVolumeAutomations</div>
-      </div>
+      }
+
       <div
         class="menu-item"
         [routerLinkActive]="'active'"
