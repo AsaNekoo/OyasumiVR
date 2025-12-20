@@ -191,7 +191,7 @@ async fn session_restart() {
         .replace(overlay_handle);
     set_brightness(1.0, None).await;
     let _ = handle.run();
-    println!("run");
+    debug!("run");
     update_status(VRStatus::Initialized).await;
     debug!("session restarted");
 

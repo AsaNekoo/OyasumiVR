@@ -4170,7 +4170,7 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=354fd212d04c1c17e5eb891aba9bc36033dcac96#354fd212d04c1c17e5eb891aba9bc36033dcac96"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=4e84566e0cc9b81699588607e8ea001370ee9b7a#4e84566e0cc9b81699588607e8ea001370ee9b7a"
 
 [[package]]
 name = "markup5ever"
@@ -10483,7 +10483,7 @@ checksum = "3ae8337f8a065cfc972643663ea4279e04e7256de865aa66fe25cec5fb912d3f"
 [[package]]
 name = "xr_input"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=354fd212d04c1c17e5eb891aba9bc36033dcac96#354fd212d04c1c17e5eb891aba9bc36033dcac96"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=4e84566e0cc9b81699588607e8ea001370ee9b7a#4e84566e0cc9b81699588607e8ea001370ee9b7a"
 dependencies = [
  "log",
  "macros",
@@ -10492,7 +10492,7 @@ dependencies = [
 [[package]]
 name = "xr_overlay"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=354fd212d04c1c17e5eb891aba9bc36033dcac96#354fd212d04c1c17e5eb891aba9bc36033dcac96"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=4e84566e0cc9b81699588607e8ea001370ee9b7a#4e84566e0cc9b81699588607e8ea001370ee9b7a"
 dependencies = [
  "ash",
  "bitmask-enum",
