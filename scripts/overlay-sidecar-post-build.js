@@ -11,7 +11,6 @@ async function main() {
   const webTargetDirectory = 'src-core/resources/dotnet-sidecars/ui';
   await rimraf(webTargetDirectory);
   await mkdirp(webTargetDirectory);
-  await copy(webSourceDirectory, webTargetDirectory, { overwrite: true });
 }
 
 main().catch((e) => {

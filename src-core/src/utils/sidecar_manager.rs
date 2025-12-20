@@ -1,8 +1,8 @@
 use log::{error, info, warn};
+use std::sync::Arc;
 use std::time::Duration;
 use sysinfo::{Pid, ProcessRefreshKind, System};
 use tokio::sync::{mpsc, Mutex};
-use std::sync::Arc;
 const LAUNCH_RETRY_INTERVALS: [Duration; 9] = [
     Duration::from_millis(100),
     Duration::from_secs(1),
@@ -138,12 +138,47 @@ impl SidecarManager {
             }
         }
         #[cfg(unix)]
-        {
-            use std::fs;
+        let child = {
+            let cef_path = PathBuf::from("resources/sidecars/cef");
+            static START_LOCK: Mutex<()> = Mutex::const_new(());
+            const LINUX_CEF_DOWNLOAD: &str = include_str!("linux_download_cef.sh");
+            let g = START_LOCK.lock().await;
+            if !cef_path.exists() {
+                log::info!("downloading chromium embeded framework, this might take a while");
+                std::fs::write("/tmp/oyasumi_download_cef.sh", LINUX_CEF_DOWNLOAD).unwrap();
+                std::process::Command::new("bash")
+                    .arg("/tmp/oyasumi_download_cef.sh")
+                    .current_dir(fs::canonicalize(".").unwrap())
+                    .spawn()
+                    .unwrap()
+                    .wait()
+                    .unwrap();
+                fs::remove_file("/tmp/oyasumi_download_cef.sh").unwrap();
+                if !cef_path.exists() {
+                    std::fs::write("download_cef.sh", LINUX_CEF_DOWNLOAD).unwrap();
+                    panic!("failed to download cef saving download script to disk");
+                }
+            }
+            let cef_path = fs::canonicalize(cef_path).unwrap();
+            use std::{fs, path::PathBuf};
 
             exe_path = fs::canonicalize(exe_path).unwrap();
             exe_dir = fs::canonicalize(exe_dir).unwrap();
-        }
+            drop(g);
+            std::process::Command::new(exe_path)
+                .env("CEF_PATH", cef_path.clone().to_str().unwrap())
+                .env("LD_LIBRARY_PATH", cef_path.clone().to_str().unwrap())
+                .current_dir(&exe_dir)
+                .args(&args)
+                .spawn()
+                .unwrap_or_else(|err| {
+                    panic!(
+                        "Could not spawn command {:?} {:?}, in path:{:?},with args:{:?}",
+                        err, exe_file, exe_dir, args
+                    )
+                })
+        };
+        #[cfg(windows)]
         let child = std::process::Command::new(exe_path)
             .current_dir(&exe_dir)
             .args(&args)
@@ -253,9 +288,9 @@ impl SidecarManager {
                     let current_sidecar_pid =
                         { self_guard.sidecar_pid.lock().await.as_ref().map(|pid| *pid) };
                     s.refresh_processes_specifics(
-                        sysinfo::ProcessesToUpdate::Some(&[
-                            Pid::from_u32(current_sidecar_pid.unwrap_or_default()),
-                        ]),
+                        sysinfo::ProcessesToUpdate::Some(&[Pid::from_u32(
+                            current_sidecar_pid.unwrap_or_default(),
+                        )]),
                         true,
                         ProcessRefreshKind::nothing().without_tasks(),
                     );
