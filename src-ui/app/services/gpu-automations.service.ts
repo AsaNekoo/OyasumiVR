@@ -34,6 +34,7 @@ import {
   EventLogGpuPowerLimitChanged,
   EventLogMsiAfterburnerProfileSet,
 } from '../models/event-log-entry';
+import { SleepPreparationService } from './sleep-preparation.service';
 
 @Injectable({
   providedIn: 'root',
@@ -62,6 +63,7 @@ export class GpuAutomationsService {
     private automationConfig: AutomationConfigService,
     private nvml: NvmlService,
     private sleep: SleepService,
+    private sleep_preparation_service: SleepPreparationService,
     private sidecar: ElevatedSidecarService,
     private eventLog: EventLogService
   ) {
@@ -313,6 +315,12 @@ export class GpuAutomationsService {
         filter(([profile]) => profile > 0)
       )
       .subscribe(([profile, reason]) => this.setMSIAfterburnerProfile(profile, reason));
+    this.sleep_preparation_service.onSleepPreparation.subscribe(() => {
+      this.setMSIAfterburnerProfile(
+        this.currentMSIAfterburnerConfig.onSleepPreparation,
+        'SLEEP_PREPARATION'
+      );
+    });
   }
 
   async testMSIAfterburnerPathWhenNeeded() {
@@ -351,7 +359,7 @@ export class GpuAutomationsService {
 
   async setMSIAfterburnerProfile(
     index: number,
-    reason: 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED'
+    reason: 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED' | 'SLEEP_PREPARATION'
   ) {
     if (index < 1 || index > 5) {
       await error(`[GpuAutomations] Attempted to set invalid MSI Afterburner profile (${index})`);
@@ -449,6 +457,12 @@ export class GpuAutomationsService {
     await this.automationConfig.updateAutomationConfig<MSIAfterburnerAutomationConfig>(
       'MSI_AFTERBURNER',
       { onSleepDisableProfile: number }
+    );
+  }
+  async setMSIAfterburnerProfileOnSleepPreparation(number: number) {
+    await this.automationConfig.updateAutomationConfig<MSIAfterburnerAutomationConfig>(
+      'MSI_AFTERBURNER',
+      { onSleepPreparation: number }
     );
   }
 }

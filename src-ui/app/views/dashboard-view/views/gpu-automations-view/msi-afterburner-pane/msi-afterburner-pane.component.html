@@ -66,6 +66,24 @@
       </div>
       <div class="setting-row">
         <div class="setting-row-label" translate>
+          <span translate>gpu-automations.lact.sleepPreparation.title</span>
+          @if (is_windows) {
+            <span translate>gpu-automations.msiAfterburner.sleepPreparation.description</span>
+          } @else {
+            <span translate>gpu-automations.lact.sleepPreparation.description</span>
+          }
+        </div>
+        <div class="setting-row-action">
+          <app-select-box
+            type="SMALL"
+            [items]="profileOptions"
+            [selected]="onPrepareProfile"
+            (selectedChange)="changeProfile('ON_PREPARE', $event!)"
+          ></app-select-box>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-row-label" translate>
           <span translate>gpu-automations.msiAfterburner.sleepModeDisable.title</span>
           @if (is_windows) {
             <span translate>gpu-automations.msiAfterburner.sleepModeEnable.description</span>

@@ -25,7 +25,7 @@ import { is_windows } from 'src-ui/app/app.module';
   standalone: false,
 })
 export class MsiAfterburnerPaneComponent implements OnInit {
-  is_windows:boolean=true;
+  is_windows: boolean = true;
   msiAfterburnerStatus: ExecutableReferenceStatus = 'UNKNOWN';
   msiAfterburnerPathAlert?: {
     text: string;
@@ -52,6 +52,7 @@ export class MsiAfterburnerPaneComponent implements OnInit {
   ];
   onDisableProfile: SelectBoxItem = this.profileOptions[0];
   onEnableProfile: SelectBoxItem = this.profileOptions[0];
+  onPrepareProfile: SelectBoxItem = this.profileOptions[0];
 
   constructor(
     protected gpuAutomations: GpuAutomationsService,
@@ -65,11 +66,12 @@ export class MsiAfterburnerPaneComponent implements OnInit {
         this.config = config;
         this.onEnableProfile = this.profileOptions[config.onSleepEnableProfile];
         this.onDisableProfile = this.profileOptions[config.onSleepDisableProfile];
+        this.onPrepareProfile=this.profileOptions[config.onSleepPreparation];
       });
     this.gpuAutomations.msiAfterburnerStatus
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((status) => this.processMSIAfterburnerStatus(status));
-      this.is_windows=is_windows;
+    this.is_windows = is_windows;
   }
 
   processMSIAfterburnerStatus(status: ExecutableReferenceStatus) {
@@ -110,7 +112,7 @@ export class MsiAfterburnerPaneComponent implements OnInit {
     if (path && typeof path === 'string') await this.gpuAutomations.setMSIAfterburnerPath(path);
   }
 
-  changeProfile(event: 'ON_DISABLE' | 'ON_ENABLE', item: SelectBoxItem) {
+  changeProfile(event: 'ON_DISABLE' | 'ON_ENABLE' | 'ON_PREPARE', item: SelectBoxItem) {
     switch (event) {
       case 'ON_DISABLE':
         this.onDisableProfile = item;
@@ -119,6 +121,10 @@ export class MsiAfterburnerPaneComponent implements OnInit {
       case 'ON_ENABLE':
         this.gpuAutomations.setMSIAfterburnerProfileOnSleepEnable(parseInt(item.id));
         this.onEnableProfile = item;
+        break;
+      case 'ON_PREPARE':
+        this.gpuAutomations.setMSIAfterburnerProfileOnSleepPreparation(parseInt(item.id));
+        this.onPrepareProfile = item;
         break;
     }
   }

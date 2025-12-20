@@ -106,7 +106,8 @@ export class GpuAutomationMessageMonitor extends MessageMonitor {
             if (!gpuAutomationsEnabled || !sidecarRunning) return { error: false };
             if (
               msiAfterburnerConfig.onSleepEnableProfile === 0 &&
-              msiAfterburnerConfig.onSleepDisableProfile === 0
+              msiAfterburnerConfig.onSleepDisableProfile === 0 &&
+              msiAfterburnerConfig.onSleepPreparation == 0
             )
               return { error: false };
             if (

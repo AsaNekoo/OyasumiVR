@@ -191,6 +191,7 @@ export interface MSIAfterburnerAutomationConfig extends AutomationConfig {
   msiAfterburnerPath: string;
   onSleepEnableProfile: number;
   onSleepDisableProfile: number;
+  onSleepPreparation: number;
 }
 
 // SLEEP MODE AUTOMATIONS
@@ -957,6 +958,7 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
     msiAfterburnerPath: 'C:\\Program Files (x86)\\MSI Afterburner\\MSIAfterburner.exe',
     onSleepEnableProfile: 0,
     onSleepDisableProfile: 0,
+    onSleepPreparation:0,
   },
   BIGSCREEN_BEYOND_FAN_CONTROL: {
     enabled: true,

@@ -1182,6 +1182,10 @@
         "description": "Apply the following MSI Afterburner profile",
         "title": "When sleep mode is disabled"
       },
+        "sleepPreparation": {
+        "description": "Apply the following MSI profile",
+        "title": "When Preparing to sleep"
+      },
       "sleepModeEnable": {
         "description": "Apply the following MSI Afterburner profile",
         "title": "When sleep mode is enabled"
@@ -1193,6 +1197,10 @@
       "sleepModeDisable": {
         "description": "Apply the following LACT profile",
         "title": "When sleep mode is disabled"
+      },
+      "sleepPreparation": {
+        "description": "Apply the following LACT profile",
+        "title": "When Preparing to sleep"
       },
       "sleepModeEnable": {
         "description": "Apply the following LACT profile",
