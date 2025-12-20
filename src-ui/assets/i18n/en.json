@@ -656,6 +656,7 @@
         "windowsPowerPolicySet": {
           "reason": {
             "SLEEP_MODE_DISABLED": "As sleep mode was disabled",
+            "SLEEP_PREPARATION": "As you prepared to go to sleep",
             "SLEEP_MODE_ENABLED": "As sleep mode was enabled"
           },
           "title": "Windows Power Policy set to the ''{policy}'' plan"
@@ -1826,6 +1827,10 @@
       "sleepModeEnable": {
         "description": "Set the following Windows Power Policy",
         "title": "When sleep mode is enabled"
+      },
+      "sleepPrepare": {
+        "description": "Set the following Windows Power Policy",
+        "title": "When Preparing to sleep"
       }
     },
     "linuxPowerPolicy": {
@@ -1838,6 +1843,10 @@
       "sleepModeEnable": {
         "description": "Set the following Power Policy",
         "title": "When sleep mode is enabled"
+      },
+      "sleepPrepare": {
+        "description": "Set the following Power Policy",
+        "title": "When Preparing to sleep"
       },
       "provider":{
           "title":"provider",

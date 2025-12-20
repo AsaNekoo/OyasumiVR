@@ -268,7 +268,7 @@ export interface EventLogChaperoneFadeDistanceChanged extends EventLogBase {
 export interface EventLogWindowsPowerPolicySet extends EventLogBase {
   type: 'windowsPowerPolicySet';
   policyName: string;
-  reason: 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED';
+  reason: 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED'|'SLEEP_PREPARATION';
 }
 
 export interface EventLogMsiAfterburnerProfileSet extends EventLogBase {

@@ -48,6 +48,24 @@
     </div>
     <div class="setting-row">
       <div class="setting-row-label" translate>
+        <span translate>power-automations.windowsPowerPolicy.sleepPrepare.title</span>
+        @if (is_windows) {
+          <span translate>power-automations.windowsPowerPolicy.sleepPrepare.description</span>
+        } @else {
+          <span translate>power-automations.linuxPowerPolicy.sleepPrepare.description</span>
+        }
+      </div>
+      <div class="setting-row-action">
+        <app-select-box
+          type="SMALL"
+          [items]="policyOptions"
+          [selected]="onSleepPreparePolicy"
+          (selectedChange)="setPolicy('ON_PREPARE', $event!)"
+        ></app-select-box>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div class="setting-row-label" translate>
         <span translate>power-automations.windowsPowerPolicy.sleepModeDisable.title</span>
         @if (is_windows) {
           <span translate>power-automations.windowsPowerPolicy.sleepModeEnable.description</span>

@@ -30,7 +30,7 @@ export class WindowsService {
 
   public async setWindowsPowerPolicy(
     guid: string,
-    reason: 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED'
+    reason: 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED'|'SLEEP_PREPARATION'
   ): Promise<void> {
     guid = guid.toUpperCase();
     await invoke<void>('set_system_power_policy', { guid });

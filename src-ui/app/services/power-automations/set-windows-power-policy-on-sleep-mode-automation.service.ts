@@ -8,6 +8,7 @@ import {
 } from '../../models/automations';
 import { SleepService } from '../sleep.service';
 import { WindowsService } from '../windows.service';
+import { SleepPreparationService } from '../sleep-preparation.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,9 @@ export class SetWindowsPowerPolicyOnSleepModeAutomationService {
   onSleepModeEnableConfig: WindowsPowerPolicyOnSleepModeAutomationConfig = structuredClone(
     AUTOMATION_CONFIGS_DEFAULT.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_ENABLE
   );
+  onSleepModePrepareConfig: WindowsPowerPolicyOnSleepModeAutomationConfig = structuredClone(
+    AUTOMATION_CONFIGS_DEFAULT.WINDOWS_POWER_POLICY_ON_SLEEP_PREPARATION
+  );
   onSleepModeDisableConfig: WindowsPowerPolicyOnSleepModeAutomationConfig = structuredClone(
     AUTOMATION_CONFIGS_DEFAULT.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_DISABLE
   );
@@ -23,15 +27,24 @@ export class SetWindowsPowerPolicyOnSleepModeAutomationService {
   constructor(
     private automationConfig: AutomationConfigService,
     private windows: WindowsService,
-    private sleepMode: SleepService
+    private sleepMode: SleepService,
+    private sleepPrepare: SleepPreparationService
   ) {}
 
   async init() {
     this.automationConfig.configs.subscribe((configs) => {
       this.onSleepModeEnableConfig = configs.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_ENABLE;
+      this.onSleepModePrepareConfig = configs.WINDOWS_POWER_POLICY_ON_SLEEP_PREPARATION;
       this.onSleepModeDisableConfig = configs.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_DISABLE;
     });
-
+    this.sleepPrepare.onSleepPreparation.subscribe(async (_) => {
+      if (this.onSleepModePrepareConfig && this.onSleepModePrepareConfig.powerPolicy) {
+        await this.windows.setWindowsPowerPolicy(
+          this.onSleepModePrepareConfig.powerPolicy,
+          'SLEEP_PREPARATION'
+        );
+      }
+    });
     this.sleepMode.mode
       .pipe(
         skip(1) // Skip first value from initial load

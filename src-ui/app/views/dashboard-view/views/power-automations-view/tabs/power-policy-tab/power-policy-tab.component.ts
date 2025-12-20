@@ -20,29 +20,33 @@ import { invoke } from '@tauri-apps/api/core';
   standalone: false,
 })
 export class PowerPolicyTabComponent implements OnInit {
-  protected is_windows:boolean=false;
+  protected is_windows: boolean = false;
   protected policyOptions: SelectBoxItem[] = [
     {
       id: 'NONE',
       label: 'shared.common.none',
     },
   ];
-   protected policyProviders: SelectBoxItem[] = [
+  protected policyProviders: SelectBoxItem[] = [
     {
       id: 'NONE',
       label: 'shared.common.none',
     },
   ];
- protected policyProvider: SelectBoxItem =
+  protected policyProvider: SelectBoxItem =
     this.policyProviders.find(
-      (p) =>
-        p.id === AUTOMATION_CONFIGS_DEFAULT.LINUX_POWER_POLICY_PROVIDER.provider
+      (p) => p.id === AUTOMATION_CONFIGS_DEFAULT.LINUX_POWER_POLICY_PROVIDER.provider
     ) ?? this.policyOptions[0];
 
   protected onSleepModeEnablePolicy: SelectBoxItem =
     this.policyOptions.find(
       (p) =>
         p.id === AUTOMATION_CONFIGS_DEFAULT.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_ENABLE.powerPolicy
+    ) ?? this.policyOptions[0];
+  protected onSleepPreparePolicy: SelectBoxItem =
+    this.policyOptions.find(
+      (p) =>
+        p.id === AUTOMATION_CONFIGS_DEFAULT.WINDOWS_POWER_POLICY_ON_SLEEP_PREPARATION.powerPolicy
     ) ?? this.policyOptions[0];
 
   protected onSleepModeDisablePolicy: SelectBoxItem =
@@ -59,8 +63,8 @@ export class PowerPolicyTabComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    await check_windows
-    this.is_windows=is_windows;
+    await check_windows;
+    this.is_windows = is_windows;
     combineLatest([
       this.automationConfigService.configs,
       // Update options when the windows power policies are updated
@@ -88,28 +92,46 @@ export class PowerPolicyTabComponent implements OnInit {
           this.policyOptions.find(
             (p) => p.id === configs.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_ENABLE.powerPolicy
           ) ?? this.policyOptions[0];
-           this.policyProvider =
-          this.policyProviders.find(
-            (p) => p.id === configs.LINUX_POWER_POLICY_PROVIDER.provider
+        this.onSleepPreparePolicy =
+          this.policyOptions.find(
+            (p) => p.id === configs.WINDOWS_POWER_POLICY_ON_SLEEP_PREPARATION.powerPolicy
           ) ?? this.policyOptions[0];
+        this.policyProvider =
+          this.policyProviders.find((p) => p.id === configs.LINUX_POWER_POLICY_PROVIDER.provider) ??
+          this.policyOptions[0];
         this.onSleepModeDisablePolicy =
           this.policyOptions.find(
             (p) => p.id === configs.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_DISABLE.powerPolicy
           ) ?? this.policyOptions[0];
       });
     // Fetch the current windows power policies when loading this view
-    this.policyProviders=(await invoke<[string]>("get_power_policy_providers")).map((x)=> <SelectBoxItem>{
-      id: x,
-      label: x,
-    });
+    this.policyProviders = (await invoke<[string]>('get_power_policy_providers')).map(
+      (x) =>
+        <SelectBoxItem>{
+          id: x,
+          label: x,
+        }
+    );
     await this.windowsService.getPowerPolicies();
   }
 
-  async setPolicy(automation: 'ON_ENABLE' | 'ON_DISABLE', selectBoxItem: SelectBoxItem) {
+  async setPolicy(
+    automation: 'ON_ENABLE' | 'ON_DISABLE' | 'ON_PREPARE',
+    selectBoxItem: SelectBoxItem
+  ) {
     switch (automation) {
       case 'ON_ENABLE':
         await this.automationConfigService.updateAutomationConfig<WindowsPowerPolicyOnSleepModeAutomationConfig>(
           'WINDOWS_POWER_POLICY_ON_SLEEP_MODE_ENABLE',
+          {
+            enabled: selectBoxItem.id !== 'NONE',
+            powerPolicy: selectBoxItem.id === 'NONE' ? undefined : selectBoxItem.id,
+          }
+        );
+        break;
+      case 'ON_PREPARE':
+        await this.automationConfigService.updateAutomationConfig<WindowsPowerPolicyOnSleepModeAutomationConfig>(
+          'WINDOWS_POWER_POLICY_ON_SLEEP_PREPARATION',
           {
             enabled: selectBoxItem.id !== 'NONE',
             powerPolicy: selectBoxItem.id === 'NONE' ? undefined : selectBoxItem.id,
@@ -127,14 +149,13 @@ export class PowerPolicyTabComponent implements OnInit {
         break;
     }
   }
-  async setProvider(item:SelectBoxItem){
+  async setProvider(item: SelectBoxItem) {
     this.automationConfigService.updateAutomationConfig<LinuxPowerPolicyProvider>(
       'LINUX_POWER_POLICY_PROVIDER',
       {
-        provider: item.label.toString()
+        provider: item.label.toString(),
       }
     );
-    await invoke("set_power_policy_provider",{name:item.label});
-
+    await invoke('set_power_policy_provider', { name: item.label });
   }
 }
