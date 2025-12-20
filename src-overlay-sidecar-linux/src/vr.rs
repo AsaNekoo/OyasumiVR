@@ -16,9 +16,9 @@ use xr_overlay::{
 };
 use xr_overlay_cef::{CefOverlayCreateInfo, create_cef_overlay};
 
-pub const DEFAULT_BINDINGS_CONFIG: &str = include_str!("../../bindings_overwrite_default.toml");
+pub const DEFAULT_BINDINGS_CONFIG: &str = include_str!("../../bindings_config.toml");
 pub static BINDING_FILE_PATH: LazyLock<PathBuf> =
-    LazyLock::new(|| PathBuf::from("../../bindings_overwrite.toml"));
+    LazyLock::new(|| PathBuf::from("../../bindings_config.toml"));
 use crate::{KILL, globals::textures, input::get_controller_create_info, killed, model::Overlay};
 pub static OVERLAY: OnceLock<Overlay> = OnceLock::new();
 pub static NOTIFICATION_OVERLAY: OnceLock<Overlay> = OnceLock::new();

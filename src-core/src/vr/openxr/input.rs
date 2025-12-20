@@ -23,14 +23,14 @@ pub fn get_input_handlers(
     ctx: AppContext<Vulkan>,
 ) -> Option<(ProfilesMetaSwitchAction, InputHandler<Vulkan>)> {
     const DEFAULT_BINDINGS_CONFIG: &str =
-        include_str!("../../../../bindings_overwrite_default.toml");
+        include_str!("../../../../bindings_config.toml");
 
-        if  !PathBuf::from("bindings_overwrite_default.toml").exists()  &&!PathBuf::from("src-core").exists() {
-            fs::write("bindings_overwrite_default.toml", DEFAULT_BINDINGS_CONFIG).unwrap();
+        if  !PathBuf::from("bindings_config.toml").exists()  &&!PathBuf::from("src-core").exists() {
+            fs::write("bindings_config.toml", DEFAULT_BINDINGS_CONFIG).unwrap();
         }
     let config = match PathBuf::from("src-core").exists() {
         true => DEFAULT_BINDINGS_CONFIG.to_string(),
-        false => read_to_string("bindings_overwrite_default.toml").unwrap(),
+        false => read_to_string("bindings_config.toml").unwrap(),
     };
 
     let config = parse_config(config, Some(|k| ["main", "overlay"].contains(&k)));
