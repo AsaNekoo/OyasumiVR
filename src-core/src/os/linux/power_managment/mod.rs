@@ -2,19 +2,22 @@ use std::sync::LazyLock;
 
 use tokio::sync::Mutex;
 
-use crate::os::linux::power_managment::power_profile_daemon::PowerProfileDaemon;
+use crate::os::linux::power_managment::{power_profile_daemon::PowerProfileDaemon, tplctl::TLPCTL};
 pub static LINUX_POWER_POLICY_MANAGER: LazyLock<Mutex<LinuxPowerPolicyManager>> =
     LazyLock::new(|| Mutex::const_new(LinuxPowerPolicyManager::new()));
 mod power_profile_daemon;
+mod tplctl;
 #[allow(dead_code)]
 #[derive(Debug)]
 enum PowerPolicyProviderEnum {
     PowerProfileDaemon,
+    TLPCTL,
 }
 impl From<String> for PowerPolicyProviderEnum{
     fn from(value: String) -> Self {
         match value.as_str(){
             "powerprofilesctl"=>Self::PowerProfileDaemon,
+            "tlpctl"=>Self::TLPCTL,
             _=>panic!("unknown power policy provider: {}",value)
         }
     }
@@ -23,6 +26,7 @@ impl From<PowerPolicyProviderEnum> for String{
     fn from(value: PowerPolicyProviderEnum) -> Self {
         match value{
             PowerPolicyProviderEnum::PowerProfileDaemon => "powerprofilesctl",
+            PowerPolicyProviderEnum::TLPCTL => "tlpctl",
         }.to_string()
     }
 }
@@ -61,11 +65,15 @@ impl LinuxPowerPolicyManager {
         if PowerProfileDaemon.is_avalible(){
             providers.push(PowerPolicyProviderEnum::PowerProfileDaemon.into());
         }
+        if TLPCTL.is_avalible(){
+            providers.push(PowerPolicyProviderEnum::TLPCTL.into());
+        }
         providers
     }
     pub fn set_provider(&mut self,name:String){
         match PowerPolicyProviderEnum::from(name){
             PowerPolicyProviderEnum::PowerProfileDaemon => {self.provider=Box::new(PowerProfileDaemon)},
+            PowerPolicyProviderEnum::TLPCTL => {self.provider=Box::new(TLPCTL)},
         }
 
     }
