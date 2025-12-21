@@ -12,7 +12,7 @@ todo: https://github.com/sofoxe1/OyasumiVR/issues/1
 things that should work (open a bug if they don't):
 
 * software brigthness
-* sleep detection (both sleep detection and head shake are not linux specific but may behave differently due to agressive optimizations)
+* sleep detection (both sleep detection and head shake are not linux specific but may behave differently due to optimizations)
 * head shake detection
 * canceling sleep with a button press (currently all button+trigger+thumbstick)
 * slightly buggy overlay

@@ -47,3 +47,9 @@ export interface SleepModeDisableOnPlayerJoinOrLeaveAutomationSleepModeStatusCha
   event: 'join' | 'leave';
   displayName: string;
 }
+
+export enum SleepState{
+  Awake=1,
+  Preparing=2,
+  Sleeping=3,
+}

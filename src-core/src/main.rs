@@ -381,6 +381,7 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         vr::commands::vr_get_app_framelimit,
         vr::commands::vr_sleep_mode_check,
         vr::commands::vr_sleep_detection_enabled,
+        vr::commands::set_sleep_state,
         #[cfg(windows)]
         hardware::beyond::commands::bigscreen_beyond_is_connected,
         #[cfg(windows)]

@@ -3,6 +3,8 @@ import { BehaviorSubject, firstValueFrom, map, shareReplay, Subject } from 'rxjs
 import { AutomationConfigService } from './automation-config.service';
 import { listen } from '@tauri-apps/api/event';
 import { info } from '@tauri-apps/plugin-log';
+import { SleepState } from '../models/sleep-mode';
+import { invoke } from '@tauri-apps/api/core';
 
 const SLEEP_PREPARATION_TIMEOUT = 5000;
 
@@ -55,6 +57,7 @@ export class SleepPreparationService {
       (await firstValueFrom(this.sleepPreparationAvailable)) &&
       !this._sleepPreparationTimedOut.value
     ) {
+      invoke("set_sleep_state",{state:SleepState.Preparing});
       this._sleepPreparationTimedOut.next(true);
       this._onSleepPreparation.next();
       setTimeout(() => this._sleepPreparationTimedOut.next(false), SLEEP_PREPARATION_TIMEOUT);

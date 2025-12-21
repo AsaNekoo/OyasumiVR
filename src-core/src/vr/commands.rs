@@ -5,7 +5,7 @@ use super::openvr::{
 };
 #[cfg(windows)]
 use crate::globals::STEAM_APP_KEY;
-use crate::{vr::{SLEEP_DETECTION_ENABLED, model::{BindingOriginData, OVRDevice, OVRFrameLimits}}, warn_unimplemented};
+use crate::{vr::{SLEEP_DETECTION_ENABLED, model::{BindingOriginData, OVRDevice, OVRFrameLimits, SleepState}}, warn_unimplemented};
 #[cfg(windows)]
 use enumset::EnumSet;
 #[cfg(windows)]
@@ -16,7 +16,11 @@ use ovr::input::{InputString, InputValueHandle};
 use ovr_overlay as ovr;
 #[cfg(windows)]
 use substring::Substring;
-
+pub static mut SLEEP_STATE:SleepState=SleepState::Awake;
+#[tauri::command]
+pub async fn set_sleep_state(state:SleepState){
+    unsafe {SLEEP_STATE=state;}
+}
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn vr_set_app_framelimit(

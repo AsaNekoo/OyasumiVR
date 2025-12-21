@@ -12,7 +12,7 @@ import {
   startWith,
   Subject,
 } from 'rxjs';
-import { SleepModeStatusChangeReason } from '../models/sleep-mode';
+import { SleepModeStatusChangeReason, SleepState } from '../models/sleep-mode';
 import { SETTINGS_KEY_SLEEP_MODE, SETTINGS_STORE } from '../globals';
 import { SleepingPose } from '../models/sleeping-pose';
 import { uniq } from 'lodash';
@@ -109,8 +109,10 @@ export class SleepService {
   }
 
   async enableSleepMode(reason: SleepModeStatusChangeReason) {
-    invoke("vr_sleep_mode_check",{value:false});
+    
     if (this._mode.value) return;
+    await invoke("set_sleep_state",{state:SleepState.Sleeping});
+    await invoke("vr_sleep_mode_check",{value:false});
     reason.enabled = true;
     info(`[Sleep] Sleep mode enabled (reason=${reason.type})`);
     this.eventLog.logEvent({
@@ -128,7 +130,9 @@ export class SleepService {
   }
 
   async disableSleepMode(reason: SleepModeStatusChangeReason) {
+   
     if (!this._mode.value) return;
+     invoke("set_sleep_state",{state:SleepState.Awake});
     reason.enabled = false;
     info(`[Sleep] Sleep mode disabled (reason=${reason.type})`);
     this.eventLog.logEvent({

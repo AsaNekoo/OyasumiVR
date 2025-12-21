@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_repr::Deserialize_repr;
 use strum_macros::{Display, EnumIter, IntoStaticStr};
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -94,15 +95,14 @@ pub enum VRStatus {
 #[serde(rename_all = "camelCase")]
 pub struct SleepDetectorStateReport {
     pub distance_in_last_15_minutes: f32,
-    // pub distance_in_last_10_minutes: f32,
-    // pub distance_in_last_5_minutes: f32,
-    // pub distance_in_last_1_minute: f32,
     pub distance_in_last_10_seconds: f32,
-    // pub rotation_in_last_15_minutes: f32,
-    // pub rotation_in_last_10_minutes: f32,
-    // pub rotation_in_last_5_minutes: f32,
-    // pub rotation_in_last_1_minute: f32,
-    // pub rotation_in_last_10_seconds: f32,
     pub start_time: u64,
     pub last_log: u64,
+}
+#[derive(Deserialize_repr, PartialEq, Debug)]
+#[repr(u8)] 
+pub enum SleepState{
+    Awake=1,
+    Preparing=2,
+    Sleeping=3
 }

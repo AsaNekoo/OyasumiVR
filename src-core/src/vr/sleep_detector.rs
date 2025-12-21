@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{collections::VecDeque, time::Duration};
 
 use glam::Vec3;
 
@@ -7,114 +7,63 @@ use crate::{
     vr::model::SleepDetectorStateReport,
 };
 
+pub const SLEEP_DETECTOR_PERIOD:Duration=Duration::from_millis(300);
+const MAX_EVENT_AGE_MS: Duration = Duration::from_mins(15); // 15 minutes
 
-const MAX_EVENT_AGE_MS: u128 = 900000; // 15 minutes
 
-#[derive(Clone, Copy)]
-struct PoseEvent {
-    value: Vec3,
-}
-
-impl PoseEvent {
-    fn distance_to(&self, other: &PoseEvent) -> f32 {
-        self.value.distance(other.value)
-    }
- 
-}
 
 pub struct SleepDetector {
-    events: Vec<PoseEvent>,
-    events_timestamps:Vec<u64>,
+    disatnces: VecDeque<f32>,
+    last_pos:Vec3,
     distance_in_last_15_minutes: f32,
     distance_in_last_10_seconds: f32,
     start_time: u64,
     last_log: u64,
     next_state_report: u64,
 }
-
+const EVENT_COUNT:usize=(MAX_EVENT_AGE_MS.as_secs_f32()/SLEEP_DETECTOR_PERIOD.as_secs_f32()) as usize;
 impl SleepDetector {
     pub fn new() -> Self {
         Self {
-            events: Vec::with_capacity(
-                (Duration::from_millis(MAX_EVENT_AGE_MS as u64).as_secs_f32() / Duration::from_millis(250).as_secs_f32()) as usize+100,
-            ),
-            events_timestamps: Vec::with_capacity(
-                (Duration::from_millis(MAX_EVENT_AGE_MS as u64).as_secs_f32() / Duration::from_millis(250).as_secs_f32()) as usize+100,
-            ),
+            disatnces: VecDeque::with_capacity(EVENT_COUNT+1),
             distance_in_last_10_seconds: 0.0,
             distance_in_last_15_minutes: 0.0,
             start_time: 0,
             last_log: 0,
             next_state_report: 0,
+            last_pos: Vec3::default(),
         }
     }
 
-    pub async fn log_pose(&mut self, position: Vec3) {
+    pub async fn log_pose(&mut self, position: Option<Vec3>) {
         let now = get_time();
         // Add the event
-        let event = PoseEvent {
-            value: position,
-        };
-        self.events.push(event);
-        self.events_timestamps.push(now);
-        debug_assert_eq!(self.events.len(),self.events_timestamps.len());
-        // Remove old events
+        if let Some(position)=position{
+        self.disatnces.push_back(position.distance(self.last_pos));
+        self.last_pos=position;
+        }else {
+            self.disatnces.push_back(0.); //treat failed posef query as no movement
+        }
+        if self.disatnces.len()>EVENT_COUNT{
+            self.disatnces.pop_front();
+        }
 
 
         // Send a state report if it's been over a second since the last one
         if now > self.next_state_report {
-            let oldest_time = now - MAX_EVENT_AGE_MS as u64;
-            let old_event_count = self
-                .events_timestamps
-                .iter()
-                .take_while(|t| **t < oldest_time)
-                .count();
-            self.events.drain(..old_event_count);
-            self.events_timestamps.drain(..old_event_count);
             if now.saturating_sub(self.last_log) > 60000 {
                 self.start_time = now;
             }
-            self.distance_in_last_10_seconds = self.distance_in_window(now,10000, 0, 0.);
+            const LAST_10_SECS_EVENT_COUNT:usize=(Duration::from_secs(10).as_secs_f32()/SLEEP_DETECTOR_PERIOD.as_secs_f32()) as usize;
+            const LAST_15_MINS_EVENT_COUNT:usize=(Duration::from_mins(15).as_secs_f32()/SLEEP_DETECTOR_PERIOD.as_secs_f32()) as usize;
+            self.distance_in_last_10_seconds = self.disatnces.iter().rev().take(LAST_10_SECS_EVENT_COUNT).sum();
 
-            self.distance_in_last_15_minutes =
-                self.distance_in_window(now,900000, 10000, self.distance_in_last_10_seconds);
+            self.distance_in_last_15_minutes =self.disatnces.iter().rev().take(LAST_15_MINS_EVENT_COUNT).sum();
 
             self.last_log = now;
             self.next_state_report = now + 1000;
             self.send_state_report().await;
         }
-    }
-
-    fn distance_in_window(&mut self,now_ms:u64, window_ms: u64, prev_ms: u64, mut prev_v: f32) -> f32 {
-        let start_time = now_ms - window_ms;
-        let start_index = match self
-            .events_timestamps
-            .iter()
-            .enumerate()
-            .skip_while(|(_, t)| **t < start_time)
-            .map(|e| e.0)
-            .next()
-        {
-            Some(v) => v,
-            None => return prev_v,
-        };
-
-        let previous_count = match prev_ms == 0 {
-            true => 0,
-            false => {
-                let start_time_previous = now_ms - prev_ms;
-                self.events_timestamps
-                    .iter()
-                    .skip_while(|t| **t < start_time_previous)
-                    .count()
-            }
-        };
-        let events = &self.events[start_index..];
-        let events = &events[..(events.len() - previous_count)];
-        for events in events.windows(2) {
-            prev_v += events[0].distance_to(&events[1]);
-        }
-        prev_v
     }
 
 

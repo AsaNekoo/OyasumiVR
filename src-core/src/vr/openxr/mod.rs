@@ -18,11 +18,7 @@ use xr_overlay::{
 use crate::{
     utils::send_event,
     vr::{
-        gesture_detector::GestureDetector,
-        model::VRStatus,
-        openxr::input::{check_user_activity, INPUT_CONTEXT},
-        sleep_detector::SleepDetector,
-        SLEEP_DETECTION_ENABLED,
+        SLEEP_DETECTION_ENABLED, commands::SLEEP_STATE, gesture_detector::GestureDetector, model::{SleepState, VRStatus}, openxr::input::{INPUT_CONTEXT, check_user_activity}, sleep_detector::{SLEEP_DETECTOR_PERIOD, SleepDetector}
     },
 };
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
@@ -130,19 +126,18 @@ pub async fn init() {
         tokio::task::spawn(async move {
             loop {
                 #[allow(clippy::collapsible_if)] //no????
-                if unsafe { SLEEP_DETECTION_ENABLED } {
-                    if let Some(posef) =
-                        get_pose("sleep", &mut *OXR_HANDLE.wait().lock().await).await
-                    {
-                        let pos = posef.position;
-                        SLEEP_DETECTOR
-                            .lock()
-                            .await
-                            .log_pose(pos.to_vec3a().to_vec3())
-                            .await;
-                    }
+                if unsafe { SLEEP_DETECTION_ENABLED&&SLEEP_STATE!=SleepState::Sleeping} {
+                    SLEEP_DETECTOR
+                        .lock()
+                        .await
+                        .log_pose(
+                            get_pose("sleep", &mut *OXR_HANDLE.wait().lock().await)
+                                .await
+                                .map(|p| p.position.to_vec3a().to_vec3()),
+                        )
+                        .await;
                 }
-                tokio::time::sleep(Duration::from_millis(300)).await;
+                tokio::time::sleep(SLEEP_DETECTOR_PERIOD).await;
             }
         });
         debug!("[Init] openxr start (2)");
@@ -272,6 +267,8 @@ pub async fn start_head_shake_detection() {
                             .log_pose([pos.x, pos.y, pos.z], [quat.x, quat.y, quat.z, quat.w])
                             .await;
                     }
+                }else {
+                    break;
                 }
                 tokio::time::sleep(Duration::from_millis(frame_time)).await;
             }
