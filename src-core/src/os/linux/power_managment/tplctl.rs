@@ -5,7 +5,6 @@ pub struct TLPCTL;
 const PROFILES: [&str;3] = ["power-saver", "balanced", "performance"];
 impl PowerPolicyProvider for TLPCTL {
     fn is_avalible(&self) -> bool {
-        println!("{:?}", Command::new("tlpctl").spawn());
         Command::new("tlpctl").spawn().is_ok()
     }
     
