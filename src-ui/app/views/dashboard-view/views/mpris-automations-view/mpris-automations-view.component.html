@@ -1,0 +1,58 @@
+<div class="pane">
+  <div class="pane-title" translate>playbackAutomations.title</div>
+  <div class="pane-content">
+    <div class="setting-view-container">
+      <div class="setting-category">
+        <p translate>playbackAutomations.description</p>
+        <div class="settings">
+          <div class="setting-row">
+            <div class="setting-row-label" translate>
+              <span translate>resolution-automations.onSleepEnable.title</span>
+            </div>
+            <div class="setting-row-action">
+              <label class="switch-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="config.pause_on_sleep_enable"
+                  (change)="set_enabled('SLEEP_ENABLE', !config.pause_on_sleep_enable)"
+                />
+
+                <span class="switch-toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-row-label" translate>
+              <span translate>runAutomations.onSleepPreparation.title</span>
+            </div>
+            <div class="setting-row-action">
+              <label class="switch-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="config.pause_on_sleep_preparation"
+                  (change)="set_enabled('SLEEP_PREPARATION', !config.pause_on_sleep_preparation)"
+                />
+                <span class="switch-toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-row-label" translate>
+              <span translate>runAutomations.onSleepDisable.title</span>
+            </div>
+            <div class="setting-row-action">
+              <label class="switch-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="config.pause_on_sleep_disable"
+                  (change)="set_enabled('SLEEP_DISABLE', !config.pause_on_sleep_disable)"
+                />
+                <span class="switch-toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -262,6 +262,7 @@ import { TurnOffDevicesWhenChargingAutomationService } from './services/power-au
 import { VRCXService } from './services/vrcx.service';
 import { StoreSnapshotService } from './services/store-snapshot.service';
 import { SPLASH_MIN_DURATION } from './globals';
+import { MpriService } from './services/mpris.service';
 import { PlaybackAutomationsViewComponent } from './views/dashboard-view/views/mpris-automations-view/mpris-automations-view.component';
 
 [
@@ -277,9 +278,9 @@ import { PlaybackAutomationsViewComponent } from './views/dashboard-view/views/m
   localeUK,
   localeDE,
 ].forEach((locale) => registerLocaleData(locale));
-export var is_windows:boolean=true;
-export async function check_windows(){
-  is_windows=await invoke("is_windows");
+export var is_windows: boolean = true;
+export async function check_windows() {
+  is_windows = await invoke('is_windows');
 }
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -502,6 +503,7 @@ export class AppModule {
     private avatarContextService: AvatarContextService,
     private updateService: UpdateService,
     private messageCenterService: MessageCenterService,
+    private mprisService: MpriService,
     private frameLimiterService: FrameLimiterService,
     private deviceManagerService: DeviceManagerService,
     private storeSnapshotService: StoreSnapshotService,
@@ -555,7 +557,7 @@ export class AppModule {
     private vrchatGroupAutomationsService: VRChatGroupAutomationsService,
     private runAutomationsService: RunAutomationsService,
     // Hotfixes
-    private fbtAvatarReloadWorkaroundService: FBTAvatarReloadWorkaroundService,
+    private fbtAvatarReloadWorkaroundService: FBTAvatarReloadWorkaroundService
   ) {
     this.init();
   }
@@ -734,6 +736,7 @@ export class AppModule {
               'Initializing sleep mode automation (#10)',
               this.sleepModeDisableOnPlayerJoinLeaveAutomationService.init()
             ),
+            this.logInit('Initializing sleep mode automation (#11)', this.mprisService.init()),
             // Power automations
             this.logInit(
               'Initializing device power automations (SteamVR/OyasumiVR)',
