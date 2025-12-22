@@ -19,6 +19,7 @@ import { getCSSColorForCCT } from 'src-shared-ts/src/cct-utils';
 import { OpenVRService } from '../openvr.service';
 import { clamp } from '../../utils/number-utils';
 import { AppSettingsService } from '../app-settings.service';
+import { is_windows } from 'src-ui/app/app.module';
 
 @Injectable({
   providedIn: 'root',
@@ -44,6 +45,7 @@ export class CCTControlService {
   ) {}
 
   async init() {
+    if (is_windows){
     this.appSettingsService.settings.subscribe((settings) => {
       this.cctControlEnabled = settings.cctControlEnabled;
       if (!this.initialized) {
@@ -70,6 +72,7 @@ export class CCTControlService {
     await listen<number>('setColorTemperature', async (event) => {
       await this.setCCT(event.payload, { cancelActiveTransition: true });
     });
+  }
   }
 
   transitionCCT(

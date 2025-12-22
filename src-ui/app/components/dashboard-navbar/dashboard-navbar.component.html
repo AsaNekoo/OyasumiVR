@@ -396,6 +396,7 @@
         </div>
         <div class="menu-item-label" translate>comp.dashboard-navbar.settings.notifications</div>
       </div>
+      @if (is_windows){
       <div
         class="menu-item"
         [routerLinkActive]="'active'"
@@ -406,6 +407,7 @@
         </div>
         <div class="menu-item-label" translate>comp.dashboard-navbar.settings.brightnessCct</div>
       </div>
+    }
       <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="['settings', 'hotkeys']">
         <div class="menu-item-icon-prefix">
           <i class="material-icons-round">keyboard</i>

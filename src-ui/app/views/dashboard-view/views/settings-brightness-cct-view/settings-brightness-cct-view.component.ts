@@ -7,6 +7,7 @@ import { VALVE_INDEX_HARDWARE_BRIGHTNESS_CONTROL_DRIVER_BOUNDS } from '../../../
 import { BIGSCREEN_BEYOND_HARDWARE_BRIGHTNESS_CONTROL_DRIVER_BOUNDS } from '../../../../services/brightness-control/hardware-brightness-drivers/bigscreen-beyond-hardware-brightness-control-driver';
 import { SET_BRIGHTNESS_OR_CCT_OPTIONS_DEFAULTS } from '../../../../services/brightness-control/brightness-control-models';
 import { clamp } from '../../../../utils/number-utils';
+import { is_windows } from 'src-ui/app/app.module';
 
 @Component({
   selector: 'app-settings-brightness-cct-view',
@@ -24,11 +25,13 @@ export class SettingsBrightnessCctViewComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    if(is_windows){
     this.appSettingsService.settings
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((settings) => {
         this.appSettings = settings;
       });
+    }
   }
 
   get valveIndexMin() {
