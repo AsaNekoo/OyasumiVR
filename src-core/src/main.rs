@@ -366,9 +366,13 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         vr::commands::vr_status,
         vr::commands::vr_get_analog_gain,
         vr::commands::openvr_set_analog_gain,
+        #[cfg(windows)]
         vr::commands::vr_get_supersample_scale,
+        #[cfg(windows)]
         vr::commands::vr_set_supersample_scale,
+        #[cfg(windows)]
         vr::commands::openvr_get_fade_distance,
+        #[cfg(windows)]
         vr::commands::openvr_set_fade_distance,
         vr::commands::vr_set_image_brightness,
         vr::commands::vr_launch_binding_configuration,

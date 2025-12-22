@@ -13,6 +13,7 @@ import {
 } from 'rxjs';
 import { OpenVRService } from './openvr.service';
 import { EventLogChaperoneFadeDistanceChanged } from '../models/event-log-entry';
+import { is_windows } from '../app.module';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +27,7 @@ export class ChaperoneFadeDistanceAutomationService {
   ) {}
 
   async init() {
+    if (is_windows){
     this.sleepService.mode
       .pipe(skip(1), distinctUntilChanged())
       .subscribe((sleepMode) => this.onSleepModeChange(sleepMode));
@@ -39,6 +41,7 @@ export class ChaperoneFadeDistanceAutomationService {
         debounceTime(3000)
       )
       .subscribe(() => this.onHmdConnect());
+    }
   }
 
   private async onHmdConnect() {

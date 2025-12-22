@@ -109,42 +109,31 @@ pub async fn vr_get_analog_gain() -> Result<f32, String> {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 #[cfg_attr(unix, expect(unused_variables))]
+#[cfg(windows)]
 pub async fn vr_set_supersample_scale(supersample_scale: Option<f32>) -> Result<(), String> {
-    #[cfg(windows)]
     return super::supersampling::set_supersample_scale(supersample_scale).await;
-    #[cfg(unix)]
-    //fixme: add this feature to libmonado
-    Ok(())
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg(windows)]
 pub async fn vr_get_supersample_scale() -> Result<Option<f32>, String> {
-    #[cfg(windows)]
     return super::supersampling::get_supersample_scale().await;
-    #[cfg(unix)]
-     //fixme: add this feature to libmonado
-    Ok(None)
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 #[cfg_attr(unix, expect(unused_variables))]
+#[cfg(windows)]
 pub async fn openvr_set_fade_distance(fade_distance: f32) -> Result<(), String> {
-    #[cfg(windows)]
     return super::chaperone::set_fade_distance(fade_distance).await;
-    #[cfg(unix)]
-    Ok(())
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
+#[cfg(windows)]
 pub async fn openvr_get_fade_distance() -> Result<f32, String> {
-    #[cfg(windows)]
     return super::chaperone::get_fade_distance().await;
-    #[cfg(unix)]
-    //is chapperon a thing in openxr?
-    Ok(f32::INFINITY)
 }
 
 #[tauri::command]

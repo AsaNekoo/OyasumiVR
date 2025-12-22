@@ -60,7 +60,6 @@
             'brightnessAutomations',
             'powerAutomations',
             'gpuAutomations',
-            'resolutionAutomations',
             'audioVolumeAutomations',
             'systemMicMuteAutomations',
           ])
@@ -99,7 +98,7 @@
         ><i class="material-icons-round">arrow_forward_ios</i></div
       >
     </div>
-
+    @if(is_windows){
     <div
       class="menu-item"
       (click)="openSubMenu('MISCELLANEOUS')"
@@ -120,6 +119,27 @@
         ><i class="material-icons-round">arrow_forward_ios</i></div
       >
     </div>
+  }@else {
+    <div
+      class="menu-item"
+      (click)="openSubMenu('MISCELLANEOUS')"
+      [class.active]="
+        pathIsActive([
+          'nightmareDetection',
+          'frameLimitAutomations',
+          'runAutomations',
+        ])
+      "
+    >
+      <div class="menu-item-icon-prefix">
+        <i class="material-icons-round">build</i>
+      </div>
+      <div class="menu-item-label" translate>comp.dashboard-navbar.miscAutomations</div>
+      <div class="menu-item-submenu-icon"
+        ><i class="material-icons-round">arrow_forward_ios</i></div
+      >
+    </div>
+  }
 
     <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'shutdownAutomations'">
       <div class="menu-item-icon-prefix">
@@ -295,12 +315,14 @@
         </div>
         <div class="menu-item-label" translate>comp.dashboard-navbar.systemMicMuteAutomations</div>
       </div>
+      @if(is_windows){
       <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'resolutionAutomations'">
         <div class="menu-item-icon-prefix">
           <i class="material-icons-round">blur_on</i>
         </div>
         <div class="menu-item-label" translate>comp.dashboard-navbar.resolutionAutomations</div>
       </div>
+    }
     </div>
   }
 
@@ -313,12 +335,14 @@
           <div class="menu-header-label" translate>comp.dashboard-navbar.miscAutomations</div>
         </button>
       </div>
+      @if(is_windows){
       <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'chaperoneAutomations'">
         <div class="menu-item-icon-prefix">
           <i class="material-symbols-outlined">guardian</i>
         </div>
         <div class="menu-item-label" translate>comp.dashboard-navbar.chaperoneAutomations</div>
       </div>
+    }
       <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'nightmareDetection'">
         <div class="menu-item-icon-prefix">
           <i class="material-icons-round">notification_important</i>

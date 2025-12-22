@@ -13,6 +13,7 @@ import {
 } from 'rxjs';
 import { EventLogRenderResolutionChanged } from '../models/event-log-entry';
 import { OpenVRService } from './openvr.service';
+import { is_windows } from '../app.module';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +27,7 @@ export class RenderResolutionAutomationService {
   ) {}
 
   async init() {
+    if (is_windows){
     this.sleepService.mode
       .pipe(skip(1), distinctUntilChanged())
       .subscribe((sleepMode) => this.onSleepModeChange(sleepMode));
@@ -39,6 +41,7 @@ export class RenderResolutionAutomationService {
         debounceTime(3000)
       )
       .subscribe(() => this.onHmdConnect());
+    }
   }
 
   private async onSleepModeChange(sleepMode: boolean, logging = true) {
