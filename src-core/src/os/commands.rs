@@ -618,3 +618,29 @@ pub async fn is_elevation_security_disabled() -> bool {
     #[cfg(unix)]
     true
 }
+#[tauri::command]
+#[cfg(unix)]
+pub async fn pause_mpris_players() {
+    use mpris::PlayerFinder;
+
+     let players=match match PlayerFinder::new() {
+        Ok(v) => v,
+        Err(e) => {
+            log::error!("failed to connect to dbus: {:?}", e);
+            return;
+        }
+    }
+    .find_all()
+    {
+        Ok(v) => v,
+        Err(e) => {
+            log::error!("failed to find mpris compatible player: {:?}", e);
+            return;
+        }
+    };
+    for player in players{
+        if let Err(err)=player.pause(){
+            log::warn!("failed to pause: {:?} with: {:?}",player.bus_name(),err);
+        }
+    }
+}

@@ -419,6 +419,8 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         os::commands::set_hardware_mic_activivation_threshold,
         os::commands::is_vrchat_active,
         os::commands::is_elevation_security_disabled,
+        #[cfg(unix)]
+        os::commands::pause_mpris_players,
         osc::commands::osc_send_command,
         osc::commands::osc_valid_addr,
         osc::commands::start_osc_server,
