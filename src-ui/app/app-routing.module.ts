@@ -37,6 +37,7 @@ import { VRChatGroupAutomationsViewComponent } from './views/dashboard-view/view
 import { SettingsBrightnessCctViewComponent } from './views/dashboard-view/views/settings-brightness-cct-view/settings-brightness-cct-view.component';
 import { RunAutomationsViewComponent } from './views/dashboard-view/views/run-automations-view/run-automations-view.component';
 import { DeviceManagerViewComponent } from './views/dashboard-view/views/device-manager-view/device-manager-view.component';
+import { PlaybackAutomationsViewComponent } from './views/dashboard-view/views/mpris-automations-view/mpris-automations-view.component';
 
 const routes: Routes = [
   {
@@ -99,6 +100,10 @@ const routes: Routes = [
       {
         path: 'runAutomations',
         component: RunAutomationsViewComponent,
+      },
+      {
+        path: 'playbackAutomations',
+        component: PlaybackAutomationsViewComponent,
       },
       {
         path: 'brightnessAutomations',

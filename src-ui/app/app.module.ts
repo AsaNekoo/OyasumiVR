@@ -262,6 +262,7 @@ import { TurnOffDevicesWhenChargingAutomationService } from './services/power-au
 import { VRCXService } from './services/vrcx.service';
 import { StoreSnapshotService } from './services/store-snapshot.service';
 import { SPLASH_MIN_DURATION } from './globals';
+import { PlaybackAutomationsViewComponent } from './views/dashboard-view/views/mpris-automations-view/mpris-automations-view.component';
 
 [
   localeEN,
@@ -388,6 +389,7 @@ export function createTranslateLoader(http: HttpClient) {
     PlayerListPresetModalComponent,
     PlayerCountSleepVisualizationComponent,
     JoinNotificationsViewComponent,
+    PlaybackAutomationsViewComponent,
     PlayerListComponent,
     MqttConfigModalComponent,
     SleepDetectionDetectionTabComponent,

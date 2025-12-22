@@ -48,6 +48,7 @@ export type AutomationType =
   | 'BIGSCREEN_BEYOND_FAN_CONTROL'
   | 'BIGSCREEN_BEYOND_RGB_CONTROL'
   | 'VRCHAT_GROUP_AUTOMATIONS'
+  | 'PLAYBACK_AUTOMATIONS'
   | 'RUN_AUTOMATIONS';
 
 export interface AutomationConfigs {
@@ -77,6 +78,7 @@ export interface AutomationConfigs {
   CHAPERONE_FADE_DISTANCE_ON_SLEEP_MODE_DISABLE: ChaperoneFadeDistanceOnSleepModeAutomationConfig;
 
   // AUDIO & COMMUNICATION
+  PLAYBACK_AUTOMATIONS:PlaybackAutomationConfig;
   AUDIO_DEVICE_AUTOMATIONS: AudioDeviceAutomationsConfig;
   SYSTEM_MIC_MUTE_AUTOMATIONS: SystemMicMuteAutomationsConfig;
   JOIN_NOTIFICATIONS: JoinNotificationsAutomationsConfig;
@@ -394,7 +396,11 @@ export interface SetAudioVolumeAutomation extends BaseAudioVolumeAutomation {
   type: 'SET_VOLUME';
   volume: number;
 }
-
+export interface PlaybackAutomationConfig extends AutomationConfig{
+  pause_on_sleep_enable:boolean,
+  pause_on_sleep_disable:boolean,
+  pause_on_sleep_preparation:boolean,
+}
 export interface AudioDeviceAutomationsConfig extends AutomationConfig {
   onSleepEnableAutomations: AudioVolumeAutomation[];
   onSleepDisableAutomations: AudioVolumeAutomation[];
@@ -958,7 +964,7 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
     msiAfterburnerPath: 'C:\\Program Files (x86)\\MSI Afterburner\\MSIAfterburner.exe',
     onSleepEnableProfile: 0,
     onSleepDisableProfile: 0,
-    onSleepPreparation:0,
+    onSleepPreparation: 0,
   },
   BIGSCREEN_BEYOND_FAN_CONTROL: {
     enabled: true,
@@ -980,7 +986,13 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
     onSleepPreparationRgb: [128, 0, 0],
   },
   LINUX_POWER_POLICY_PROVIDER: {
-    enabled:true,
-    provider:"powerprofilesctl"
+    enabled: true,
+    provider: "powerprofilesctl"
+  },
+  PLAYBACK_AUTOMATIONS:{
+    pause_on_sleep_enable: false,
+    pause_on_sleep_disable: false,
+    pause_on_sleep_preparation: false,
+    enabled: true //not used
   }
 };

@@ -235,6 +235,7 @@
       "powerAutomations": "Power Automations",
       "resolutionAutomations": "Resolution Automations",
       "runAutomations": "Run Automations",
+      "playbackAutomations": "Playback Automations",
       "settings": {
         "advanced": "Advanced Settings",
         "brightnessCct": "Brightness & CCT Settings",
@@ -1886,6 +1887,10 @@
       "title": "Change the render resolution to"
     },
     "title": "Resolution Automations"
+  },
+  "playbackAutomations":{
+    "title": "Playback Automations",
+    "description": "OyasumiVR can automatically pause mrpis compatible players"
   },
   "runAutomations": {
     "commandsToRun": "Commands to run",
