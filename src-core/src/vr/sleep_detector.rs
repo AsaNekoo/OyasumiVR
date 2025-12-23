@@ -55,13 +55,14 @@ impl SleepDetector {
                 self.start_time = now;
             }
             const LAST_10_SECS_EVENT_COUNT:usize=(Duration::from_secs(10).as_secs_f32()/SLEEP_DETECTOR_PERIOD.as_secs_f32()) as usize;
-            const LAST_15_MINS_EVENT_COUNT:usize=(Duration::from_mins(15).as_secs_f32()/SLEEP_DETECTOR_PERIOD.as_secs_f32()) as usize;
+            // const LAST_15_MINS_EVENT_COUNT:usize=(Duration::from_mins(15).as_secs_f32()/SLEEP_DETECTOR_PERIOD.as_secs_f32()) as usize;
             self.distance_in_last_10_seconds = self.disatnces.iter().rev().take(LAST_10_SECS_EVENT_COUNT).sum();
 
-            self.distance_in_last_15_minutes =self.disatnces.iter().rev().take(LAST_15_MINS_EVENT_COUNT).sum();
+            // self.distance_in_last_15_minutes =self.disatnces.iter().rev().take(LAST_15_MINS_EVENT_COUNT).sum();
+            self.distance_in_last_15_minutes =self.disatnces.iter().sum();
 
             self.last_log = now;
-            self.next_state_report = now + 1000;
+            self.next_state_report = now + 30000;
             self.send_state_report().await;
         }
     }
