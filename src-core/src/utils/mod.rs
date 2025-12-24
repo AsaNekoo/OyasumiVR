@@ -42,28 +42,28 @@ impl TrackedProcess {
     }
 }
 pub async fn init() {
-    tokio::task::spawn(watch_vrchat_process());
+    // tokio::task::spawn(watch_vrchat_process());
 }
 pub static VRCHAT_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 
-async fn watch_vrchat_process() {
-    loop {
-        {
-            let res = crate::utils::is_process_active(crate::utils::TrackedProcess::Vrchat).await;
-            let mut vrc_active = VRCHAT_ACTIVE.lock().await;
-            if *vrc_active != res {
-                *vrc_active = res;
-                crate::utils::send_event("VRCHAT_PROCESS_ACTIVE", res).await;
-                if res {
-                    info!("[Core] Detected VRChat process has started");
-                } else {
-                    info!("[Core] Detected VRChat process has stopped");
-                }
-            }
-        }
-        tokio::time::sleep(Duration::from_secs(1)).await;
-    }
-}
+// async fn watch_vrchat_process() {
+//     loop {
+//         {
+//             let res = crate::utils::is_process_active(crate::utils::TrackedProcess::Vrchat).await;
+//             let mut vrc_active = VRCHAT_ACTIVE.lock().await;
+//             if *vrc_active != res {
+//                 *vrc_active = res;
+//                 crate::utils::send_event("VRCHAT_PROCESS_ACTIVE", res).await;
+//                 if res {
+//                     info!("[Core] Detected VRChat process has started");
+//                 } else {
+//                     info!("[Core] Detected VRChat process has stopped");
+//                 }
+//             }
+//         }
+//         tokio::time::sleep(Duration::from_secs(1)).await;
+//     }
+// }
 pub async fn is_process_active(process: TrackedProcess) -> bool {
     static ACTIVE_PROCESS: Mutex<Vec<(TrackedProcess, Pid)>> = Mutex::const_new(Vec::new());
     let mut sysinfo_guard = SYSINFO.lock().await;
