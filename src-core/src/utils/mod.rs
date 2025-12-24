@@ -1,10 +1,10 @@
-use log::{error, info};
+use log::error;
 use serde::Serialize;
 use std::ffi::OsStr;
 #[cfg(windows)]
 use std::os::raw::c_char;
 use std::sync::LazyLock;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 #[cfg(windows)]
 use std::{ffi::OsStr, sync::LazyLock, time::Duration};
 use sysinfo::{Pid, ProcessRefreshKind, ProcessesToUpdate, Signal};
@@ -52,7 +52,7 @@ impl TrackedProcess {
 pub async fn init() {
     // tokio::task::spawn(watch_vrchat_process());
 }
-pub static VRCHAT_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
+// pub static VRCHAT_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 
 // async fn watch_vrchat_process() {
 //     loop {

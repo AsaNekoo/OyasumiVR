@@ -7,7 +7,7 @@ use super::models::WindowsPowerPolicy;
 use crate::os::audio_devices::AudioDeviceDto;
 #[cfg(unix)]
 use crate::os::linux::audio::LINUX_AUDIO_DEVICE_MANAGER;
-use crate::utils::VRCHAT_ACTIVE;
+// use crate::utils::VRCHAT_ACTIVE;
 #[cfg(unix)]
 use crate::warn_unimplemented;
 use log::error;
@@ -48,13 +48,13 @@ pub async fn quit_steamvr(kill: bool) {
     crate::utils::quit_steamvr(kill).await;
 }
 
-#[tauri::command]
-#[oyasumivr_macros::command_profiling]
-pub async fn is_vrchat_active() -> bool {
-    let vrc_active_guard = VRCHAT_ACTIVE.lock().await;
-    *vrc_active_guard
-    // true
-}
+// #[tauri::command]
+// #[oyasumivr_macros::command_profiling]
+// pub async fn is_vrchat_active() -> bool {
+//     let vrc_active_guard = VRCHAT_ACTIVE.lock().await;
+//     *vrc_active_guard
+//     // true
+// }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
