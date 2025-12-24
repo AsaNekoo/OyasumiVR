@@ -146,13 +146,13 @@ export class ShutdownAutomationsService {
       this.sleepModeLastSet = Date.now();
     });
     // Track being alone
-    combineLatest([this.vrchat.world, this.vrchat.vrchatProcessActive])
+    combineLatest([this.vrchat.world])
       .pipe(
-        tap(([world, active]) => {
+        tap(([world]) => {
           if (world.players.length > 1) this.wasNotAlone = true;
-          if (!active) this.wasNotAlone = false;
+          // if (!active) this.wasNotAlone = false;
         }),
-        map(([world, active]) => (active && world.loaded ? world.players.length : 0)),
+        map(([world]) => (world.loaded ? world.players.length : 0)),
         distinctUntilChanged(),
         map((playerCount) => playerCount === 1 && this.wasNotAlone)
       )

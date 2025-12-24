@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { IPCService } from '../ipc.service';
-import { filter, firstValueFrom, map, pairwise, switchMap, take, tap } from 'rxjs';
+import { map, pairwise, switchMap, take, tap } from 'rxjs';
 import { OpenVRInputService } from '../openvr-input.service';
 import {
   Empty,
-  OverlayMenuOpenRequest,
-  OyasumiSidecarControllerRole,
+  // OverlayMenuOpenRequest,
+  // OyasumiSidecarControllerRole,
 } from '../../../../src-grpc-web-client/overlay-sidecar_pb';
-import { info } from '@tauri-apps/plugin-log';
+// import { info } from '@tauri-apps/plugin-log';
 import { AppSettingsService } from '../app-settings.service';
 import { APP_SETTINGS_DEFAULT, AppSettings } from '../../models/settings';
 
-import { OVRInputEventAction } from '../../models/ovr-input-event';
+// import { OVRInputEventAction } from '../../models/ovr-input-event';
 import { invoke } from '@tauri-apps/api/core';
 import { VRChatService } from '../vrchat-api/vrchat.service';
 
@@ -64,44 +64,44 @@ export class OverlayService {
         })
       )
       .subscribe();
-    // Respond to VRChat process state changes
-    this.vrchat.vrchatProcessActive.subscribe((active) => {
-      // Close the overlay menu if it's open and VRChat is no longer active
-      if (!active && this.appSettings.overlayMenuOnlyOpenWhenVRChatIsRunning) {
-        this.ipcService.getOverlaySidecarClient()?.closeOverlayMenu({} as Empty);
-      }
-    });
-    // Detect action for toggling the overlay
-    this.openvrInput.state
-      .pipe(
-        pairwise(),
-        filter(() => this.appSettings.overlayMenuEnabled),
-        map((states) => states.map((state) => state[OVRInputEventAction.OpenOverlay])),
-        map(([previous, current]) =>
-          current.find(
-            (currentDevice) =>
-              !previous.some((previousDevice) => previousDevice.index === currentDevice.index)
-          )
-        ),
-        filter(Boolean),
-        map((device) =>
-          device.role === 'LeftHand'
-            ? OyasumiSidecarControllerRole.Left
-            : OyasumiSidecarControllerRole.Right
-        )
-      )
-      .subscribe(async (controllerRole) => {
-        // Block opening if VRChat is not active (and the setting for that is enabled)
-        if (this.appSettings.overlayMenuOnlyOpenWhenVRChatIsRunning) {
-          const active = await firstValueFrom(this.vrchat.vrchatProcessActive);
-          if (!active) return;
-        }
-        // Toggle the overlay
-        info('[Overlay] Toggling overlay menu (controller action)');
-        this.ipcService.getOverlaySidecarClient()?.toggleOverlayMenu({
-          controllerRole,
-        } as OverlayMenuOpenRequest);
-      });
+    // // Respond to VRChat process state changes
+    // this.vrchat.vrchatProcessActive.subscribe((active) => {
+    //   // Close the overlay menu if it's open and VRChat is no longer active
+    //   if (!active && this.appSettings.overlayMenuOnlyOpenWhenVRChatIsRunning) {
+    //     this.ipcService.getOverlaySidecarClient()?.closeOverlayMenu({} as Empty);
+    //   }
+    // });
+    // // Detect action for toggling the overlay
+    // this.openvrInput.state
+    //   .pipe(
+    //     pairwise(),
+    //     filter(() => this.appSettings.overlayMenuEnabled),
+    //     map((states) => states.map((state) => state[OVRInputEventAction.OpenOverlay])),
+    //     map(([previous, current]) =>
+    //       current.find(
+    //         (currentDevice) =>
+    //           !previous.some((previousDevice) => previousDevice.index === currentDevice.index)
+    //       )
+    //     ),
+    //     filter(Boolean),
+    //     map((device) =>
+    //       device.role === 'LeftHand'
+    //         ? OyasumiSidecarControllerRole.Left
+    //         : OyasumiSidecarControllerRole.Right
+    //     )
+    //   )
+    //   .subscribe(async (controllerRole) => {
+    //     // Block opening if VRChat is not active (and the setting for that is enabled)
+    //     if (this.appSettings.overlayMenuOnlyOpenWhenVRChatIsRunning) {
+    //       const active = await firstValueFrom(this.vrchat.vrchatProcessActive);
+    //       if (!active) return;
+    //     }
+    //     // Toggle the overlay
+    //     info('[Overlay] Toggling overlay menu (controller action)');
+    //     this.ipcService.getOverlaySidecarClient()?.toggleOverlayMenu({
+    //       controllerRole,
+    //     } as OverlayMenuOpenRequest);
+    //   });
   }
 
   private async startOrRestartSidecar(gpuAcceleration: boolean) {

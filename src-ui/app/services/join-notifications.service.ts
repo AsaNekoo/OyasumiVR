@@ -90,15 +90,15 @@ export class JoinNotificationsService {
       this.worldLoaded = w.loaded;
     });
     // Clear queued notifications when VRChat stops
-    this.vrchat.vrchatProcessActive
-      .pipe(
-        skip(1),
-        distinctUntilChanged(),
-        filter((active) => !active)
-      )
-      .subscribe(() => {
-        this.queuedNotifications = [];
-      });
+    // this.vrchat.vrchatProcessActive
+    //   .pipe(
+    //     skip(1),
+    //     distinctUntilChanged(),
+    //     filter((active) => !active)
+    //   )
+    //   .subscribe(() => {
+    //     this.queuedNotifications = [];
+    //   });
     // Clear queued notifications when switching worlds
     this.vrchat.world
       .pipe(
@@ -153,8 +153,8 @@ export class JoinNotificationsService {
     // Don't process events from initial load, or from before a world has loaded
     if (event.initialLoad || !this.worldLoaded) return;
     // Don't process these events while VRC is not active
-    const vrcActive = await firstValueFrom(this.vrchat.vrchatProcessActive);
-    if (!vrcActive) return;
+    // const vrcActive = await firstValueFrom(this.vrchat.vrchatProcessActive);
+    // if (!vrcActive) return;
 
     switch (event.type) {
       case 'OnPlayerJoined':

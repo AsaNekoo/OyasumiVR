@@ -150,7 +150,7 @@ export class SteamService {
           {} as { enabledTimestamp?: number; trigger?: boolean }
         ),
         filter((acc) => !!acc.trigger),
-        switchMap(() => this.vrchat.vrchatProcessActive.pipe(take(1))),
+        // switchMap(() => this.vrchat.vrchatProcessActive.pipe(take(1))),
         tap(() => debug('[Steam] SLEEP_8H achievement triggered')),
         switchMap(() => this.getAchievement(SteamAchievements.SLEEP_8H)),
         filter((unlocked) => !unlocked),
@@ -169,7 +169,7 @@ export class SteamService {
             change.reason.automation === 'SLEEP_MODE_ENABLE_FOR_SLEEP_DETECTOR'
           );
         }),
-        switchMap(() => this.vrchat.vrchatProcessActive.pipe(take(1))),
+        // switchMap(() => this.vrchat.vrchatProcessActive.pipe(take(1))),
         filter(Boolean),
         switchMap(() =>
           this.vrchat.world.pipe(

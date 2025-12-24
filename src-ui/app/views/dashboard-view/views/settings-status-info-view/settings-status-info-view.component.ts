@@ -223,12 +223,12 @@ export class SettingsStatusInfoViewComponent {
       {
         name: 'VRChat',
         entries: [
-          {
-            key: 'Client Process',
-            value: vrchat.vrchatProcessActive.pipe(
-              map((active) => (active ? 'Running' : 'Inactive'))
-            ),
-          },
+          // {
+          //   key: 'Client Process',
+          //   value: vrchat.vrchatProcessActive.pipe(
+          //     map((active) => (active ? 'Running' : 'Inactive'))
+          //   ),
+          // },
           {
             key: 'Login Status',
             value: vrchat.status.pipe(

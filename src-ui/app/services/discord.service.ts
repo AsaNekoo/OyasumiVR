@@ -32,19 +32,18 @@ export class DiscordService {
         map((settings) => settings.discordActivityMode),
         distinctUntilChanged()
       ),
-      this.appSettingsService.settings.pipe(
-        map((settings) => settings.discordActivityOnlyWhileVRChatIsRunning),
-        distinctUntilChanged()
-      ),
-      this.vrchat.vrchatProcessActive.pipe(distinctUntilChanged()),
+      // this.appSettingsService.settings.pipe(
+      //   map((settings) => settings.discordActivityOnlyWhileVRChatIsRunning),
+      //   distinctUntilChanged()
+      // ),
+      // this.vrchat.vrchatProcessActive.pipe(distinctUntilChanged()),
       this.sleepService.mode.pipe(distinctUntilChanged()),
     ])
       .pipe(
         debounceTime(100),
-        map(([activityMode, onlyWhileVRChatIsRunning, vrchatActive, sleepMode]) => {
+        map(([activityMode, sleepMode]) => {
           if (activityMode === 'DISABLED') return null;
           if (activityMode === 'ONLY_ASLEEP' && !sleepMode) return null;
-          if (onlyWhileVRChatIsRunning && !vrchatActive) return null;
           return sleepMode;
         }),
         distinctUntilChanged(),

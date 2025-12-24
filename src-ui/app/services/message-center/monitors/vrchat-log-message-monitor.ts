@@ -2,31 +2,31 @@ import { inject } from '@angular/core';
 import { VRChatService } from '../../vrchat-api/vrchat.service';
 import { MessageMonitor } from './message-monitor';
 import { VRChatLogService } from '../../vrchat-log.service';
-import { combineLatest, debounceTime, distinctUntilChanged, filter, map, merge } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, map } from 'rxjs';
 import { openUrl } from '@tauri-apps/plugin-opener';
 export class VRChatLogMessageMonitor extends MessageMonitor {
   private vrchat = inject(VRChatService);
   private vrchatLog = inject(VRChatLogService);
 
   public override async init(): Promise<void> {
-    combineLatest([
-      merge(
-        this.vrchat.vrchatProcessActive.pipe(
-          distinctUntilChanged(),
-          debounceTime(60000),
-          filter(Boolean),
-          map(() => true)
-        ),
-        this.vrchat.vrchatProcessActive.pipe(
-          distinctUntilChanged(),
-          filter((active) => !active),
-          map(() => false)
-        )
-      ).pipe(distinctUntilChanged()),
+    combineLatest(
+      // merge(
+      //   this.vrchat.vrchatProcessActive.pipe(
+      //     distinctUntilChanged(),
+      //     debounceTime(60000),
+      //     filter(Boolean),
+      //     map(() => true)
+      //   ),
+      //   this.vrchat.vrchatProcessActive.pipe(
+      //     distinctUntilChanged(),
+      //     filter((active) => !active),
+      //     map(() => false)
+      //   )
+      // ).pipe(distinctUntilChanged()),
       this.vrchatLog.logPath,
-    ])
+    )
       .pipe(
-        map(([vrcRunning, logPath]) => vrcRunning && !logPath),
+        map((logPath) => !logPath),
         debounceTime(2000),
         distinctUntilChanged()
       )

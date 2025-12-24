@@ -100,13 +100,13 @@ export class InviteAutomationsService {
       (c) => c.AUTO_ACCEPT_INVITE_REQUESTS
     );
     // Stop if VRChat is not currently running
-    if (!(await firstValueFrom(this.vrchat.vrchatProcessActive))) {
-      warn(
-        `[VRChat] Ignoring invite request from ${notification.senderUsername}, as VRChat is not currently running.`
-      );
-      this.playInviteRequestSound(config, false, sleepMode);
-      return;
-    }
+    // if (!(await firstValueFrom(this.vrchat.vrchatProcessActive))) {
+    //   warn(
+    //     `[VRChat] Ignoring invite request from ${notification.senderUsername}, as VRChat is not currently running.`
+    //   );
+    //   this.playInviteRequestSound(config, false, sleepMode);
+    //   return;
+    // }
     // Stop if the automation is disabled
     if (!config.enabled) {
       warn(
