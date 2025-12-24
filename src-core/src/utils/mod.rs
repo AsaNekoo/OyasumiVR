@@ -24,11 +24,15 @@ pub mod models;
 pub mod profiling;
 pub mod serialization;
 pub mod sidecar_manager;
-
+#[allow(dead_code)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum TrackedProcess {
     Steamvr,
     Vrchat,
+    #[cfg(unix)]
+    MonadoService,
+    #[cfg(unix)]
+    Wivrn,
 }
 impl TrackedProcess {
     pub fn name(&self) -> &OsStr {
@@ -38,6 +42,10 @@ impl TrackedProcess {
             #[cfg(unix)]
             Self::Steamvr => "vrmonitor",
             Self::Vrchat => "VRChat.exe",
+            #[cfg(unix)]
+            Self::MonadoService => "monado-service",
+            #[cfg(unix)]
+            Self::Wivrn => "wivrn-server",
         })
     }
 }
@@ -105,14 +113,20 @@ pub async fn is_process_active(process: TrackedProcess) -> bool {
 }
 pub async fn quit_steamvr(kill: bool) {
     let sysinfo_guard = SYSINFO.lock().await;
-    if is_process_active(TrackedProcess::Steamvr).await {
-        //is_process_active already refreshes processes
-        for process in sysinfo_guard.processes_by_exact_name(TrackedProcess::Steamvr.name()) {
-            if kill
-                || (process.kill_with(Signal::Term).is_none()
-                    && process.kill_with(Signal::Quit).is_none())
-            {
-                let _ = process.kill_with(Signal::Kill);
+    for p in [
+        TrackedProcess::Steamvr,
+        TrackedProcess::Wivrn,
+        TrackedProcess::MonadoService,
+    ] {
+        if is_process_active(p).await {
+            //is_process_active already refreshes processes
+            for process in sysinfo_guard.processes_by_exact_name(TrackedProcess::Steamvr.name()) {
+                if kill
+                    || (process.kill_with(Signal::Term).is_none()
+                        && process.kill_with(Signal::Quit).is_none())
+                {
+                    let _ = process.kill_with(Signal::Kill);
+                }
             }
         }
     }
