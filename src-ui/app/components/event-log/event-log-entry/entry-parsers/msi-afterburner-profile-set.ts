@@ -8,7 +8,11 @@ export class EventLogMsiAfterburnerProfileSetEntryParser extends EventLogEntryPa
   }
 
   override headerInfoTitle(): string {
-    return 'comp.event-log-entry.type.msiAfterburnerProfileSet.title';
+    if (is_windows) {
+      return 'comp.event-log-entry.type.msiAfterburnerProfileSet.title';
+    } else {
+      return 'comp.event-log-entry.type.LactProfileSet.title';
+    }
   }
 
   override headerInfoTitleParams(entry: EventLogMsiAfterburnerProfileSet): { [s: string]: string } {
@@ -18,9 +22,9 @@ export class EventLogMsiAfterburnerProfileSetEntryParser extends EventLogEntryPa
   }
 
   override headerInfoSubTitle(entry: EventLogMsiAfterburnerProfileSet): string {
-    if (is_windows){
-    return 'comp.event-log-entry.type.msiAfterburnerProfileSet.reason.' + entry.reason;
-    }else{
+    if (is_windows) {
+      return 'comp.event-log-entry.type.msiAfterburnerProfileSet.reason.' + entry.reason;
+    } else {
       return 'comp.event-log-entry.type.LactProfileSet.reason.' + entry.reason;
     }
   }
