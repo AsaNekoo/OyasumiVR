@@ -51,7 +51,7 @@ impl SleepDetector {
 
         // Send a state report if it's been over a second since the last one
         if now > self.next_state_report {
-            if now.saturating_sub(self.last_log) > 60000 {
+            if now.saturating_sub(self.last_log) > 10000 {
                 self.start_time = now;
             }
             const LAST_10_SECS_EVENT_COUNT:usize=(Duration::from_secs(10).as_secs_f32()/SLEEP_DETECTOR_PERIOD.as_secs_f32()) as usize;
