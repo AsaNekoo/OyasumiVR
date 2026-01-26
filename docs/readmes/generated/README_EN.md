@@ -23,9 +23,9 @@ things that should work (open a bug if they don't):
 * all vrchat automations
 * sounds playback (no linux specific code)
 * audio device automations
+* discord rich presence
 
 things that should work but are not tested:
-* discord rich presence
 * system shutdown
 * pulsoid integration (no linux specific code)
 * sunset automation (no linux specific code)
