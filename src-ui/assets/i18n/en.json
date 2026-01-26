@@ -1192,7 +1192,7 @@
         "description": "Apply the following MSI Afterburner profile",
         "title": "When sleep mode is disabled"
       },
-        "sleepPreparation": {
+      "sleepPreparation": {
         "description": "Apply the following MSI profile",
         "title": "When Preparing to sleep"
       },
@@ -1216,7 +1216,6 @@
         "description": "Apply the following LACT profile",
         "title": "When sleep mode is enabled"
       }
-      
     },
     "powerLimiting": {
       "activatingSleepMode": {
@@ -1866,9 +1865,9 @@
         "description": "Set the following Power Policy",
         "title": "When Preparing to sleep"
       },
-      "provider":{
-          "title":"provider",
-          "description": "Select which program should be used to controll system's power policy"
+      "provider": {
+        "title": "provider",
+        "description": "Select which program should be used to controll system's power policy"
       }
     }
   },
@@ -1897,7 +1896,7 @@
     },
     "title": "Resolution Automations"
   },
-  "playbackAutomations":{
+  "playbackAutomations": {
     "title": "Playback Automations",
     "description": "OyasumiVR can automatically pause mrpis compatible players"
   },
@@ -2912,7 +2911,8 @@
   "systemTray": {
     "prepareForSleep": "Prepare for sleep",
     "quit": "Quit OyasumiVR",
-    "sleepMode": "Sleep Mode"
+    "sleepMode": "Sleep Mode",
+    "showWindow": "Open OyasumiVR"
   },
   "updater": {
     "modals": {
