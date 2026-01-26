@@ -79,6 +79,18 @@ export class SystemTrayService {
           item: 'Separator',
         },
         {
+          text: this.translateService.instant('systemTray.showWindow'),
+          action: async () => {
+            const { getCurrentWindow } = await import('@tauri-apps/api/window');
+            const win = getCurrentWindow();
+            await win.show();
+            await win.setFocus();
+          },
+        },
+        {
+          item: 'Separator',
+        },
+        {
           text: this.translateService.instant('systemTray.sleepMode'),
           checked: await firstValueFrom(this.sleepService.mode),
           action: async () => {
@@ -103,7 +115,10 @@ export class SystemTrayService {
         },
         {
           text: this.translateService.instant('systemTray.quit'),
-          item: 'Quit',
+          action: async () => {
+            const { exit } = await import('@tauri-apps/plugin-process');
+            await exit(0);
+          },
         },
       ],
     });
