@@ -37,7 +37,7 @@ pub async fn init() {
     });
 }
 //based on discord's crate
-pub async fn is_discord_ipc_active()->bool {
+pub async fn is_discord_ipc_active() -> bool {
     #[cfg(unix)]
     {
         let tmp_path = std::env::var("XDG_RUNTIME_DIR")
@@ -57,7 +57,7 @@ pub async fn is_discord_ipc_active()->bool {
                 use std::{fmt::Write, str::FromStr};
                 write!(path, "{}", seq).unwrap();
                 let path = PathBuf::from_str(path.as_str()).unwrap();
-                if path.is_file() {
+                if path.exists() {
                     return true;
                 }
             }
@@ -74,7 +74,7 @@ pub async fn is_discord_ipc_active()->bool {
             if  tokio::net::windows::named_pipe::ClientOptions::new().open(&socket_path).is_ok(){
                 return true;
             }
-           
+
         }
         false
     }
