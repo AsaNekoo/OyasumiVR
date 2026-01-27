@@ -1,8 +1,7 @@
-linux port of https://github.com/Raphiiko/OyasumiVR maybe (probablly not) one day i will upstream it
+linux port of https://github.com/Raphiiko/OyasumiVR
 
 
-
-very much work in progress (i'm yet to met someone who would care about the port so some features are missing)
+very much work in progress
 
 
 if you find a bug in overlay or other linux specific stuff open a bug report in this repo
