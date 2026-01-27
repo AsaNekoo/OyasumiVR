@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {
   BehaviorSubject,
   bufferTime,
-  combineLatest,
   distinctUntilChanged,
   filter,
   firstValueFrom,
@@ -17,7 +16,7 @@ import { SETTINGS_KEY_SLEEP_MODE, SETTINGS_STORE } from '../globals';
 import { SleepingPose } from '../models/sleeping-pose';
 import { uniq } from 'lodash';
 import { OpenVRService } from './openvr.service';
-import { OVRDevicePose } from '../models/ovr-device';
+import { VRDevicePose } from '../models/ovr-device';
 import { SleepingPoseDetector } from '../utils/sleeping-pose-detector';
 import * as THREE from 'three';
 import { info } from '@tauri-apps/plugin-log';
@@ -51,12 +50,7 @@ export class SleepService {
   }> = this._onSleepModeChange.asObservable();
 
   public pose: Observable<SleepingPose> = merge(
-    combineLatest([this.openvr.devices, this.openvr.devicePoses]).pipe(
-      map(([devices, poses]) => {
-        const hmdDevice = devices.find((d) => d.class === 'HMD');
-        if (!hmdDevice) return null;
-        return poses[hmdDevice.index] || null;
-      }),
+    this.openvr.hmd_pose.pipe(
       filter((hmdPose) => hmdPose !== null),
       map((hmdPose) => this.getSleepingPoseForDevicePose(hmdPose!)),
       bufferTime(1000),
@@ -109,10 +103,9 @@ export class SleepService {
   }
 
   async enableSleepMode(reason: SleepModeStatusChangeReason) {
-    
     if (this._mode.value) return;
-    await invoke("set_sleep_state",{state:SleepState.Sleeping});
-    await invoke("vr_sleep_mode_check",{value:false});
+    await invoke('set_sleep_state', { state: SleepState.Sleeping });
+    await invoke('vr_sleep_mode_check', { value: false });
     reason.enabled = true;
     info(`[Sleep] Sleep mode enabled (reason=${reason.type})`);
     this.eventLog.logEvent({
@@ -130,9 +123,8 @@ export class SleepService {
   }
 
   async disableSleepMode(reason: SleepModeStatusChangeReason) {
-   
     if (!this._mode.value) return;
-     invoke("set_sleep_state",{state:SleepState.Awake});
+    invoke('set_sleep_state', { state: SleepState.Awake });
     reason.enabled = false;
     info(`[Sleep] Sleep mode disabled (reason=${reason.type})`);
     this.eventLog.logEvent({
@@ -149,7 +141,7 @@ export class SleepService {
     }
   }
 
-  private getSleepingPoseForDevicePose(pose: OVRDevicePose): SleepingPose {
+  private getSleepingPoseForDevicePose(pose: VRDevicePose): SleepingPose {
     if (!pose) return this.poseDetector.sleepingPose;
     this.poseDetector.processOrientation(pose.quaternion);
     return this.poseDetector.sleepingPose;

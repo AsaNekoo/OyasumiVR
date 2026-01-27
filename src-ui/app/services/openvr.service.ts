@@ -2,7 +2,7 @@ import { ApplicationRef, Injectable } from '@angular/core';
 import { listen } from '@tauri-apps/api/event';
 import { DeviceUpdateEvent } from '../models/events';
 import { invoke } from '@tauri-apps/api/core';
-import { OVRDevice, OVRDevicePose } from '../models/ovr-device';
+import { OVRDevice, VRDevicePose } from '../models/ovr-device';
 import {
   BehaviorSubject,
   distinctUntilChanged,
@@ -28,11 +28,9 @@ export class OpenVRService {
   private _devices: BehaviorSubject<OVRDevice[]> = new BehaviorSubject<OVRDevice[]>([]);
   public devices: Observable<OVRDevice[]> = this._devices.asObservable();
 
-  private _devicePoses: BehaviorSubject<{
-    [trackingIndex: number]: OVRDevicePose;
-  }> = new BehaviorSubject<{ [p: number]: OVRDevicePose }>({});
-  public devicePoses: Observable<{ [trackingIndex: number]: OVRDevicePose }> =
-    this._devicePoses.asObservable();
+  private _hmd_pose: BehaviorSubject<VRDevicePose> = new BehaviorSubject<VRDevicePose>({quaternion:[0,0,0,0],position:[0,0,0]});
+  public hmd_pose: Observable<VRDevicePose> =
+    this._hmd_pose.asObservable();
 
   constructor(
     private appRef: ApplicationRef,
@@ -60,18 +58,18 @@ export class OpenVRService {
       ),
       listen<OpenVRStatus>('VR_STATUS_UPDATE', (event) => this.onStatusUpdate(event.payload)),
       listen<any>('OVR_POSE_UPDATE', (event) => {
-        const poses = structuredClone(this._devicePoses.value);
+        // const poses = structuredClone(this._devicePoses.value);
         const {
-          index,
+          // index,
           quaternion,
           position,
         }: {
-          index: number;
+          // index: number;
           quaternion: [number, number, number, number];
           position: [number, number, number];
         } = event.payload;
-        poses[index] = { quaternion, position };
-        this._devicePoses.next(poses);
+        let pose = { quaternion, position };
+        this._hmd_pose.next(pose);
         this.appRef.tick();
       }),
     ]);
@@ -134,7 +132,7 @@ export class OpenVRService {
       case 'INACTIVE':
       case 'INITIALIZING':
         this._devices.next([]);
-        this._devicePoses.next({});
+        this._hmd_pose.next({quaternion:[0,0,0,0],position:[0,0,0]});
         break;
       case 'INITIALIZED':
         break;

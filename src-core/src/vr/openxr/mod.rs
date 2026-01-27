@@ -18,7 +18,7 @@ use xr_overlay::{
 use crate::{
     utils::send_event,
     vr::{
-        SLEEP_DETECTION_ENABLED, commands::SLEEP_STATE, gesture_detector::GestureDetector, model::{SleepState, VRStatus}, openxr::input::{INPUT_CONTEXT, check_user_activity}, sleep_detector::{SLEEP_DETECTOR_PERIOD, SleepDetector}
+        SLEEP_DETECTION_ENABLED, commands::SLEEP_STATE, gesture_detector::GestureDetector, model::{SleepState, VRDevicePose, VRStatus}, openxr::input::{INPUT_CONTEXT, check_user_activity}, sleep_detector::{SLEEP_DETECTOR_PERIOD, SleepDetector}
     },
 };
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
@@ -127,15 +127,28 @@ pub async fn init() {
             loop {
                 #[allow(clippy::collapsible_if)] //no????
                 if unsafe { SLEEP_DETECTION_ENABLED&&SLEEP_STATE!=SleepState::Sleeping} {
+                    let pose=get_pose("sleep", &mut *OXR_HANDLE.wait().lock().await)
+                                .await;
                     SLEEP_DETECTOR
                         .lock()
                         .await
                         .log_pose(
-                            get_pose("sleep", &mut *OXR_HANDLE.wait().lock().await)
-                                .await
-                                .map(|p| p.position.to_vec3a().to_vec3()),
+                            pose.map(|p| p.position.to_vec3a().to_vec3()),
                         )
                         .await;
+                    if let Some(pose)=pose{
+                        let o=pose.orientation;
+                        let p=pose.position;
+                    send_event(
+                        "OVR_POSE_UPDATE",
+                        VRDevicePose {
+                            index:0,
+                            quaternion: [o.x,o.y,o.z,o.w],
+                            position: [p.x,p.y,p.z],
+                        },
+                    ) 
+                    .await;
+                    }
                 }
                 tokio::time::sleep(SLEEP_DETECTOR_PERIOD).await;
             }

@@ -81,13 +81,7 @@ impl From<ovr_overlay::sys::ETrackedDeviceClass> for TrackedDeviceClass {
 
 
 
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct OVRDevicePose {
-    pub index: u32,
-    pub quaternion: [f64; 4],
-    pub position: [f32; 3],
-}
+
 
 
 

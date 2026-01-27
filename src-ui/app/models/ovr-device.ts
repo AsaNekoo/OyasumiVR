@@ -62,7 +62,7 @@ export interface OVRDevice {
   isTurningOff: boolean;
 }
 
-export interface OVRDevicePose {
+export interface VRDevicePose {
   quaternion: [number, number, number, number];
   position: [number, number, number];
 }

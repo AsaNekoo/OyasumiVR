@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use super::models::{
-    DeviceUpdateEvent, OVRDevice, OVRDevicePose, OVRHandleType, OpenVRInputEvent,
+    DeviceUpdateEvent, OVRDevice, VRDevicePose, OVRHandleType, OpenVRInputEvent,
     TrackedDeviceClass,
 };
 use super::{GestureDetector, SleepDetector, OVR_CONTEXT};
@@ -337,7 +337,7 @@ async fn refresh_device_poses() {
                     drop(next_pose_broadcast);
                     send_event(
                         "OVR_POSE_UPDATE",
-                        OVRDevicePose {
+                        VRDevicePose {
                             index: n as u32,
                             quaternion: [q.x, q.y, q.z, q.w],
                             position: pos.v,

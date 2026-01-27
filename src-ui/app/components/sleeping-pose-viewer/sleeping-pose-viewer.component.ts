@@ -15,7 +15,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OpenVRService } from '../../services/openvr.service';
 import { combineLatest, filter, map } from 'rxjs';
 import { SleepService } from '../../services/sleep.service';
-import { OVRDevicePose } from '../../models/ovr-device';
+import { VRDevicePose } from '../../models/ovr-device';
 import { SleepingPose } from '../../models/sleeping-pose';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -57,16 +57,12 @@ export class SleepingPoseViewerComponent implements AfterViewInit {
       this.sleepingPose = pose;
       this.cdr.detectChanges();
     });
-    combineLatest([this.openvr.devices, this.openvr.devicePoses])
+    combineLatest(this.openvr.hmd_pose)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        map(([devices, poses]) => {
-          const hmdDevice = devices.find((d) => d.class === 'HMD');
-          if (!hmdDevice) return null;
-          return poses[hmdDevice.index] || null;
-        }),
+     
         filter((hmdPose) => hmdPose !== null),
-        map((hmdPose) => hmdPose as OVRDevicePose)
+        map((hmdPose) => hmdPose as VRDevicePose)
       )
       .subscribe((hmdPose) => {
         const hmdOrientation = new THREE.Quaternion(...hmdPose.quaternion);

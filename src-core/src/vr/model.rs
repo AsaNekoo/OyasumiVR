@@ -106,3 +106,10 @@ pub enum SleepState{
     Preparing=2,
     Sleeping=3
 }
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VRDevicePose {
+    pub index: u32,
+    pub quaternion: [f32; 4],
+    pub position: [f32; 3],
+}
