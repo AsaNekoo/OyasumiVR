@@ -3,7 +3,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { OscParameter, OscScript, OscScriptSleepAction } from '../models/osc-script';
 import { flatten } from 'lodash';
 import { TaskQueue } from '../utils/task-queue';
-import { debug, error, info } from '@tauri-apps/plugin-log';
+import { debug, info } from '@tauri-apps/plugin-log';
 import { listen } from '@tauri-apps/api/event';
 import { OSCMessage, OSCMessageRaw, OSCValueTypeE, parseOSCMessage } from '../models/osc-message';
 import {
@@ -72,6 +72,7 @@ export class OscService {
         );
         await invoke('set_osc_receive_address_whitelist', { whitelist: addresses });
       });
+    
     this.appSettings.settings
       .pipe(
         map((s) => s.oscServerEnabled),
@@ -79,7 +80,7 @@ export class OscService {
         debounceTime(500),
         switchMap(async (enabled) => {
           if (enabled) {
-            await this.startOscServer();
+            //set_osc_receive_address_whitelist starts the server
             await this.fetchVRChatOSCAddress();
           } else {
             await this.stopOscServer();
@@ -105,23 +106,23 @@ export class OscService {
     this.avatarContext = context;
   }
 
-  private async startOscServer(): Promise<{ oscAddress: string; oscQueryAddress: string } | null> {
-    let [oscAddress, oscQueryAddress] = (await invoke<[string, string] | null>(
-      'start_osc_server'
-    )) ?? [null, null];
-    if (oscAddress) {
-      oscAddress = oscAddress.replace('0.0.0.0', '127.0.0.1');
-      this._oscServerAddress.next(oscAddress);
-    } else error("[OSC] Couldn't start OSC server");
-    if (oscQueryAddress) {
-      oscQueryAddress = oscQueryAddress.replace('0.0.0.0', '127.0.0.1');
-      this._oscQueryServerAddress.next(oscQueryAddress);
-      for (const method of this._oscMethods.value) {
-        await invoke('add_osc_method', { method: this.mapToOscMethod(method) });
-      }
-    } else error("[OSC] Couldn't start OSCQuery server");
-    return oscAddress && oscQueryAddress ? { oscAddress, oscQueryAddress } : null;
-  }
+  // private async startOscServer(): Promise<{ oscAddress: string; oscQueryAddress: string } | null> {
+  //   let [oscAddress, oscQueryAddress] = (await invoke<[string, string] | null>(
+  //     'start_osc_server'
+  //   )) ?? [null, null];
+  //   if (oscAddress) {
+  //     oscAddress = oscAddress.replace('0.0.0.0', '127.0.0.1');
+  //     this._oscServerAddress.next(oscAddress);
+  //   } else error("[OSC] Couldn't start OSC server");
+  //   if (oscQueryAddress) {
+  //     oscQueryAddress = oscQueryAddress.replace('0.0.0.0', '127.0.0.1');
+  //     this._oscQueryServerAddress.next(oscQueryAddress);
+  //     for (const method of this._oscMethods.value) {
+  //       await invoke('add_osc_method', { method: this.mapToOscMethod(method) });
+  //     }
+  //   } else error("[OSC] Couldn't start OSCQuery server");
+  //   return oscAddress && oscQueryAddress ? { oscAddress, oscQueryAddress } : null;
+  // }
 
   public async addOscMethod(method: OscMethod<unknown>) {
     const methods = [...this._oscMethods.value].filter(
