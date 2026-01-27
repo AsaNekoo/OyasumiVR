@@ -67,6 +67,11 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
         y: -0.3,
         z: -0.6,
     };
+    let mic_pos = Vector3f {
+        x: -0.3,
+        y: -0.3,
+        z: -0.6,
+    };
     let framerate = app.read().unwrap().current_refresh_rate() as u32/2;
     let overlay = create_cef_overlay(
         app.clone(),
@@ -106,7 +111,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
     );
     let mic_overlay = app.write().unwrap().add_overlay(OverlayCreateInfo {
         type_: xr_overlay::runner::OverlayCreateInfoType::Unmanaged { size: [0.04,0.04].into() },
-        pos:Vector3f { x: -0., y: -0.12, z: -0.2 },
+        pos: mic_pos,
         spawn_visible: true,
         show_mode: ShowMode::default(),
         name: Some("mic_mute".to_owned()),
@@ -117,6 +122,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
         ..Default::default()
     });
     MIC_MUTE_OVERLAY.set(mic_overlay).unwrap();
+    *MIC_INDICATOR.lock().unwrap() = Some(MicMuteIndicator::new(mic_overlay));
     let delay = Duration::from_millis(500).as_millis() as f32
         / (1000. / app.read().unwrap().current_refresh_rate() as f32);
     app.write()
@@ -144,6 +150,9 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
         loop {
             if unsafe { KILL } {
                 break;
+            }
+            if let Some(indicator) = MIC_INDICATOR.lock().unwrap().as_mut() {
+                indicator.update_frame();
             }
             let mut guard = app.write().unwrap();
             match guard.run(false) {
@@ -227,16 +236,149 @@ pub async fn hide_dashboard() {
         .unwrap()
         .set_visible(OVERLAY.wait().xr_handle, false);
 }
-pub fn set_mic_state(mute:bool,alpha:f32,visible:bool){
-    trace!("set_mic_state:{{mute:{},alpha:{},visible:{}}}",mute,alpha,visible);
-    let mut guard=XR_CTX.get().as_ref().unwrap().write().unwrap();
-    let handle=MIC_MUTE_OVERLAY.wait();
-    guard.set_visible(*handle, visible);
-    if visible{
-        guard.set_raw_texture(*handle, match mute{
-            true => textures::MIC_MUTE.clone(),
-            false => textures::MIC_UNMUTE.clone(),
-        }, alpha, false);
-        
+pub static MIC_INDICATOR: std::sync::Mutex<Option<MicMuteIndicator>> = std::sync::Mutex::new(None);
+
+pub struct MicMuteIndicator {
+    overlay_handle: OverlayHandle,
+    mute_state: bool,
+    mic_active: bool,
+    max_opacity: f32,
+    fade_out: bool,
+    enabled: bool,
+    last_state_change: std::time::Instant,
+    last_presence_indication: std::time::Instant,
+    last_mic_activity_change: std::time::Instant,
+    last_set_scale: f32,
+    base_scale: f32,
+    mute_image_state: Option<bool>,
+    last_opacity: f32,
+}
+
+impl MicMuteIndicator {
+    pub fn new(handle: OverlayHandle) -> Self {
+        Self {
+            overlay_handle: handle,
+            mute_state: true,
+            mic_active: false,
+            max_opacity: 100.0,
+            fade_out: false,
+            enabled: false,
+            last_state_change: std::time::Instant::now(),
+            last_presence_indication: std::time::Instant::now(),
+            last_mic_activity_change: std::time::Instant::now(),
+            last_set_scale: 0.0,
+            base_scale: 0.088,
+            mute_image_state: None,
+            last_opacity: -1.0,
+        }
+    }
+
+    pub fn set_active(&mut self, active: bool) {
+        if self.mic_active != active {
+            self.last_mic_activity_change = std::time::Instant::now();
+        }
+        self.mic_active = active;
+    }
+
+    pub fn update_frame(&mut self) {
+        if let Some(state) = crate::globals::STATE.blocking_lock().as_ref() {
+            if state.system_mic_muted != self.mute_state {
+                self.mute_state = state.system_mic_muted;
+                self.last_state_change = std::time::Instant::now();
+            }
+            if let Some(settings) = &state.settings {
+                self.max_opacity = settings.system_mic_indicator_opacity as f32;
+                self.fade_out = settings.system_mic_indicator_fadeout;
+                if settings.system_mic_indicator_enabled != self.enabled {
+                    self.enabled = settings.system_mic_indicator_enabled;
+                    XR_CTX
+                        .wait()
+                        .write()
+                        .unwrap()
+                        .set_visible(self.overlay_handle, self.enabled);
+                }
+            }
+        }
+        if !self.enabled {
+            return;
+        }
+
+        let now = std::time::Instant::now();
+        let time_since_last_state_change =
+            now.duration_since(self.last_state_change).as_millis() as f32;
+        let time_since_last_presence_indication = now
+            .duration_since(self.last_presence_indication)
+            .as_millis() as f32;
+        let time_since_last_mic_activity_change = now
+            .duration_since(self.last_mic_activity_change)
+            .as_millis() as f32;
+
+        let mut max_opacity = self.max_opacity
+            * if self.mute_state {
+                1.0
+            } else {
+                0.1
+            };
+
+        let opacity = if self.mic_active && !self.mute_state {
+            self.max_opacity / 100.
+        } else if self.fade_out {
+            let time_since = time_since_last_presence_indication
+                .min(time_since_last_state_change)
+                .min(time_since_last_mic_activity_change);
+            // MathUtils.InvLerpClamped(3500, 6000, timeSince)
+            let val = (time_since - 3500.) / (6000. - 3500.);
+            let val = val.clamp(0., 1.);
+            let opacity_factor = val * val; // InQuad
+            (max_opacity / 100.) * (1.0 - opacity_factor)
+        } else {
+            max_opacity / 100.
+        };
+
+        if self.mute_image_state != Some(self.mute_state) || (self.last_opacity - opacity).abs() > 0.001 {
+            self.mute_image_state = Some(self.mute_state);
+            self.last_opacity = opacity;
+
+            let texture = match self.mute_state {
+                true => textures::MIC_MUTE.clone(),
+                false => textures::MIC_UNMUTE.clone(),
+            };
+            XR_CTX.wait().write().unwrap().set_raw_texture(
+                self.overlay_handle,
+                texture,
+                opacity,
+                false,
+            );
+        }
+
+         // Scale
+        let t_state = ((time_since_last_state_change - 200.) / (350. - 200.)).clamp(0., 1.);
+        let scale_state_change_factor = t_state * t_state;
+
+        let mut scale_activity_change_factor = 1.0;
+        if !self.mute_state {
+            let t_activity =
+                ((time_since_last_mic_activity_change - 0.) / (100. - 0.)).clamp(0., 1.);
+            let factor = t_activity * t_activity;
+            if self.mic_active {
+                scale_activity_change_factor = 1.0 - factor;
+            }
+        }
+        let scale_factor = scale_state_change_factor.min(scale_activity_change_factor);
+        let scale = ((1.0 - scale_factor) * 0.25 + 1.0) * self.base_scale;
+
+        if (self.last_set_scale - scale).abs() > 0.001 {
+            XR_CTX.wait().write().unwrap().set_size(
+                self.overlay_handle,
+                [scale, scale].into(),
+            );
+            self.last_set_scale = scale;
+        }
+    }
+}
+
+pub fn set_mic_active(active: bool) {
+    if let Some(indicator) = MIC_INDICATOR.lock().unwrap().as_mut() {
+        indicator.set_active(active);
     }
 }
