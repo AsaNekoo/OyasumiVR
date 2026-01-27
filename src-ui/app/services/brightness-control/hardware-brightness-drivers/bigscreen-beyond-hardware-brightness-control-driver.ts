@@ -11,7 +11,7 @@ import {
   Observable,
   shareReplay,
   startWith,
-  switchMap,
+  // switchMap,
 } from 'rxjs';
 import { invoke } from '@tauri-apps/api/core';
 import { AppSettings } from '../../../models/settings';
@@ -38,11 +38,11 @@ export class BigscreenBeyondHardwareBrightnessControlDriver extends HardwareBrig
     interval(10000)
       .pipe(
         startWith(0),
-        switchMap(() =>
-          invoke<boolean>('bigscreen_beyond_is_connected').then((connected) => {
-            this.connected.next(connected);
-          })
-        )
+        // switchMap(() =>
+        //   invoke<boolean>('bigscreen_beyond_is_connected').then((connected) => {
+        //     this.connected.next(connected);
+        //   })
+        // )
       )
       .subscribe();
     // When connecting the beyond, attempt loading the last saved brightness percentage from the driver utility's preference file

@@ -526,7 +526,7 @@ export class AppModule {
     private sleepDevicePowerAutomationsService: SleepDevicePowerAutomationsService,
     private turnOffDevicesOnBatteryLevelAutomationService: TurnOffDevicesOnBatteryLevelAutomationService,
     private turnOffDevicesWhenChargingAutomationService: TurnOffDevicesWhenChargingAutomationService,
-    private setWindowsPowerPolicyOnSleepModeAutomationService: SetWindowsPowerPolicyOnSleepModeAutomationService,
+    private setSystemPowerPolicyOnSleepModeAutomationService: SetWindowsPowerPolicyOnSleepModeAutomationService,
     // OSC automations
     private oscGeneralAutomationsService: OscGeneralAutomationsService,
     private sleepingAnimationsAutomationService: SleepingAnimationsAutomationService,
@@ -756,7 +756,7 @@ export class AppModule {
             ),
             this.logInit(
               'Initializing Windows power policy automations',
-              this.setWindowsPowerPolicyOnSleepModeAutomationService.init()
+              this.setSystemPowerPolicyOnSleepModeAutomationService.init()
             ),
             // OSC automations
             this.logInit(
@@ -790,15 +790,15 @@ export class AppModule {
               this.brightnessControlAutomationService.init()
             ),
             // Resolution automations
-            this.logInit(
-              'Initializing render resolution automations',
-              this.renderResolutionAutomationService.init()
-            ),
+            // this.logInit(
+            //   'Initializing render resolution automations',
+            //   this.renderResolutionAutomationService.init()
+            // ),
             // Fade distance automations
-            this.logInit(
-              'Initializing chaperone automations',
-              this.chaperoneFadeDistanceAutomationService.init()
-            ),
+            // this.logInit(
+            //   'Initializing chaperone automations',
+            //   this.chaperoneFadeDistanceAutomationService.init()
+            // ),
             // Shutdown automations
             this.logInit(
               'Initializing shutdown automations',
@@ -817,14 +817,14 @@ export class AppModule {
               'Initializing nightmare detection automation',
               this.nightmareDetectionAutomationService.init()
             ),
-            this.logInit(
-              'Initializing Bigscreen Beyond LED automation',
-              this.bigscreenBeyondLedAutomationService.init()
-            ),
-            this.logInit(
-              'Initializing Bigscreen Beyond fan automation',
-              this.bigscreenBeyondFanAutomationService.init()
-            ),
+            // this.logInit(
+            //   'Initializing Bigscreen Beyond LED automation',
+            //   this.bigscreenBeyondLedAutomationService.init()
+            // ),
+            // this.logInit(
+            //   'Initializing Bigscreen Beyond fan automation',
+            //   this.bigscreenBeyondFanAutomationService.init()
+            // ),
             this.logInit(
               'Initializing VRChat avatar automations',
               this.vrchatAvatarAutomationsService.init()
