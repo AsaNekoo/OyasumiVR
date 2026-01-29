@@ -29,9 +29,9 @@ export class ProcessActiveMqttIntegrationService {
       displayName: 'SteamVR Running',
       value: 'off',
     });
-    // this.vrchat.vrchatProcessActive.pipe(distinctUntilChanged()).subscribe((active) => {
-    //   this.mqtt.setSensorPropertyValue('vrchatActive', active ? 'on' : 'off');
-    // });
+    this.vrchat.vrchatProcessActive.pipe(distinctUntilChanged()).subscribe((active) => {
+      this.mqtt.setSensorPropertyValue('vrchatActive', active ? 'on' : 'off');
+    });
     this.openvr.status.pipe(distinctUntilChanged()).subscribe((status) => {
       this.mqtt.setSensorPropertyValue('steamvrActive', status === 'INITIALIZED' ? 'on' : 'off');
     });

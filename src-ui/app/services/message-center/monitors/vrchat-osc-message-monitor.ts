@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { VRChatService } from '../../vrchat-api/vrchat.service';
 import { MessageMonitor } from './message-monitor';
 import { OscService } from '../../osc.service';
-import { combineLatest, debounceTime, distinctUntilChanged, map } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, filter, map, merge } from 'rxjs';
 import { openUrl } from '@tauri-apps/plugin-opener';
 
 export class VRChatOSCMessageMonitor extends MessageMonitor {
@@ -11,13 +11,26 @@ export class VRChatOSCMessageMonitor extends MessageMonitor {
 
   public override async init(): Promise<void> {
     combineLatest([
+      merge(
+        this.vrchat.vrchatProcessActive.pipe(
+          distinctUntilChanged(),
+          debounceTime(60000),
+          filter(Boolean),
+          map(() => true)
+        ),
+        this.vrchat.vrchatProcessActive.pipe(
+          distinctUntilChanged(),
+          filter((active) => !active),
+          map(() => false)
+        )
+      ).pipe(distinctUntilChanged()),
       this.osc.vrchatOscAddress.pipe(distinctUntilChanged()),
       this.osc.vrchatOscQueryAddress.pipe(distinctUntilChanged()),
     ])
       .pipe(
         map(
-          ([oscAddress, oscQueryAddress]) =>
-            (!oscAddress || !oscQueryAddress)
+          ([vrcRunning, oscAddress, oscQueryAddress]) =>
+            vrcRunning && (!oscAddress || !oscQueryAddress)
         ),
         debounceTime(2000),
         distinctUntilChanged()

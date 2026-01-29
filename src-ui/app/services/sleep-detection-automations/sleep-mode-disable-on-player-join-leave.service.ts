@@ -7,7 +7,7 @@ import {
 } from '../../models/automations';
 
 import { SleepService } from '../sleep.service';
-import { filter, map, switchMap, tap } from 'rxjs';
+import { filter, firstValueFrom, map, switchMap, tap } from 'rxjs';
 import { LimitedUser } from 'vrchat';
 import { VRChatLogService } from '../vrchat-log.service';
 import { VRChatLogEvent } from '../../models/vrchat-log-event';
@@ -75,8 +75,8 @@ export class SleepModeDisableOnPlayerJoinLeaveAutomationService {
     // Only process join and leave events
     if (event.type !== 'OnPlayerJoined' && event.type !== 'OnPlayerLeft') return;
     // Don't process these events while VRC is not active
-    // const vrcActive = await firstValueFrom(this.vrchat.vrchatProcessActive);
-    // if (!vrcActive) return; //vrchat should produce events while it's not running
+    const vrcActive = await firstValueFrom(this.vrchat.vrchatProcessActive);
+    if (!vrcActive) return;
     // Don't process events from the user themselves
     if (event.displayName === this.ownVRChatDisplayName) return;
     // Check per event
