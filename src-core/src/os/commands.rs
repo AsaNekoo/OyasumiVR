@@ -38,13 +38,13 @@ pub async fn quit_steamvr(kill: bool) {
     crate::utils::quit_steamvr(kill).await;
 }
 
-// #[tauri::command]
-// #[oyasumivr_macros::command_profiling]
-// pub async fn is_vrchat_active() -> bool {
-//     let vrc_active_guard = VRCHAT_ACTIVE.lock().await;
-//     *vrc_active_guard
-//     // true
-// }
+#[tauri::command]
+#[oyasumivr_macros::command_profiling]
+pub async fn is_vrchat_active() -> bool {
+    let vrc_active_guard = VRCHAT_ACTIVE.lock().await;
+    *vrc_active_guard
+    // true
+}
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
