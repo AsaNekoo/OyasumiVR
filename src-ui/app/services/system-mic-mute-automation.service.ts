@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { AudioDeviceService } from './audio-device.service';
-import { OpenVRInputService } from './openvr-input.service';
 import { AutomationConfigService } from './automation-config.service';
 import {
   BehaviorSubject,
@@ -10,7 +9,6 @@ import {
   filter,
   firstValueFrom,
   map,
-  pairwise,
   shareReplay,
   skip,
   switchMap,
@@ -24,10 +22,8 @@ import {
   SystemMicMuteAutomationsConfig,
   SystemMicMuteControllerBindingBehavior,
 } from '../models/automations';
-import { isEqual } from 'lodash';
 import { info } from '@tauri-apps/plugin-log';
 import { SleepPreparationService } from './sleep-preparation.service';
-import { OVRInputEventAction } from '../models/ovr-input-event';
 import { NotificationService } from './notification.service';
 import {
   EventLogChangedSystemMicControllerButtonBehavior,
@@ -36,7 +32,6 @@ import {
 import { EventLogService } from './event-log.service';
 import { invoke } from '@tauri-apps/api/core';
 import { VRChatService } from './vrchat-api/vrchat.service';
-import { getBuiltInNotificationSound } from '../models/notification-sounds';
 
 @Injectable({
   providedIn: 'root',
@@ -70,7 +65,6 @@ export class SystemMicMuteAutomationService {
   constructor(
     private automationConfigService: AutomationConfigService,
     private audioDeviceService: AudioDeviceService,
-    private openvrInputService: OpenVRInputService,
     private sleepService: SleepService,
     private sleepPreparationService: SleepPreparationService,
     private notificationService: NotificationService,
@@ -210,39 +204,8 @@ export class SystemMicMuteAutomationService {
 
   private handleControllerBinding() {
     let buttonPressed = false;
-    const buttonPressed$ = this.openvrInputService.state.pipe(
-      map((state) => state[OVRInputEventAction.MuteMicrophone].map((d) => d.index)),
-      distinctUntilChanged((a, b) => isEqual(a, b)),
-      pairwise(),
-      map(([oldState, newState]) => {
-        return newState.some((d) => !oldState.includes(d));
-      }),
-      filter(() => this.config.controllerBinding)
-    );
 
-    // Respond to button presses
-    buttonPressed$.subscribe(async (pressed) => {
-      buttonPressed = pressed;
-      switch (this._effectiveControllerBehaviour.value) {
-        case 'TOGGLE': {
-          const isMuted = await firstValueFrom(this.isMicMuted);
-          if (isMuted === null) break;
-          if (pressed) {
-            const sound = getBuiltInNotificationSound(isMuted ? 'mic_unmute' : 'mic_mute');
-            await this.notificationService.playSound(sound, this.config.muteSoundVolume / 100);
 
-            await this.setMute(!isMuted);
-          }
-          break;
-        }
-        case 'PUSH_TO_TALK': {
-          const sound = getBuiltInNotificationSound(pressed ? 'mic_unmute' : 'mic_mute');
-          await this.notificationService.playSound(sound, this.config.muteSoundVolume / 100);
-          await this.setMute(!pressed);
-          break;
-        }
-      }
-    });
     // Reevaluate mute state when the behavior changes
     this._effectiveControllerBehaviour
       .pipe(

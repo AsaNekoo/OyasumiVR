@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { IPCService } from '../ipc.service';
 import { map, pairwise, switchMap, take, tap } from 'rxjs';
-import { OpenVRInputService } from '../openvr-input.service';
 import {
   Empty,
   // OverlayMenuOpenRequest,
@@ -24,7 +23,6 @@ export class OverlayService {
 
   constructor(
     private ipcService: IPCService,
-    private openvrInput: OpenVRInputService,
     private appSettingsService: AppSettingsService,
     private vrchat: VRChatService
   ) {}

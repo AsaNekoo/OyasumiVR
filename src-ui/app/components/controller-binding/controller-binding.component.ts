@@ -1,6 +1,5 @@
 import { Component, DestroyRef, Input, OnInit } from '@angular/core';
 import { OVRInputEventAction, OVRInputEventActionSet } from '../../models/ovr-input-event';
-import { OpenVRInputService } from 'src-ui/app/services/openvr-input.service';
 import { filter, firstValueFrom, interval, pairwise, startWith, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { OVRActionBinding } from '../../models/ovr-action-binding';
@@ -52,7 +51,6 @@ export class ControllerBindingComponent implements OnInit {
   }
 
   constructor(
-    protected openvrInputService: OpenVRInputService,
     private openvr: OpenVRService,
     private destroyRef: DestroyRef
   ) {}
@@ -89,7 +87,6 @@ export class ControllerBindingComponent implements OnInit {
         error = 'STEAMVR_INACTIVE';
         return;
       }
-      bindings = await this.openvrInputService.getActionBindings(this.actionSetKey, this.actionKey);
       if (bindings.length === 0) {
         const controllers = await firstValueFrom(this.openvr.devices).then((devices) =>
           devices.filter((d) => d.class === 'Controller')
@@ -149,8 +146,7 @@ export class ControllerBindingComponent implements OnInit {
     }
   }
 
-  async launchBindingConfiguration(showOnDesktop: boolean) {
+  async launchBindingConfiguration(_: boolean) {
     this.dropdownOpen = false;
-    if (this.steamVRActive) await this.openvrInputService.launchBindingConfiguration(showOnDesktop);
   }
 }

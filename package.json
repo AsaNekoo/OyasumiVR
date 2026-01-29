@@ -11,7 +11,7 @@
     "start:overlay": "cd src-overlay-sidecar && dotnet build && dotnet run -- dev",
     "start:overlay-ui": "cd src-overlay-ui && npm run dev",
     "build:ui": "cd src-ui && ng build",
-    "build_linux": "nice -n20 run-p build:core build:sidecars",
+    "build": "nice -n20 run-p build:core build:sidecars",
     "build:core": "run-s build::pre && run-s build:ui && npm run tauri build",
     "build:pre": " node scripts/pre-build.js && run-p build:front && node scripts/pre-build-linux.js",
     "build:front": "ng build",
