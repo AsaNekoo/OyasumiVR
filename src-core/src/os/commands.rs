@@ -215,7 +215,7 @@ pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
             manager
                 .devices()
                 .iter()
-                .map(|device| AudioDeviceDto::from(device.clone()))
+                .map(|device: &super::linux::audio::LinuxAudioDevice| AudioDeviceDto::from(device.clone()))
                 .collect::<Vec<AudioDeviceDto>>()
         } else {
             error!(

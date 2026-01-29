@@ -13,9 +13,7 @@
       "nsis"
     ],
     "resources": [
-      "./openvr_api.dll",
       "./flags.toml",
-      "./steam_api64.dll",
       "./resources/**/*"
     ],
     "icon": [
