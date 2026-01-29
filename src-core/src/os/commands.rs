@@ -2,6 +2,7 @@ use super::models::Output;
 use super::models::WindowsPowerPolicy;
 use crate::os::linux::audio::LINUX_AUDIO_DEVICE_MANAGER;
 use crate::os::models::AudioDeviceDto;
+use crate::utils::VRCHAT_ACTIVE;
 use crate::warn_unimplemented;
 use log::error;
 
@@ -38,13 +39,12 @@ pub async fn quit_steamvr(kill: bool) {
     crate::utils::quit_steamvr(kill).await;
 }
 
-// #[tauri::command]
-// #[oyasumivr_macros::command_profiling]
-// pub async fn is_vrchat_active() -> bool {
-//     let vrc_active_guard = VRCHAT_ACTIVE.lock().await;
-//     *vrc_active_guard
-//     // true
-// }
+#[tauri::command]
+#[oyasumivr_macros::command_profiling]
+pub async fn is_vrchat_active() -> bool {
+    unsafe { VRCHAT_ACTIVE }
+    // true
+}
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
@@ -128,42 +128,37 @@ pub async fn get_power_policy_providers() -> Vec<String> {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn active_system_power_policy() -> Option<WindowsPowerPolicy> {
- 
-        use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
-        let current = LINUX_POWER_POLICY_MANAGER
-            .lock()
-            .await
-            .get_current_profile();
-        Some(WindowsPowerPolicy {
-            guid: current.clone(),
-            name: current,
-        })
-    
+    use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
+    let current = LINUX_POWER_POLICY_MANAGER
+        .lock()
+        .await
+        .get_current_profile();
+    Some(WindowsPowerPolicy {
+        guid: current.clone(),
+        name: current,
+    })
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn get_system_power_policies() -> Vec<WindowsPowerPolicy> {
+    use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
 
-        use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
-
-        LINUX_POWER_POLICY_MANAGER
-            .lock()
-            .await
-            .get_avalible_profiles()
-            .into_iter()
-            .map(|p| WindowsPowerPolicy {
-                guid: p.clone(),
-                name: p,
-            })
-            .collect()
-    
+    LINUX_POWER_POLICY_MANAGER
+        .lock()
+        .await
+        .get_avalible_profiles()
+        .into_iter()
+        .map(|p| WindowsPowerPolicy {
+            guid: p.clone(),
+            name: p,
+        })
+        .collect()
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn windows_is_elevated() -> bool {
-  
     true
 }
 
@@ -171,7 +166,6 @@ pub async fn windows_is_elevated() -> bool {
 #[oyasumivr_macros::command_profiling]
 #[cfg_attr(unix, expect(unused_variables))]
 pub async fn system_shutdown(message: String, timeout: u32, force_close_apps: bool) {
-
     let _ = system_shutdown::shutdown();
 }
 
@@ -179,7 +173,6 @@ pub async fn system_shutdown(message: String, timeout: u32, force_close_apps: bo
 #[oyasumivr_macros::command_profiling]
 #[cfg_attr(unix, expect(unused_variables))]
 pub async fn system_reboot(message: String, timeout: u32, force_close_apps: bool) {
-
     let _ = system_shutdown::reboot();
 }
 
@@ -204,63 +197,58 @@ pub async fn system_logout() {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
- 
-        let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
-        if let Some(manager) = manager_guard.as_mut() {
-            if refresh {
-                if let Err(err) = manager.refresh_devices() {
-                    error!("[Core] Failed to refresh audio devices: {:?}", err);
-                }
+    let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
+    if let Some(manager) = manager_guard.as_mut() {
+        if refresh {
+            if let Err(err) = manager.refresh_devices() {
+                error!("[Core] Failed to refresh audio devices: {:?}", err);
             }
-            manager
-                .devices()
-                .iter()
-                .map(|device: &super::linux::audio::LinuxAudioDevice| AudioDeviceDto::from(device.clone()))
-                .collect::<Vec<AudioDeviceDto>>()
-        } else {
-            error!(
-                "[Core] Could not get audio devices, as audio device manager was not initialized"
-            );
-            Vec::new()
         }
-    
+        manager
+            .devices()
+            .iter()
+            .map(|device: &super::linux::audio::LinuxAudioDevice| {
+                AudioDeviceDto::from(device.clone())
+            })
+            .collect::<Vec<AudioDeviceDto>>()
+    } else {
+        error!("[Core] Could not get audio devices, as audio device manager was not initialized");
+        Vec::new()
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_audio_device_volume(device_id: String, volume: f32) {
-  
-        let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
-        if let Some(manager) = manager_guard.as_mut() {
-            if let Err(error) = manager.set_audio_device_volume(device_id, volume) {
-                error!("[Core] Could not set audio device volume, {:?}", error);
-            }
-        } else {
-            error!("[Core] Could not set audio device volume, as audio device manager was not initialized");
+    let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
+    if let Some(manager) = manager_guard.as_mut() {
+        if let Err(error) = manager.set_audio_device_volume(device_id, volume) {
+            error!("[Core] Could not set audio device volume, {:?}", error);
         }
-    
+    } else {
+        error!(
+            "[Core] Could not set audio device volume, as audio device manager was not initialized"
+        );
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_audio_device_mute(device_id: String, mute: bool) {
- 
-        let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
-        if let Some(manager) = manager_guard.as_mut() {
-            if let Err(error) = manager.set_audio_device_mute(device_id, mute) {
-                error!("[Core] Could not set audio device mute state, {:?}", error);
-            }
-        } else {
-            error!("[Core] Could not set audio device mute state, as audio device manager was not initialized");
+    let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
+    if let Some(manager) = manager_guard.as_mut() {
+        if let Err(error) = manager.set_audio_device_mute(device_id, mute) {
+            error!("[Core] Could not set audio device mute state, {:?}", error);
         }
-    
+    } else {
+        error!("[Core] Could not set audio device mute state, as audio device manager was not initialized");
+    }
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 #[cfg_attr(unix, allow(unused_variables))]
 pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
-
     warn_unimplemented!();
 }
 
@@ -268,7 +256,6 @@ pub async fn set_hardware_mic_activity_enabled(enabled: bool) {
 #[oyasumivr_macros::command_profiling]
 #[cfg_attr(unix, allow(unused_variables))]
 pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
-
     warn_unimplemented!();
 }
 
@@ -276,14 +263,12 @@ pub async fn set_hardware_mic_activivation_threshold(threshold: f32) {
 #[oyasumivr_macros::command_profiling]
 #[cfg_attr(unix, allow(unused_variables))]
 pub async fn set_mic_activity_device_id(device_id: Option<String>) {
-   
     warn_unimplemented!();
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn is_elevation_security_disabled() -> bool {
-
     true
 }
 #[tauri::command]

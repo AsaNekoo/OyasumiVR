@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MqttDiscoveryService } from '../mqtt-discovery.service';
 import { VRChatService } from '../../vrchat-api/vrchat.service';
-import { combineLatest } from 'rxjs';
+import { combineLatest, firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -45,17 +45,16 @@ export class VRChatMqttIntegrationService {
     });
     this.vrchat.user.subscribe(async (user) => {
       await this.mqtt.setSensorPropertyValue('vrcPlayerName', user?.displayName ?? 'null');
-      // await this.mqtt.setSensorPropertyValue(
-      //   'vrcStatus',
-      //   user?.status.toString() ??
-      //     ((await firstValueFrom(this.vrchat.vrchatProcessActive)) ? 'offline' : 'null')
-      // );
+      await this.mqtt.setSensorPropertyValue(
+        'vrcStatus',
+        user?.status.toString() ??
+          ((await firstValueFrom(this.vrchat.vrchatProcessActive)) ? 'offline' : 'null')
+      );
     });
-    // combineLatest([this.vrchat.world, this.vrchat.vrchatProcessActive]).subscribe(
-    combineLatest([this.vrchat.world]).subscribe(
-      async ([world]) => {
-        await this.mqtt.setPropertyAvailability('vrcWorldInstanceId', world.loaded);
-        await this.mqtt.setPropertyAvailability('vrcWorldPlayerCount', world.loaded);
+    combineLatest([this.vrchat.world, this.vrchat.vrchatProcessActive]).subscribe(
+      async ([world, vrcActive]) => {
+        await this.mqtt.setPropertyAvailability('vrcWorldInstanceId', world.loaded && vrcActive);
+        await this.mqtt.setPropertyAvailability('vrcWorldPlayerCount', world.loaded && vrcActive);
         await this.mqtt.setSensorPropertyValue('vrcWorldInstanceId', world.instanceId ?? 'null');
         await this.mqtt.setSensorPropertyValue(
           'vrcWorldPlayerCount',

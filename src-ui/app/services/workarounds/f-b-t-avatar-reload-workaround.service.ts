@@ -6,6 +6,8 @@ import {
   filter,
   map,
   pairwise,
+  switchMap,
+  take,
   throttleTime,
 } from 'rxjs';
 import { isEqual } from 'lodash';
@@ -48,7 +50,7 @@ export class FBTAvatarReloadWorkaroundService {
         distinctUntilChanged((a, b) => isEqual(a, b)),
         filter(([prev, curr]) => prev.length > 0 && curr.length === 0),
         // Only run while VRChat is active
-        // switchMap(() => this.vrchat.vrchatProcessActive.pipe(take(1))),
+        switchMap(() => this.vrchat.vrchatProcessActive.pipe(take(1))),
         filter(Boolean),
         // Only trigger once every 5s max
         throttleTime(5000, asyncScheduler, { leading: true, trailing: false })

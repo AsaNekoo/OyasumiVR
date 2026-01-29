@@ -14,7 +14,7 @@ use crate::{
 static VRCHAT_OSC_ADDR: std::sync::Mutex<Option<SocketAddr>> = std::sync::Mutex::new(None);
 static VRCHAT_OSCQUERY_ADDR: std::sync::Mutex<Option<SocketAddr>> = std::sync::Mutex::new(None);
 //VRChatOSC internally uses RwLock
-static OSC_SERVER: Mutex<Option<Arc<VRChatOSC>>> = Mutex::const_new(None);
+pub static OSC_SERVER: Mutex<Option<Arc<VRChatOSC>>> = Mutex::const_new(None);
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn get_vrchat_osc_address() -> Option<String> {

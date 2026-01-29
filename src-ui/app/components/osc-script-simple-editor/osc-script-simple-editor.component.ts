@@ -11,7 +11,7 @@ import { SelectBoxItem } from '../select-box/select-box.component';
 import { fade, hshrink, noop, vshrink } from 'src-ui/app/utils/animations';
 import { TString } from '../../models/translatable-string';
 import { floatPrecision } from '../../utils/number-utils';
-import { combineLatest, debounceTime, startWith, Subject, tap } from 'rxjs';
+import { combineLatest, debounceTime, firstValueFrom, startWith, Subject, tap } from 'rxjs';
 import { OscService } from '../../services/osc.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAX_PARAMETERS_PER_COMMAND, MAX_STRING_VALUE_LENGTH } from '../../utils/osc-script-utils';
@@ -135,8 +135,8 @@ export class OscScriptSimpleEditorComponent implements OnInit {
 
   private async checkShowVRChatAutocompleteInfo() {
     // Only show if VRChat is not running and avatar context is unavailable
-    // const isVRChatRunning = await firstValueFrom(this.vrchat.vrchatProcessActive);
-    if (!this.currentAvatarContext) {
+    const isVRChatRunning = await firstValueFrom(this.vrchat.vrchatProcessActive);
+    if (!this.currentAvatarContext && !isVRChatRunning) {
       await this.appSettings.promptDialogForOneTimeFlag(
         'OSC_SCRIPT_SIMPLE_EDITOR_VRCHAT_AUTOCOMPLETE_INFO'
       );
