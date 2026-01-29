@@ -406,7 +406,6 @@ export class GpuAutomationsService {
     // Try running it
     try {
       await invoke<boolean>('msi_afterburner_set_profile', {
-        executablePath: path,
         profile: 0, // Profile 0 for testing without actually setting a profile
       });
     } catch (e) {
