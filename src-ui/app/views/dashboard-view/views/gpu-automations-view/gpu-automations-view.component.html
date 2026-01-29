@@ -2,96 +2,14 @@
   <!-- TITLE-->
   <div class="pane-title" translate
     ><span translate>gpu-automations.title</span>
-    @if (is_windows){
-    @if (!['DISABLED'].includes(panel)) {
-      <button class="btn btn-secondary" (click)="gpuAutomations.disable()" translate @fade>
-        gpu-automations.disable
-      </button>
-    }
-  }
-  </div>
-  @if(is_windows){
-  <!-- TAB BAR-->
-  @if (panel === 'ENABLED') {
-    <div class="tab-bar" @vshrink>
-      <div
-        class="tab"
-        [class.active]="activeTab === 'POWER_LIMITS'"
-        (click)="activeTab = 'POWER_LIMITS'"
-      >
-        <div class="tab-label">
-          @if (nvmlErrors | async) {
-            <i class="material-icons" style="color: var(--color-warning)" @hshrink>
-              error_outline
-            </i>
-          }
-          <span translate>gpu-automations.tabs.powerLimiting</span>
-        </div>
-      </div>
-      <div
-        class="tab"
-        [class.active]="activeTab === 'MSI_AFTERBURNER'"
-        (click)="activeTab = 'MSI_AFTERBURNER'"
-      >
-        <div class="tab-label">
-          @if (msiAfterburnerErrors | async) {
-            <i class="material-icons" style="color: var(--color-warning)" @hshrink>
-              error_outline
-            </i>
-          }
-          <span translate>gpu-automations.tabs.msiAfterburner</span>
-        </div>
-      </div>
-    </div>
-  }
-  <!-- PANES-->
-  @if (panel === 'ENABLED' && activeTab === 'POWER_LIMITS') {
-    <app-gpu-powerlimiting-pane></app-gpu-powerlimiting-pane>
-  }
-  @if (panel === 'ENABLED' && activeTab === 'MSI_AFTERBURNER') {
-    <app-msi-afterburner-pane></app-msi-afterburner-pane>
-  }
-  <!--  DISABLED-->
-  @if (panel !== 'ENABLED') {
-    <div class="pane-content pane-content-disabled">
-      <div class="icon">
-        @if (['DISABLED'].includes(panel)) {
-          <i class="material-icons">info</i>
-        }
-        @if (['NO_SIDECAR'].includes(panel)) {
-          <i class="material-icons"> warning </i>
-        }
-      </div>
-      <div class="description" [innerHTML]="disabledMessage | translate"></div>
-      <div class="btn-row">
-        @if (panel === 'NO_SIDECAR') {
-          <button class="btn btn-primary action" (click)="startSidecar()" translate>
-            gpu-automations.requestAdministrator
-          </button>
-        }
-        @if (!['DISABLED'].includes(panel)) {
-          <button class="btn btn-secondary action" (click)="gpuAutomations.disable()" translate>
-            gpu-automations.disable
-          </button>
-        }
-      </div>
-      @if (panel === 'DISABLED') {
-        <div class="alert">
-          <div class="alert-bg"></div>
-          <div class="alert-icon">
-            <i class="material-icons">warning</i>
-          </div>
-          <div class="alert-content flex-row">
-            <span [innerHTML]="'gpu-automations.enableWarning' | translate"></span>
-            <button class="btn btn-primary" (click)="gpuAutomations.enable()" translate>
-              gpu-automations.enable
-            </button>
-          </div>
-        </div>
+    @if (is_windows) {
+      @if (!['DISABLED'].includes(panel)) {
+        <button class="btn btn-secondary" (click)="gpuAutomations.disable()" translate @fade>
+          gpu-automations.disable
+        </button>
       }
-    </div>
-  }
-}@else {
-   <app-msi-afterburner-pane></app-msi-afterburner-pane>
-}
+    }
+  </div>
+
+  <app-msi-afterburner-pane></app-msi-afterburner-pane>
 </div>

@@ -22,7 +22,6 @@ import { OpenVRService } from './services/openvr.service';
 import { GpuAutomationsViewComponent } from './views/dashboard-view/views/gpu-automations-view/gpu-automations-view.component';
 import { SleepService } from './services/sleep.service';
 import { GpuAutomationsService } from './services/gpu-automations.service';
-import { PowerLimitInputComponent } from './views/dashboard-view/views/gpu-automations-view/power-limit-input/power-limit-input.component';
 import { NgPipesModule } from 'ngx-pipes';
 import { OscService } from './services/osc.service';
 import { OscAutomationsViewComponent } from './views/dashboard-view/views/osc-automations-view/osc-automations-view.component';
@@ -60,7 +59,6 @@ import { CachedValue } from './utils/cached-value';
 import { ImageCacheService } from './services/image-cache.service';
 import { ImageCachePipe } from './pipes/image-cache.pipe';
 import { InviteAutomationsService } from './services/invite-automations.service';
-import { GpuPowerlimitingPaneComponent } from './views/dashboard-view/views/gpu-automations-view/gpu-powerlimiting-pane/gpu-powerlimiting-pane.component';
 import { MsiAfterburnerPaneComponent } from './views/dashboard-view/views/gpu-automations-view/msi-afterburner-pane/msi-afterburner-pane.component';
 import { invoke } from '@tauri-apps/api/core';
 import { SleepModeChangeOnSteamVRStatusAutomationService } from './services/sleep-detection-automations/sleep-mode-change-on-steamvr-status-automation.service';
@@ -309,7 +307,6 @@ export function createTranslateLoader(http: HttpClient) {
     MqttConfigModalComponent,
     DevicePowerOnDisableSleepModeModalComponent,
     GpuAutomationsViewComponent,
-    PowerLimitInputComponent,
     OscAutomationsViewComponent,
     SelectBoxComponent,
     TStringTranslatePipe,
@@ -337,7 +334,6 @@ export function createTranslateLoader(http: HttpClient) {
     InvitesTabComponent,
     SoundsTabComponent,
     FriendSelectionModalComponent,
-    GpuPowerlimitingPaneComponent,
     MsiAfterburnerPaneComponent,
     BrightnessAutomationsViewComponent,
     SliderSettingComponent,

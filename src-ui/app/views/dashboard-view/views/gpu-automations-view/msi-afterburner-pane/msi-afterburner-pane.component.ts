@@ -5,7 +5,6 @@ import {
   AppSettings,
   ExecutableReferenceStatus,
 } from '../../../../../models/settings';
-import { open as openFile } from '@tauri-apps/plugin-dialog';
 
 import { GpuAutomationsService } from '../../../../../services/gpu-automations.service';
 import {
@@ -97,20 +96,7 @@ export class MsiAfterburnerPaneComponent implements OnInit {
       : undefined;
   }
 
-  async browseForMsiAfterburner() {
-    const path = await openFile({
-      defaultPath: 'C:\\Program Files (x86)\\MSI Afterburner',
-      directory: false,
-      multiple: false,
-      filters: [
-        {
-          name: 'MSIAfterburner',
-          extensions: ['exe'],
-        },
-      ],
-    });
-    if (path && typeof path === 'string') await this.gpuAutomations.setMSIAfterburnerPath(path);
-  }
+
 
   changeProfile(event: 'ON_DISABLE' | 'ON_ENABLE' | 'ON_PREPARE', item: SelectBoxItem) {
     switch (event) {

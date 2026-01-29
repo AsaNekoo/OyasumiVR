@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { AutomationConfigService } from './automation-config.service';
 import {
   BehaviorSubject,
-  combineLatest,
   distinctUntilChanged,
   filter,
   firstValueFrom,
@@ -13,25 +12,18 @@ import {
   startWith,
   switchMap,
   take,
-  tap,
 } from 'rxjs';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
-  GPUPowerLimitsAutomationConfig,
   MSIAfterburnerAutomationConfig,
 } from '../models/automations';
 
-import { GPUDevice, GPUPowerLimit } from '../models/gpu-device';
-import { NvmlService } from './nvml.service';
-import { NvmlDevice } from '../models/nvml-device';
 import { SleepService } from './sleep.service';
-import { error, info, warn } from '@tauri-apps/plugin-log';
+import { error, warn } from '@tauri-apps/plugin-log';
 import { invoke } from '@tauri-apps/api/core';
 import { ExecutableReferenceStatus } from '../models/settings';
-import { ElevatedSidecarService } from './elevated-sidecar.service';
 import { EventLogService } from './event-log.service';
 import {
-  EventLogGpuPowerLimitChanged,
   EventLogMsiAfterburnerProfileSet,
 } from '../models/event-log-entry';
 import { SleepPreparationService } from './sleep-preparation.service';
@@ -40,14 +32,6 @@ import { SleepPreparationService } from './sleep-preparation.service';
   providedIn: 'root',
 })
 export class GpuAutomationsService {
-  // Power limiting
-  private currentPowerLimitsConfig: GPUPowerLimitsAutomationConfig = structuredClone(
-    AUTOMATION_CONFIGS_DEFAULT.GPU_POWER_LIMITS
-  );
-  public powerLimitsConfig: Observable<GPUPowerLimitsAutomationConfig> =
-    this.automationConfig.configs.pipe(map((configs) => configs.GPU_POWER_LIMITS));
-  private _nvmlDevices: BehaviorSubject<GPUDevice[]> = new BehaviorSubject<GPUDevice[]>([]);
-  public nvmlDevices: Observable<Array<GPUDevice & { selected: boolean }>>;
   // MSI Afterburner
   private currentMSIAfterburnerConfig: MSIAfterburnerAutomationConfig = structuredClone(
     AUTOMATION_CONFIGS_DEFAULT.MSI_AFTERBURNER
@@ -61,43 +45,14 @@ export class GpuAutomationsService {
 
   constructor(
     private automationConfig: AutomationConfigService,
-    private nvml: NvmlService,
     private sleep: SleepService,
     private sleep_preparation_service: SleepPreparationService,
-    private sidecar: ElevatedSidecarService,
     private eventLog: EventLogService
   ) {
-    this.powerLimitsConfig.subscribe((config) => (this.currentPowerLimitsConfig = config));
     this.msiAfterburnerConfig.subscribe((config) => (this.currentMSIAfterburnerConfig = config));
-    this.nvmlDevices = combineLatest([
-      this.automationConfig.configs.pipe(map((configs) => configs.GPU_POWER_LIMITS)),
-      this._nvmlDevices,
-    ]).pipe(
-      map(([config, devices]) =>
-        devices.map((d) => ({ ...d, selected: d.id === config.selectedDeviceId }))
-      )
-    );
   }
 
   async init() {
-    // Process detected NVIDIA cards
-    this.nvml.devices
-      .pipe(
-        tap((nvmlDevices) => {
-          const devices = nvmlDevices.map((nd) => this.mapNvmlDeviceToGPUDevice(nd));
-          this._nvmlDevices.next(devices);
-        })
-      )
-      .subscribe();
-    // If no GPU is selected and GPUs are detected, select the first one by default.
-    this._nvmlDevices.subscribe((devices) => {
-      if (this.currentPowerLimitsConfig.selectedDeviceId === null) {
-        const device = devices.find((d) => d.supportsPowerLimiting);
-        if (device) this.selectPowerLimitingDevice(device);
-      }
-    });
-    // Setup sleep based power limiting automations
-    this.setupPowerLimitOnSleepAutomations();
     // Test MSI Afterburner executable reference
     this.testMSIAfterburnerPathWhenNeeded();
     // Setup sleep based msi afterburner automations
@@ -106,184 +61,22 @@ export class GpuAutomationsService {
 
   isEnabled(): Observable<boolean> {
     return this.automationConfig.configs.pipe(
-      map((configs) => configs.GPU_POWER_LIMITS.enabled && configs.MSI_AFTERBURNER.enabled)
+      map((configs) => configs.MSI_AFTERBURNER.enabled)
     );
   }
 
   async enable() {
-    await this.automationConfig.updateAutomationConfig<GPUPowerLimitsAutomationConfig>(
-      'GPU_POWER_LIMITS',
-      { ...structuredClone(AUTOMATION_CONFIGS_DEFAULT.GPU_POWER_LIMITS), enabled: true }
-    );
     await this.automationConfig.updateAutomationConfig<MSIAfterburnerAutomationConfig>(
       'MSI_AFTERBURNER',
       { ...structuredClone(AUTOMATION_CONFIGS_DEFAULT.MSI_AFTERBURNER), enabled: true }
     );
-    if (this.currentPowerLimitsConfig.selectedDeviceId === null) {
-      const device = (this._nvmlDevices.value ?? []).find((d) => d.supportsPowerLimiting);
-      if (device) this.selectPowerLimitingDevice(device);
-    }
   }
 
   async disable() {
-    await this.automationConfig.updateAutomationConfig<GPUPowerLimitsAutomationConfig>(
-      'GPU_POWER_LIMITS',
-      { ...structuredClone(AUTOMATION_CONFIGS_DEFAULT.GPU_POWER_LIMITS), enabled: false }
-    );
     await this.automationConfig.updateAutomationConfig<MSIAfterburnerAutomationConfig>(
       'MSI_AFTERBURNER',
       { ...structuredClone(AUTOMATION_CONFIGS_DEFAULT.MSI_AFTERBURNER), enabled: false }
     );
-  }
-
-  async selectPowerLimitingDevice(device: GPUDevice) {
-    if (device.id === this.currentPowerLimitsConfig.selectedDeviceId) return;
-
-    await this.automationConfig.updateAutomationConfig<GPUPowerLimitsAutomationConfig>(
-      'GPU_POWER_LIMITS',
-      {
-        selectedDeviceId: device.id,
-        onSleepEnable: {
-          ...structuredClone(AUTOMATION_CONFIGS_DEFAULT.GPU_POWER_LIMITS.onSleepEnable),
-          powerLimit: device.defaultPowerLimit,
-        },
-        onSleepDisable: {
-          ...structuredClone(AUTOMATION_CONFIGS_DEFAULT.GPU_POWER_LIMITS.onSleepDisable),
-          powerLimit: device.defaultPowerLimit,
-        },
-      }
-    );
-  }
-
-  async setSleepEnablePowerLimit(limit: GPUPowerLimit) {
-    await this.automationConfig.updateAutomationConfig<GPUPowerLimitsAutomationConfig>(
-      'GPU_POWER_LIMITS',
-      {
-        ...structuredClone(this.currentPowerLimitsConfig),
-        onSleepEnable: {
-          enabled: this.currentPowerLimitsConfig.onSleepEnable.enabled,
-          powerLimit: limit.limit,
-          resetToDefault: limit.default,
-        },
-      }
-    );
-  }
-
-  async setSleepDisablePowerLimit(limit: GPUPowerLimit) {
-    await this.automationConfig.updateAutomationConfig<GPUPowerLimitsAutomationConfig>(
-      'GPU_POWER_LIMITS',
-      {
-        ...structuredClone(this.currentPowerLimitsConfig),
-        onSleepDisable: {
-          enabled: this.currentPowerLimitsConfig.onSleepDisable.enabled,
-          powerLimit: limit.limit,
-          resetToDefault: limit.default,
-        },
-      }
-    );
-  }
-
-  async togglePowerLimitOnSleepEnabledAutomation() {
-    const config = structuredClone(this.currentPowerLimitsConfig);
-    config.onSleepEnable.enabled = !config.onSleepEnable.enabled;
-    await this.automationConfig.updateAutomationConfig<GPUPowerLimitsAutomationConfig>(
-      'GPU_POWER_LIMITS',
-      config
-    );
-  }
-
-  async togglePowerLimitOnSleepDisabledAutomation() {
-    const config = structuredClone(this.currentPowerLimitsConfig);
-    config.onSleepDisable.enabled = !config.onSleepDisable.enabled;
-    await this.automationConfig.updateAutomationConfig<GPUPowerLimitsAutomationConfig>(
-      'GPU_POWER_LIMITS',
-      config
-    );
-  }
-
-  private setupPowerLimitOnSleepAutomations() {
-    const setupOnSleepAutomation = (on: 'ENABLE' | 'DISABLE') => {
-      const getAutomationConfig = () => {
-        switch (on) {
-          case 'ENABLE':
-            return this.currentPowerLimitsConfig.onSleepEnable;
-          case 'DISABLE':
-            return this.currentPowerLimitsConfig.onSleepDisable;
-        }
-      };
-      this.sleep.mode
-        .pipe(
-          // Skip first value from initial load
-          skip(1),
-          // Trigger only on enable or disable
-          filter((sleepMode) => {
-            switch (on) {
-              case 'ENABLE':
-                return sleepMode;
-              case 'DISABLE':
-                return !sleepMode;
-            }
-          }),
-          // Check if GPU automations are enabled
-          switchMap(() => this.isEnabled().pipe(take(1))),
-          filter((gpuAutomationsEnabled) => gpuAutomationsEnabled),
-          // Check if on sleep disable automation is enabled
-          filter(() => getAutomationConfig().enabled),
-          // Fetch selected device
-          switchMap(() =>
-            this.nvmlDevices.pipe(
-              take(1),
-              map((devices) =>
-                devices.find((d) => d.id === this.currentPowerLimitsConfig.selectedDeviceId)
-              )
-            )
-          ),
-          // Check if selected device is available and supports power limiting
-          filter((selectedDevice) => !!selectedDevice && !!selectedDevice.supportsPowerLimiting),
-          switchMap((selectedDevice) => {
-            info('[GpuAutomations] Setting power limit');
-            const powerLimit = getAutomationConfig().resetToDefault
-              ? selectedDevice!.defaultPowerLimit!
-              : getAutomationConfig().powerLimit || selectedDevice!.defaultPowerLimit!;
-            return this.nvml.setPowerLimit(selectedDevice!.id, powerLimit * 1000).then(() => {
-              this.eventLog.logEvent({
-                type: 'gpuPowerLimitChanged',
-                device: selectedDevice!.name,
-                limit: powerLimit,
-                resetToDefault: getAutomationConfig().resetToDefault,
-                reason: on === 'ENABLE' ? 'SLEEP_MODE_ENABLED' : 'SLEEP_MODE_DISABLED',
-              } as EventLogGpuPowerLimitChanged);
-            });
-          })
-        )
-        .subscribe();
-    };
-    setupOnSleepAutomation('ENABLE');
-    setupOnSleepAutomation('DISABLE');
-  }
-
-  private mapNvmlDeviceToGPUDevice(nvmlDevice: NvmlDevice): GPUDevice {
-    return {
-      id: nvmlDevice.uuid,
-      type: 'NVIDIA',
-      name: nvmlDevice.name,
-      supportsPowerLimiting:
-        typeof nvmlDevice.minPowerLimit === 'number' &&
-        typeof nvmlDevice.maxPowerLimit === 'number' &&
-        typeof nvmlDevice.defaultPowerLimit === 'number' &&
-        (nvmlDevice.minPowerLimit !== nvmlDevice.defaultPowerLimit ||
-          nvmlDevice.maxPowerLimit !== nvmlDevice.defaultPowerLimit) &&
-        nvmlDevice.maxPowerLimit > nvmlDevice.minPowerLimit,
-      minPowerLimit:
-        nvmlDevice.minPowerLimit !== undefined ? nvmlDevice.minPowerLimit / 1000 : undefined,
-      maxPowerLimit:
-        nvmlDevice.maxPowerLimit !== undefined ? nvmlDevice.maxPowerLimit / 1000 : undefined,
-      defaultPowerLimit:
-        nvmlDevice.defaultPowerLimit !== undefined
-          ? nvmlDevice.defaultPowerLimit / 1000
-          : undefined,
-      powerLimit: nvmlDevice.powerLimit !== undefined ? nvmlDevice.powerLimit / 1000 : undefined,
-    };
   }
 
   async setupMSIAfterburnerProfileSleepAutomations() {
@@ -330,30 +123,20 @@ export class GpuAutomationsService {
         pairwise(),
         // Only if the status is still unknown, or if the path was changed (by the user)
         filter(
-          ([prev, curr]) =>
-            this._msiAfterburnerStatus.value === 'UNKNOWN' ||
-            prev.msiAfterburnerPath !== curr.msiAfterburnerPath
+          () =>
+            this._msiAfterburnerStatus.value === 'UNKNOWN'
         ),
         map(([, curr]) => curr.msiAfterburnerPath),
-        // Only while the sidecar is running
-        switchMap((msiAfterburnerPath) =>
-          this.sidecar.sidecarStarted.pipe(
-            filter(Boolean),
-            take(1),
-            map(() => msiAfterburnerPath)
-          )
-        ),
         // Only while one of the profile automations is active (so we don't launch afterburner for nothing)
-        switchMap((msiAfterburnerPath) =>
+        switchMap(() =>
           this.msiAfterburnerConfig.pipe(
             filter((config) => !!(config.onSleepEnableProfile || config.onSleepDisableProfile)),
             take(1),
-            map(() => msiAfterburnerPath)
           )
         )
       )
-      .subscribe((msiAfterburnerPath) => {
-        this.setMSIAfterburnerPath(msiAfterburnerPath as string, false);
+      .subscribe(() => {
+        this.testmsi();
       });
   }
 
@@ -392,17 +175,8 @@ export class GpuAutomationsService {
     }
   }
 
-  async setMSIAfterburnerPath(path: string, save = true) {
-    if (save)
-      await this.automationConfig.updateAutomationConfig<MSIAfterburnerAutomationConfig>(
-        'MSI_AFTERBURNER',
-        { msiAfterburnerPath: path }
-      );
+  async testmsi() {
     this._msiAfterburnerStatus.next('CHECKING');
-    if (!path.endsWith('MSIAfterburner.exe')) {
-      this._msiAfterburnerStatus.next('NOT_FOUND');
-      return;
-    }
     // Try running it
     try {
       await invoke<boolean>('msi_afterburner_set_profile', {
