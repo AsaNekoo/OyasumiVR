@@ -137,7 +137,6 @@ import { AudioDeviceService } from './services/audio-device.service';
 import { SystemMicMuteAutomationsViewComponent } from './views/dashboard-view/views/system-mic-mute-automations-view/system-mic-mute-automations-view.component';
 import { SystemMicMuteAutomationService } from './services/system-mic-mute-automation.service';
 import { OverlayService } from './services/overlay/overlay.service';
-import { ControllerBindingComponent } from './components/controller-binding/controller-binding.component';
 import { TranslationLoaderViewComponent } from './modules/translation/views/translation-loader-view/translation-loader-view.component';
 import { FormsModule } from '@angular/forms';
 import { TranslationEditorViewComponent } from './modules/translation/views/translation-editor-view/translation-editor-view.component';
@@ -367,7 +366,6 @@ export function createTranslateLoader(http: HttpClient) {
     MiscTestingComponent,
     VRChatMicMuteAutomationsViewComponent,
     SystemMicMuteAutomationsViewComponent,
-    ControllerBindingComponent,
     TranslationLoaderViewComponent,
     TranslationEditorViewComponent,
     TextareaAutoResizeDirective,

@@ -1,6 +1,6 @@
 use crate::{
     vr::{
-        model::{BindingOriginData, OVRDevice, OVRFrameLimits, SleepState},
+        model::{OVRDevice, OVRFrameLimits, SleepState},
         openxr::SLEEP_DETECTOR,
         SLEEP_DETECTION_ENABLED,
     },
@@ -98,32 +98,9 @@ pub async fn vr_set_image_brightness(
     super::openxr::set_brightness(brightness, perceived_brightness_adjustment_gamma).await;
 }
 
-#[tauri::command]
-#[oyasumivr_macros::command_profiling]
-#[cfg_attr(unix, allow(unused_variables))]
-pub async fn vr_launch_binding_configuration(show_on_desktop: bool) {
-    //fixme: figure this out
-}
-
-#[tauri::command]
-#[oyasumivr_macros::command_profiling]
-pub async fn openvr_is_dashboard_visible() -> bool {
-    false
-}
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn openvr_reregister_manifest() -> Result<(), String> {
     Ok(())
-}
-
-#[tauri::command]
-#[cfg_attr(unix, allow(unused_variables))]
-#[oyasumivr_macros::command_profiling]
-pub async fn vr_get_binding_origins(
-    action_set_key: String,
-    action_key: String,
-) -> Option<Vec<BindingOriginData>> {
-    //fixme: look at it and see wha it does
-    None
 }

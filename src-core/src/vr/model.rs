@@ -72,18 +72,6 @@ pub enum TrackedDeviceClass {
     TrackingReference,
     DisplayRedirect,
 }
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BindingOriginData {
-    pub localized_controller_type: String,
-    pub localized_hand: String,
-    pub localized_input_source: String,
-    pub device_path_name: String,
-    pub input_path_name: String,
-    pub mode_name: String,
-    pub slot_name: String,
-    pub input_source_type: String,
-}
 #[derive(Serialize, Clone,Display,Copy,PartialEq,Debug)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum VRStatus {
