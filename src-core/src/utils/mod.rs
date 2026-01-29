@@ -42,12 +42,15 @@ pub static mut VRCHAT_ACTIVE: bool = false;
 //in case vrchat crashes
 async fn watch_vrchat_process_osc() {
     loop {
-        tokio::time::sleep(Duration::from_secs(30)).await;
+        //this is only meant to eventually set not running in case of a crash\
+        //large wait value so it doesnt actually require osc to be enabled
+        //oyasumi would still work fine if the frontend thought vrchat was always active anyways
+        tokio::time::sleep(Duration::from_mins(2)).await;
         if unsafe {
             SystemTime::now()
                 .duration_since(LAST_ACTIVE)
                 .unwrap_or_default()
-                < Duration::from_secs(30)
+                < Duration::from_mins(2)
         } {
             unsafe {
                 log::debug!(
