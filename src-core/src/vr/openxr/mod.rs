@@ -18,7 +18,12 @@ use xr_overlay::{
 use crate::{
     utils::send_event,
     vr::{
-        SLEEP_DETECTION_ENABLED, commands::SLEEP_STATE, gesture_detector::GestureDetector, model::{SleepState, VRDevicePose, VRStatus}, openxr::input::{INPUT_CONTEXT, check_user_activity}, sleep_detector::{SLEEP_DETECTOR_PERIOD, SleepDetector}
+        commands::SLEEP_STATE,
+        gesture_detector::GestureDetector,
+        model::{SleepState, VRDevicePose, VRStatus},
+        openxr::input::{check_user_activity, INPUT_CONTEXT},
+        sleep_detector::{SleepDetector, SLEEP_DETECTOR_PERIOD},
+        SLEEP_DETECTION_ENABLED,
     },
 };
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
@@ -125,32 +130,29 @@ pub async fn init() {
 
         tokio::task::spawn(async move {
             loop {
-                #[allow(clippy::collapsible_if)] //no????
-                if unsafe { SLEEP_DETECTION_ENABLED&&SLEEP_STATE!=SleepState::Sleeping} {
-                    let pose=get_pose("sleep", &mut *OXR_HANDLE.wait().lock().await)
-                                .await;
-                    SLEEP_DETECTOR
-                        .lock()
-                        .await
-                        .log_pose(
-                            pose.map(|p| p.position.to_vec3a().to_vec3()),
-                        )
-                        .await;
-                    if let Some(pose)=pose{
-                        let o=pose.orientation;
-                        let p=pose.position;
+                let pose = get_pose("sleep", &mut *OXR_HANDLE.wait().lock().await).await;
+                if let Some(pose) = pose {
+                    let o = pose.orientation;
+                    let p = pose.position;
+                    #[allow(clippy::collapsible_if)] //no????
+                    if unsafe { SLEEP_DETECTION_ENABLED && SLEEP_STATE != SleepState::Sleeping } {
+                        SLEEP_DETECTOR
+                            .lock()
+                            .await
+                            .log_pose(pose.position.to_vec3a().to_vec3())
+                            .await;
+                    }
                     send_event(
                         "OVR_POSE_UPDATE",
                         VRDevicePose {
-                            index:0,
-                            quaternion: [o.x,o.y,o.z,o.w],
-                            position: [p.x,p.y,p.z],
+                            index: 0,
+                            quaternion: [o.x, o.y, o.z, o.w],
+                            position: [p.x, p.y, p.z],
                         },
-                    ) 
+                    )
                     .await;
-                    }
+                    tokio::time::sleep(SLEEP_DETECTOR_PERIOD).await;
                 }
-                tokio::time::sleep(SLEEP_DETECTOR_PERIOD).await;
             }
         });
         debug!("[Init] openxr start (2)");
@@ -280,7 +282,7 @@ pub async fn start_head_shake_detection() {
                             .log_pose([pos.x, pos.y, pos.z], [quat.x, quat.y, quat.z, quat.w])
                             .await;
                     }
-                }else {
+                } else {
                     break;
                 }
                 tokio::time::sleep(Duration::from_millis(frame_time)).await;

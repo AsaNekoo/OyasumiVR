@@ -40,15 +40,13 @@ impl SleepDetector {
         }
     }
 
-    pub async fn log_pose(&mut self, position: Option<Vec3>) {
+    pub async fn log_pose(&mut self, position: Vec3) {
         let now = get_time();
         // Add the event
-        if let Some(position) = position {
-            self.disatnces.push_back(position.distance(self.last_pos));
-            self.last_pos = position;
-        } else {
-            self.disatnces.push_back(0.); //treat failed posef query as no movement
-        }
+        // if let Some(position) = position {
+        self.disatnces.push_back(position.distance(self.last_pos));
+        self.last_pos = position;
+
         if self.disatnces.len() > EVENT_COUNT {
             self.disatnces.pop_front();
         }
