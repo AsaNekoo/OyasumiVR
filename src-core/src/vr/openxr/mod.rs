@@ -319,7 +319,7 @@ pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gam
 fn adjust_for_perceived_brightness(linear_percent: f64, gamma: f64) -> f64 {
     linear_percent.powf(1.0 / gamma)
 }
-static SLEEP_DETECTOR: LazyLock<Mutex<SleepDetector>> =
+pub static SLEEP_DETECTOR: LazyLock<Mutex<SleepDetector>> =
     LazyLock::new(|| Mutex::new(SleepDetector::new()));
-static GESTURE_DETECTOR: LazyLock<Mutex<GestureDetector>> =
+pub static GESTURE_DETECTOR: LazyLock<Mutex<GestureDetector>> =
     LazyLock::new(|| Mutex::new(GestureDetector::new()));

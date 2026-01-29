@@ -5,7 +5,14 @@ use super::openvr::{
 };
 #[cfg(windows)]
 use crate::globals::STEAM_APP_KEY;
-use crate::{vr::{SLEEP_DETECTION_ENABLED, model::{BindingOriginData, OVRDevice, OVRFrameLimits, SleepState}}, warn_unimplemented};
+use crate::{
+    vr::{
+        model::{BindingOriginData, OVRDevice, OVRFrameLimits, SleepState},
+        openxr::SLEEP_DETECTOR,
+        SLEEP_DETECTION_ENABLED,
+    },
+    warn_unimplemented,
+};
 #[cfg(windows)]
 use enumset::EnumSet;
 #[cfg(windows)]
@@ -16,10 +23,12 @@ use ovr::input::{InputString, InputValueHandle};
 use ovr_overlay as ovr;
 #[cfg(windows)]
 use substring::Substring;
-pub static mut SLEEP_STATE:SleepState=SleepState::Awake;
+pub static mut SLEEP_STATE: SleepState = SleepState::Awake;
 #[tauri::command]
-pub async fn set_sleep_state(state:SleepState){
-    unsafe {SLEEP_STATE=state;}
+pub async fn set_sleep_state(state: SleepState) {
+    unsafe {
+        SLEEP_STATE = state;
+    }
 }
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
@@ -44,17 +53,23 @@ pub async fn vr_get_app_framelimit(app_id: u32) -> Result<Option<OVRFrameLimits>
 }
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn vr_sleep_mode_check(value:bool){
+pub async fn vr_sleep_mode_check(value: bool) {
     #[cfg(unix)]
-    {match value {
-        true => super::openxr::start_head_shake_detection().await,
-        false => super::openxr::stop_head_shake_detection().await,
-    }}
+    {
+        match value {
+            true => super::openxr::start_head_shake_detection().await,
+            false => super::openxr::stop_head_shake_detection().await,
+        }
+    }
 }
 #[tauri::command]
-pub async fn vr_sleep_detection_enabled(value:bool)
-{
-    unsafe{SLEEP_DETECTION_ENABLED=value;}
+pub async fn vr_sleep_detection_enabled(value: bool) {
+    unsafe {
+        if !SLEEP_DETECTION_ENABLED && value {
+            SLEEP_DETECTOR.lock().await.reset_start_time().await;
+        }
+        SLEEP_DETECTION_ENABLED = value;
+    }
 }
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
@@ -81,10 +96,18 @@ pub async fn vr_get_devices() -> Vec<OVRDevice> {
 pub async fn vr_status() -> String {
     #[cfg(windows)]
     {
-       super::openvr::OVR_STATUS.lock().await.to_string().to_uppercase()
+        super::openvr::OVR_STATUS
+            .lock()
+            .await
+            .to_string()
+            .to_uppercase()
     }
     #[cfg(unix)]
-    super::openxr::OXR_STATE.lock().await.to_string().to_uppercase()
+    super::openxr::OXR_STATE
+        .lock()
+        .await
+        .to_string()
+        .to_uppercase()
 }
 
 #[tauri::command]
@@ -139,15 +162,12 @@ pub async fn openvr_get_fade_distance() -> Result<f32, String> {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 #[cfg_attr(unix, allow(unused_variables))]
-pub async fn vr_set_analog_color_temp(
-    temperature: Option<u32>,
-) -> Result<(f64, f64, f64), String> {
+pub async fn vr_set_analog_color_temp(temperature: Option<u32>) -> Result<(f64, f64, f64), String> {
     #[cfg(windows)]
     return super::colortemp_analog::set_color_temp(temperature).await;
     #[cfg(unix)]
     warn_unimplemented!();
     Err("not implemented".into())
-
 }
 
 #[tauri::command]
@@ -157,8 +177,11 @@ pub async fn vr_set_image_brightness(
     perceived_brightness_adjustment_gamma: Option<f64>,
 ) {
     #[cfg(windows)]
-    super::openvr::brightness_overlay::set_brightness(brightness, perceived_brightness_adjustment_gamma)
-        .await;
+    super::openvr::brightness_overlay::set_brightness(
+        brightness,
+        perceived_brightness_adjustment_gamma,
+    )
+    .await;
     #[cfg(unix)]
     super::openxr::set_brightness(brightness, perceived_brightness_adjustment_gamma).await;
 }
@@ -200,12 +223,11 @@ pub async fn openvr_is_dashboard_visible() -> bool {
         };
         return manager.is_dashboard_visible();
     }
-        #[cfg(unix)]
-        {
-            //there is no one dashboard on openxr
-            false
-        }
-    
+    #[cfg(unix)]
+    {
+        //there is no one dashboard on openxr
+        false
+    }
 }
 
 #[tauri::command]
@@ -260,7 +282,8 @@ pub async fn openvr_reregister_manifest() -> Result<(), String> {
             }
         }
     }
-    #[cfg(unix)]{
+    #[cfg(unix)]
+    {
         //not used
         Ok(())
     }
@@ -417,7 +440,8 @@ pub async fn vr_get_binding_origins(
 
         Some(datas)
     }
-    #[cfg(unix)]{
+    #[cfg(unix)]
+    {
         //fixme: look at it and see wha it does
         None
     }
