@@ -5,7 +5,8 @@ use pulseaudio::protocol::{
 };
 use tokio::sync::Mutex;
 
-use crate::os::audio_devices::{AudioDeviceDto, AudioDeviceType};
+use crate::os::models::{AudioDeviceDto, AudioDeviceType};
+
 #[allow(dead_code)]
 pub static LINUX_AUDIO_DEVICE_MANAGER: LazyLock<Mutex<Option<LinuxAudioDeviceManager>>> =
     LazyLock::new(|| {

@@ -1,18 +1,10 @@
 use log::error;
 use serde::Serialize;
 use std::ffi::OsStr;
-#[cfg(windows)]
-use std::os::raw::c_char;
 use std::sync::LazyLock;
 use std::time::{SystemTime, UNIX_EPOCH};
-#[cfg(windows)]
-use std::{ffi::OsStr, sync::LazyLock, time::Duration};
 use sysinfo::{Pid, ProcessRefreshKind, ProcessesToUpdate, Signal};
-#[cfg(windows)]
-use sysinfo::{ProcessesToUpdate, RefreshKind, Signal, System};
 use tauri::Emitter;
-use tokio::sync::Mutex;
-#[cfg(windows)]
 use tokio::sync::Mutex;
 
 use crate::globals::{TAURI_APP_HANDLE, TAURI_CLI_MATCHES};
@@ -29,22 +21,15 @@ pub mod sidecar_manager;
 pub enum TrackedProcess {
     Steamvr,
     Vrchat,
-    #[cfg(unix)]
     MonadoService,
-    #[cfg(unix)]
     Wivrn,
 }
 impl TrackedProcess {
     pub fn name(&self) -> &OsStr {
         OsStr::new(match self {
-            #[cfg(windows)]
-            Self::Steamvr => "vrmonitor.exe",
-            #[cfg(unix)]
             Self::Steamvr => "vrmonitor",
             Self::Vrchat => "VRChat.exe",
-            #[cfg(unix)]
             Self::MonadoService => "monado-service",
-            #[cfg(unix)]
             Self::Wivrn => "wivrn-server",
         })
     }
@@ -191,14 +176,4 @@ pub async fn cli_sidecar_overlay_mode() -> models::OverlaySidecarMode {
             models::OverlaySidecarMode::Release
         }
     }
-}
-#[cfg(windows)]
-pub fn convert_char_array_to_string(slice: &[c_char]) -> Option<String> {
-    let trimmed_array: Vec<u8> = slice
-        .iter()
-        .map(|&c| c as u8)
-        .take_while(|&x| x != 0)
-        .collect();
-
-    String::from_utf8(trimmed_array).ok()
 }

@@ -22,8 +22,7 @@ mod vr;
 mod vrc_log_parser;
 mod vrcx;
 
-#[cfg(windows)]
-use std::mem;
+
 use std::sync::atomic::Ordering;
 
 use config::Config;
@@ -33,14 +32,12 @@ pub use grpc::models as Models;
 use cronjob::CronJob;
 use globals::{APTABASE_APP_KEY, FLAGS, TAURI_APP_HANDLE};
 use log::{error, info, warn, LevelFilter};
-#[cfg(windows)]
-use oyasumivr_shared::windows::is_elevated;
+
 use serde_json::json;
 use tauri::{plugin::TauriPlugin, Manager, Wry};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::RotationStrategy;
-#[cfg(windows)]
-use webview2_com::Microsoft::Web::WebView2::Win32::ICoreWebView2Settings6;
+
 
 use crate::globals::APTABASE_HOST;
 #[macro_export]
@@ -54,14 +51,8 @@ macro_rules! warn_unimplemented {
 }
 #[tokio::main]
 async fn main() {
-    #[cfg(unix)]
     std::fs::write("/proc/self/oom_score_adj", "1000").ok();
     // Attach to parent console if we're running from a command line
-    #[cfg(windows)]
-    {
-        use windows::Win32::System::Console::{AttachConsole, ATTACH_PARENT_PROCESS};
-        let _ = unsafe { AttachConsole(ATTACH_PARENT_PROCESS) };
-    }
     // Construct OyasumiVR Tauri application
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
@@ -208,9 +199,6 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
 }
 
 async fn app_setup(app_handle: tauri::AppHandle) {
-    // Process elevation security args
-    #[cfg(windows)]
-    os::elevation::process_elevation_cli_args().await;
 
     info!(
         "[Core] Starting OyasumiVR in {} mode",
@@ -223,12 +211,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     };
     info!("[Core] Setting working directory to: {:?}", executable_path);
     std::env::set_current_dir(&executable_path).unwrap();
-    // Clean up old batch files from previous runs
-    #[cfg(windows)]
-    os::cleanup_batch_files().await;
-    // Run any migrations first
-    #[cfg(windows)]
-    migrations::run_migrations().await;
+
     // Load configs
     load_configs().await;
     // Set up app reference
@@ -240,22 +223,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
         let window = app_handle.get_webview_window("main").unwrap();
         window.open_devtools();
     }
-    // Disable swipe navigation in main window
-    #[cfg(windows)]
-    {
-        window
-            .with_webview(|webview| unsafe {
-                let settings = webview
-                    .controller()
-                    .CoreWebView2()
-                    .unwrap()
-                    .Settings()
-                    .unwrap();
-                let settings: ICoreWebView2Settings6 = mem::transmute(settings);
-                settings.SetIsSwipeNavigationEnabled(false).unwrap();
-            })
-            .unwrap();
-    }
+ 
     // Get dependencies
     let cache_dir = app_handle.path().app_cache_dir().unwrap();
     // Register deep link schemas if needed
@@ -274,9 +242,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     // Initialize gRPC server
     grpc::init_server().await;
     grpc::init_web_server().await;
-    // Initialize OSC
-    #[cfg(windows)]
-    osc::init().await;
+
     // Initialize OpenVR Manager
     vr::init().await;
     // Initialize Image Cache
@@ -287,14 +253,8 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     os::init_audio_device_manager().await;
     // Initialize Lighthouse Bluetooth
     lighthouse::init().await;
-    // Initialize Hardware modules
-    #[cfg(windows)]
-    hardware::init().await;
     // Initialize log commands
     commands::log_utils::init(app_handle.path().app_log_dir().unwrap()).await;
-    // Initialize elevated sidecar module
-    #[cfg(windows)]
-    elevated_sidecar::init().await;
     // Initialize overlay sidecar module
     overlay_sidecar::init().await;
     // Initialize Discord module
@@ -305,25 +265,6 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     let mut cron = CronJob::new("CRON_MINUTE_START", on_cron_minute_start);
     cron.seconds("0");
     CronJob::start_job_threaded(cron);
-    // If we have admin privileges, prelaunch the elevation sidecar
-    #[cfg(windows)]
-    if is_elevated() {
-        info!("[Core] Main process is running with elevation. Pre-launching elevated sidecar...");
-        // Wait for grpc server to start so we can pass the port
-        loop {
-            let core_grpc_port = grpc::SERVER_PORT.lock().await;
-            // Once we have the port, start the sidecar
-            if core_grpc_port.is_some() {
-                drop(core_grpc_port);
-                elevated_sidecar::commands::start_elevated_sidecar().await;
-                break;
-            }
-        }
-    } else {
-        info!(
-            "[Core] Main process is running without elevation. Elevated sidecar will be launched on demand."
-        );
-    }
 
     // Start profiling if we're in debug mode
     // #[cfg(debug_assertions)]
@@ -366,14 +307,6 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         vr::commands::vr_status,
         vr::commands::vr_get_analog_gain,
         vr::commands::openvr_set_analog_gain,
-        #[cfg(windows)]
-        vr::commands::vr_get_supersample_scale,
-        #[cfg(windows)]
-        vr::commands::vr_set_supersample_scale,
-        #[cfg(windows)]
-        vr::commands::openvr_get_fade_distance,
-        #[cfg(windows)]
-        vr::commands::openvr_set_fade_distance,
         vr::commands::vr_set_image_brightness,
         vr::commands::vr_launch_binding_configuration,
         vr::commands::vr_get_binding_origins,
@@ -386,16 +319,6 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         vr::commands::vr_sleep_mode_check,
         vr::commands::vr_sleep_detection_enabled,
         vr::commands::set_sleep_state,
-        #[cfg(windows)]
-        hardware::beyond::commands::bigscreen_beyond_is_connected,
-        #[cfg(windows)]
-        hardware::beyond::commands::bigscreen_beyond_set_brightness,
-        #[cfg(windows)]
-        hardware::beyond::commands::bigscreen_beyond_set_led_color,
-        #[cfg(windows)]
-        hardware::beyond::commands::bigscreen_beyond_set_fan_speed,
-        #[cfg(windows)]
-        hardware::beyond::commands::bigscreen_beyond_get_saved_preferences,
         os::commands::is_windows,
         os::commands::run_command,
         os::commands::run_cmd_commands,
@@ -419,7 +342,6 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         os::commands::set_hardware_mic_activivation_threshold,
         // os::commands::is_vrchat_active,
         os::commands::is_elevation_security_disabled,
-        #[cfg(unix)]
         os::commands::pause_mpris_players,
         osc::commands::osc_send_command,
         osc::commands::osc_valid_addr,
@@ -467,9 +389,7 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         grpc::commands::get_core_grpc_web_port,
         telemetry::commands::set_telemetry_enabled,
         vrcx::commands::vrcx_log,
-        #[cfg(unix)]
         os::commands::set_power_policy_provider,
-        #[cfg(unix)]
         os::commands::get_power_policy_providers,
     ]
 }

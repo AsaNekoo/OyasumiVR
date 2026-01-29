@@ -38,48 +38,29 @@ pub async fn init() {
 }
 //based on discord's crate
 pub async fn is_discord_ipc_active() -> bool {
-    #[cfg(unix)]
-    {
-        let tmp_path = std::env::var("XDG_RUNTIME_DIR")
-            .or_else(|_| std::env::var("TMPDIR"))
-            .or_else(|_| std::env::var("TMP"))
-            .or_else(|_| std::env::var("TEMP"))
-            .unwrap_or_else(|_| "/tmp".to_owned());
+    let tmp_path = std::env::var("XDG_RUNTIME_DIR")
+        .or_else(|_| std::env::var("TMPDIR"))
+        .or_else(|_| std::env::var("TMP"))
+        .or_else(|_| std::env::var("TEMP"))
+        .unwrap_or_else(|_| "/tmp".to_owned());
 
-        // Discord just uses a simple round robin approach to finding a socket to use
-        let mut socket_path = format!("{}/app/com.discordapp.Discord/discord-ipc-0", tmp_path);
-        // let mut socket_path = format!("{}/app/com.discordapp.Discord/discord-ipc-0", tmp_path);
-        let mut fallback_path = format!("{}/discord-ipc-0", tmp_path);
+    // Discord just uses a simple round robin approach to finding a socket to use
+    let mut socket_path = format!("{}/app/com.discordapp.Discord/discord-ipc-0", tmp_path);
+    // let mut socket_path = format!("{}/app/com.discordapp.Discord/discord-ipc-0", tmp_path);
+    let mut fallback_path = format!("{}/discord-ipc-0", tmp_path);
 
-        for seq in 0..10i32 {
-            for path in [&mut socket_path, &mut fallback_path] {
-                path.pop();
-                use std::{fmt::Write, str::FromStr};
-                write!(path, "{}", seq).unwrap();
-                let path = PathBuf::from_str(path.as_str()).unwrap();
-                if path.exists() {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-    #[cfg(windows)]
-    {
-    let mut socket_path = "\\\\?\\pipe\\discord-ipc-0".to_owned();
-        for seq in 0..10i32 {
-            socket_path.pop();
-            use std::fmt::Write;
-            write!(&mut socket_path, "{}", seq).unwrap();
-            if  tokio::net::windows::named_pipe::ClientOptions::new().open(&socket_path).is_ok(){
+    for seq in 0..10i32 {
+        for path in [&mut socket_path, &mut fallback_path] {
+            path.pop();
+            use std::{fmt::Write, str::FromStr};
+            write!(path, "{}", seq).unwrap();
+            let path = PathBuf::from_str(path.as_str()).unwrap();
+            if path.exists() {
                 return true;
             }
-
         }
-        false
     }
-
-
+    false
 }
 pub async fn on_discord_started() {
     tokio::time::sleep(Duration::from_secs(10)).await;

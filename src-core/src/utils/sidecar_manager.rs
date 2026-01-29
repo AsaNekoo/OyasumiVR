@@ -137,7 +137,6 @@ impl SidecarManager {
                 args.push(arg.clone());
             }
         }
-        #[cfg(unix)]
         let child = {
             let cef_path = PathBuf::from("resources/sidecars/cef");
             static START_LOCK: Mutex<()> = Mutex::const_new(());
@@ -178,17 +177,6 @@ impl SidecarManager {
                     )
                 })
         };
-        #[cfg(windows)]
-        let child = std::process::Command::new(exe_path)
-            .current_dir(&exe_dir)
-            .args(&args)
-            .spawn()
-            .unwrap_or_else(|err| {
-                panic!(
-                    "Could not spawn command {:?} {:?}, in path:{:?},with args:{:?}",
-                    err, exe_file, exe_dir, args
-                )
-            });
         let child_pid = child.id();
         *self.sidecar_pid.lock().await = Some(child_pid);
         *self.sidecar_child.lock().await = Some(child);

@@ -1,8 +1,6 @@
 pub mod commands;
 
 use crate::utils::sidecar_manager::SidecarManager;
-#[cfg(windows)]
-use crate::Models::overlay_sidecar::MicrophoneActivityMode;
 use crate::{
     utils::send_event,
     Models::overlay_sidecar::oyasumi_overlay_sidecar_client::OyasumiOverlaySidecarClient,
@@ -18,19 +16,7 @@ static SIDECAR_MANAGER: LazyLock<Mutex<Option<SidecarManager>>> = LazyLock::new(
 
 pub async fn init() {
     let (tx, mut rx) = tokio::sync::mpsc::channel(10);
-    #[cfg(windows)]
-    {
-        *SIDECAR_MANAGER.lock().await = Some(SidecarManager::new(
-            "OVERLAY".to_string(),
-            "resources/dotnet-sidecars/".to_string(),
-            "oyasumivr-overlay-sidecar.exe".to_string(),
-            tx,
-            true,
-            vec![],
-        ));
-    }
-    #[cfg(unix)]
-    {
+
         *SIDECAR_MANAGER.lock().await = Some(SidecarManager::new(
             "OVERLAY".to_string(),
             "resources/sidecars/".to_string(),
@@ -39,7 +25,7 @@ pub async fn init() {
             true, 
             vec![],
         ));
-    }
+    
     // Listen for sidecar stop signals
     tokio::spawn(async move {
         while (rx.recv().await).is_some() {
@@ -73,20 +59,4 @@ pub async fn handle_overlay_sidecar_start(
     *SIDECAR_GRPC_CLIENT.lock().await = Some(grpc_client);
     send_event("OVERLAY_SIDECAR_STARTED", args.grpc_web_port).await;
     Ok(())
-}
-#[cfg(windows)]
-pub async fn set_microphone_active(active: bool, mode: MicrophoneActivityMode) {
-    let mut client_guard = SIDECAR_GRPC_CLIENT.lock().await;
-    let client = match client_guard.as_mut() {
-        Some(client) => client,
-        None => return,
-    };
-    let _ = client
-        .set_microphone_active(tonic::Request::new(
-            crate::Models::overlay_sidecar::SetMicrophoneActiveRequest {
-                active,
-                mode: mode as i32,
-            },
-        ))
-        .await;
 }

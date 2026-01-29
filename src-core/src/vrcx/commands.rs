@@ -1,41 +1,8 @@
-#[cfg(windows)]
-use crate::vrcx::*;
-#[cfg(windows)]
-use log::debug;
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 #[cfg_attr(unix, allow(unused_variables))]
 pub async fn vrcx_log(msg: String) -> bool {
-    #[cfg(windows)]
-    {
-        let sender = &mut VRCX_NORITICATION_SENDER.lock().unwrap();
-        if sender.sender.is_none() && sender.connect().is_err() {
-            debug!("[VRCX] failed to connect to VRCX");
-            return false;
-        }
-        if let Err(err) = sender.send_msg(msg.clone()) {
-            match err {
-                VrcxNotificationSenderError::NotConnected => {
-                    if sender.connect().is_err() {
-                        debug!("[VRCX] failed to connect to VRCX");
-                        return false;
-                    }
-                    if sender.send_msg(msg).is_err() {
-                        debug!("[VRCX] failed to send message to VRCX");
-                        return false;
-                    }
-                }
-                VrcxNotificationSenderError::SendFailed(_) => {
-                    debug!("[VRCX] failed to send message to VRCX");
-                    return false;
-                }
-                VrcxNotificationSenderError::UnableToConnect(_) => unreachable!(),
-            };
-        }
-        return true;
-    }
-    //fixme: figure out where is the pipe on linux
-    #[cfg(unix)]
+    //fixme: expose ipc in vrcx
     true
 }

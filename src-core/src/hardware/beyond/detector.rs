@@ -2,19 +2,7 @@ use hidapi::HidApi;
 use log::error;
 use std::ffi::OsStr;
 use std::iter::once;
-#[cfg(windows)]
-use std::os::windows::ffi::OsStrExt;
-use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
-#[cfg(windows)]
-use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
-#[cfg(windows)]
-use windows::Win32::System::LibraryLoader::GetModuleHandleW;
-#[cfg(windows)]
-use windows::Win32::UI::WindowsAndMessaging::{
-    CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, GetWindowLongPtrW,
-    PostQuitMessage, RegisterClassW, SetWindowLongPtrW, TranslateMessage, GWLP_USERDATA, MSG,
-    WNDCLASSW, WM_CREATE, WM_DESTROY, WM_DEVICECHANGE,
-};
+
 
 pub enum PnPDetectorEvent {
     Plug { device_ref: PnPDetectorDevice },

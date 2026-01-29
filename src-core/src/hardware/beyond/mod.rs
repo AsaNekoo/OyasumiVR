@@ -9,91 +9,10 @@ use tokio::sync::Mutex;
 use crate::utils::send_event;
 
 pub mod commands;
-#[cfg(windows)]
-mod detector;
-#[cfg(windows)]
-const BIGSCREEN_VID: u16 = 0x35bd;
-#[cfg(windows)]
-const BEYOND_PID: u16 = 0x0101;
+
 
 static BSB_CONNECTED: LazyLock<AtomicBool> = LazyLock::new(|| AtomicBool::new(false));
 static BSB_DEVICE: LazyLock<Mutex<Option<HidDevice>>> = LazyLock::new(|| Mutex::new(None));
-#[cfg(windows)]
-pub async fn init() {
-    tokio::spawn(async move {
-        let mut api = match HidApi::new() {
-            Ok(a) => a,
-            Err(e) => {
-                error!("[Core] Failed to initialize HIDAPI: {}", e);
-                return;
-            }
-        };
-        // Check if beyond is currently connected
-        match api.refresh_devices() {
-            Ok(_) => {}
-            Err(e) => {
-                error!("[Core][Beyond] Could not refresh device list: {}", e);
-                return;
-            }
-        }
-        let devices = api.device_list();
-        for device_info in devices {
-            if device_info.vendor_id() == BIGSCREEN_VID && device_info.product_id() == BEYOND_PID {
-                on_bsb_plugged(&api).await;
-                break;
-            }
-        }
-        // Detect USB plug/unplug events
-        #[cfg(windows)]
-        let mut detector = detector::PnPDetector::start();
-        #[cfg(windows)]
-        loop {
-            let event = match detector.recv().await {
-                Some(e) => e,
-                None => {
-                    warn!("[Core][Beyond] PnP detector task terminated");
-                    return;
-                }
-            };
-            match event {
-                detector::PnPDetectorEvent::Plug { device_ref } => {
-                    if device_ref.vid == BIGSCREEN_VID && device_ref.pid == BEYOND_PID {
-                        on_bsb_plugged(&api).await;
-                    }
-                }
-                detector::PnPDetectorEvent::Unplug { device_ref } => {
-                    if device_ref.vid == BIGSCREEN_VID && device_ref.pid == BEYOND_PID {
-                        on_bsb_unplugged().await;
-                    }
-                }
-            }
-        }
-    });
-}
-#[cfg(windows)]
-async fn on_bsb_plugged(api: &HidApi) {
-    let device = match api.open(BIGSCREEN_VID, BEYOND_PID) {
-        Ok(d) => d,
-        Err(e) => {
-            error!(
-                "[Core][Beyond] Could not open device for Bigscreen Beyond: {}",
-                e
-            );
-            return;
-        }
-    };
-    *BSB_DEVICE.lock().await = Some(device);
-    BSB_CONNECTED.store(true, Ordering::Relaxed);
-    info!("[Core] Bigscreen Beyond connected");
-    send_event("BIGSCREEN_BEYOND_CONNECTED", true).await;
-}
-#[cfg(windows)]
-async fn on_bsb_unplugged() {
-    *BSB_DEVICE.lock().await = None;
-    BSB_CONNECTED.store(false, Ordering::Relaxed);
-    info!("[Core] Bigscreen Beyond disconnected");
-    send_event("BIGSCREEN_BEYOND_CONNECTED", false).await;
-}
 
 pub fn set_led_color(device: &HidDevice, r: u8, g: u8, b: u8) -> Result<(), String> {
     match device.send_feature_report(&[0, 0x4c, r, g, b]) {

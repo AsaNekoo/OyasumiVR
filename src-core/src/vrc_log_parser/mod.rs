@@ -4,8 +4,6 @@ use crate::utils::send_event;
 use chrono::{Local, NaiveDateTime, TimeZone};
 use log::{debug, info, trace, warn};
 use serde::{Deserialize, Serialize};
-#[cfg(windows)]
-use std::os::windows::prelude::MetadataExt;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::{
     fs::{read_dir, File},
@@ -29,23 +27,15 @@ static MUTE_LOG_DIR_NO_EXIST_WARNINGS: AtomicBool = AtomicBool::new(false);
 fn get_latest_log_path() -> Option<String> {
     // Get all files in the log directory
     let dir = {
-        #[cfg(windows)]
-        {
-            let home_dir = dirs::home_dir()?;
-            read_dir(home_dir.join("AppData\\LocalLow\\VRChat\\VRChat"))
-        }
-        #[cfg(unix)]
-        {
-            let mut path = steamlocate::SteamDir::locate()
-                .ok()?
-                .find_app(438100)
-                .ok()??
-                .1
-                .path()
-                .to_path_buf();
-            path.push("steamapps/compatdata/438100/pfx/drive_c/users/steamuser/AppData/LocalLow/VRChat/VRChat");
-            read_dir(path)
-        }
+        let mut path = steamlocate::SteamDir::locate()
+            .ok()?
+            .find_app(438100)
+            .ok()??
+            .1
+            .path()
+            .to_path_buf();
+        path.push("steamapps/compatdata/438100/pfx/drive_c/users/steamuser/AppData/LocalLow/VRChat/VRChat");
+        read_dir(path)
     };
     // If log directory doesn't exist, return no path   q
     if dir.is_err() {
@@ -92,20 +82,10 @@ fn get_latest_log_path() -> Option<String> {
         // Find most recent log file
         .max_by_key(|entry| {
             entry.path().metadata().ok().map(|m| {
-                if cfg!(windows) {
-                    #[cfg(unix)]
-                    unreachable!();
-                    #[cfg(windows)]
-                    m.creation_time()
-                } else if cfg!(unix) {
-                    #[cfg(unix)]
-                    m.created()
-                        .unwrap_or_else(|_| m.accessed().unwrap())
-                        .duration_since(UNIX_EPOCH)
-                        .unwrap()
-                } else {
-                    unimplemented!();
-                }
+                m.created()
+                    .unwrap_or_else(|_| m.accessed().unwrap())
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap()
             })
         })
         // Get the path for it
@@ -137,7 +117,7 @@ async fn process_log_line(line: String, initial_load: bool) {
             return;
         }
         let time = line.split_at("2026.01.27 21:55:57".len()).0;
-        let line = line.split_at(INFO_OFFSET+2).1;
+        let line = line.split_at(INFO_OFFSET + 2).1;
         if line.starts_with("[Behaviour]") {
             let _ = parse_on_player_joined(line, initial_load, time).await
                 || parse_on_player_left(line, initial_load, time).await
@@ -210,7 +190,6 @@ async fn parse_on_location_change(line: &str, initial_load: bool, time: &str) ->
         && !line.starts_with("[Behaviour] Joining or Creating Room: ")
         && !line.starts_with("[Behaviour] Joining friend: ")
     {
-
         let offset = 10;
         if offset > line.len() {
             return true;

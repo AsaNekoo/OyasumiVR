@@ -11,77 +11,12 @@ use log::info;
 use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use tonic::transport::Channel;
- #[cfg(windows)]
-pub static SIDECAR_GRPC_CLIENT: LazyLock<Mutex<Option<OyasumiElevatedSidecarClient<Channel>>>> =
-    LazyLock::new(Default::default);
-     #[cfg(windows)]
-static SIDECAR_MANAGER: LazyLock<Mutex<Option<SidecarManager>>> = LazyLock::new(Default::default);
-#[cfg(windows)]
-pub async fn init() {
-    #[cfg(windows)]
-    {
-        let (tx, mut rx) = tokio::sync::mpsc::channel(10);
-        *SIDECAR_MANAGER.lock().await = Some(SidecarManager::new(
-            "ELEVATED".to_string(),
-            "resources/elevated-sidecar/".to_string(),
-            "oyasumivr-elevated-sidecar.exe".to_string(),
-            tx,
-            false,
-            vec![],
-        ));
-        // Wait for sidecar stop signals
-        tokio::spawn(async move {
-            while (rx.recv().await).is_some() {
-                *SIDECAR_GRPC_CLIENT.lock().await = None;
-                send_event("ELEVATED_SIDECAR_STOPPED", ()).await;
-            }
-        });
-    }
-}
 
 #[allow(dead_code)]
-pub async fn request_stop() {
-    #[cfg(windows)]
-    {
-        let mut client_guard = SIDECAR_GRPC_CLIENT.lock().await;
-        let client = match client_guard.as_mut() {
-            Some(client) => client,
-            None => return,
-        };
-        info!("[Core] Stopping current sidecar...");
-        let _ = client
-            .request_stop(tonic::Request::new(
-                crate::Models::elevated_sidecar::Empty {},
-            ))
-            .await;
-    }
-}
+pub async fn request_stop() {}
 
 pub async fn handle_elevated_sidecar_start(
     args: &ElevatedSidecarStartArgs,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    #[cfg(windows)]
-    {
-        let manager_guard = SIDECAR_MANAGER.lock().await;
-        let manager = manager_guard.as_ref().unwrap();
-        // Ignore this signal if it is invalid
-        if !manager
-            .handle_start_signal(
-                Some(args.grpc_port),
-                Some(args.grpc_web_port),
-                args.pid,
-                args.old_pid,
-            )
-            .await
-        {
-            return Ok(());
-        }
-        // Create new GRPC client
-        let grpc_client =
-            OyasumiElevatedSidecarClient::connect(format!("http://127.0.0.1:{}", args.grpc_port))
-                .await?;
-        *SIDECAR_GRPC_CLIENT.lock().await = Some(grpc_client);
-        send_event("ELEVATED_SIDECAR_STARTED", args.grpc_web_port).await;
-    }
     Ok(())
 }

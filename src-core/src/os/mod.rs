@@ -1,64 +1,23 @@
-mod audio_devices;
 pub mod commands;
 pub mod elevation;
 mod models;
 mod sounds_gen;
-#[cfg(unix)]
 pub mod linux;
-#[cfg(windows)]
-use self::audio_devices::manager::AudioDeviceManager;
 use log::error;
 use rodio::{source::Source, Decoder};
 use rodio::{OutputStream, Sink};
 use std::collections::HashMap;
-#[cfg(windows)]
-use std::ffi::OsString;
 use std::fs::File;
 use std::io::BufReader;
-#[cfg(windows)]
-use std::os::windows::ffi::OsStringExt;
-#[cfg(windows)]
-use std::slice;
 use std::sync::LazyLock;
-#[cfg(windows)]
-use std::time::Duration;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;
-#[cfg(windows)]
-use windows::core::GUID;
-#[cfg(windows)]
-use windows::Win32::Foundation::ERROR_SUCCESS;
-#[cfg(windows)]
-use windows::Win32::System::Power::{
-    PowerEnumerate, PowerGetActiveScheme, PowerReadFriendlyName, PowerSetActiveScheme,
-    ACCESS_SCHEME,
-};
-
 type PlaySoundSender = LazyLock<Mutex<Option<Sender<(String, f32)>>>>;
 
 static PLAY_SOUND_TX: PlaySoundSender = LazyLock::new(Mutex::default);
-#[cfg(windows)]
-static AUDIO_DEVICE_MANAGER: LazyLock<Mutex<Option<AudioDeviceManager>>> =
-    LazyLock::new(Mutex::default);
+
 pub async fn init_audio_device_manager() {
-    #[cfg(windows)]
-    {
-        let mut manager = AUDIO_DEVICE_MANAGER.lock().await;
-        if manager.is_some() {
-            return;
-        }
-        let m = match AudioDeviceManager::create().await {
-            Ok(m) => m,
-            Err(e) => {
-                error!("[Core] Failed to create audio device manager: {}", e);
-                return;
-            }
-        };
-        *manager = Some(m);
-        if let Err(e) = manager.as_ref().unwrap().refresh_audio_devices().await {
-            error!("[Core] Failed to refresh audio devices: {}", e);
-        }
-    }
+  
 }
 
 
@@ -137,143 +96,4 @@ pub async fn init_sound_playback() {
             }
         }
     });
-}
-#[cfg(windows)]
-/// Cleanup old batch files created by run_cmd_commands
-pub async fn cleanup_batch_files() {
-    let temp_dir = env::temp_dir();
-
-    match tokio::fs::read_dir(&temp_dir).await {
-        Ok(mut entries) => {
-            let mut cleanup_count = 0;
-            while let Ok(Some(entry)) = entries.next_entry().await {
-                if let Some(filename) = entry.file_name().to_str() {
-                    // Check if this is one of our batch files
-                    if filename.starts_with("oyasumi_") && filename.ends_with(".bat") {
-                        let file_path = entry.path();
-                        match tokio::fs::remove_file(&file_path).await {
-                            Ok(_) => {
-                                cleanup_count += 1;
-                            }
-                            Err(e) => {
-                                // Log but don't fail - file might be in use or already deleted
-                                warn!("[Core] Could not remove batch file {:?}: {}", file_path, e);
-                            }
-                        }
-                    }
-                }
-            }
-            if cleanup_count > 0 {
-                info!(
-                    "[Core] Cleaned up {} old batch files from temp directory",
-                    cleanup_count
-                );
-            }
-        }
-        Err(e) => {
-            error!(
-                "[Core] Failed to read temp directory for batch file cleanup: {}",
-                e
-            );
-        }
-    }
-}
-#[cfg(windows)]
-fn get_system_power_policies() -> Vec<GUID> {
-    let mut power_schemes = Vec::new();
-    let mut index: u32 = 0;
-    let mut buffer_size: u32 = std::mem::size_of::<GUID>() as u32;
-
-    loop {
-        let mut buffer: GUID = unsafe { std::mem::zeroed() };
-        let result = unsafe {
-            PowerEnumerate(
-                None,
-                None,
-                None,
-                ACCESS_SCHEME,
-                index,
-                Some(&mut buffer as *mut _ as *mut u8),
-                &mut buffer_size as *mut _,
-            )
-        };
-
-        if result == ERROR_SUCCESS {
-            power_schemes.push(buffer);
-            index += 1;
-        } else {
-            break;
-        }
-    }
-
-    power_schemes
-}
-#[cfg(windows)]
-fn active_system_power_policy() -> Option<GUID> {
-    unsafe {
-        let mut guid: *mut GUID = std::ptr::null_mut();
-        if PowerGetActiveScheme(None, &mut guid).is_ok() && !guid.is_null() {
-            Some(*guid)
-        } else {
-            None
-        }
-    }
-}
-#[cfg(windows)]
-fn set_system_power_policy(guid: &GUID) -> bool {
-    let result = unsafe { PowerSetActiveScheme(None, Some(guid)) };
-    if result.is_err() {
-        error!(
-            "[Core] Failed to set Windows power policy. Result code {:?}",
-            result
-        );
-    };
-    result.is_ok()
-}
-#[cfg(windows)]
-fn get_friendly_name_for_windows_power_policy(scheme_guid: &GUID) -> Option<String> {
-    let mut buffer_size: u32 = 0;
-
-    // First call to determine the buffer size needed
-    let result = unsafe {
-        PowerReadFriendlyName(
-            None,
-            Some(scheme_guid as *const _),
-            None,
-            None,
-            None,
-            &mut buffer_size,
-        )
-    };
-
-    if result != ERROR_SUCCESS || buffer_size == 0 {
-        return None;
-    }
-
-    let mut buffer: Vec<u8> = vec![0; buffer_size as usize];
-
-    // Second call to actually get the friendly name
-    let result = unsafe {
-        PowerReadFriendlyName(
-            None,
-            Some(scheme_guid as *const _),
-            None,
-            None,
-            Some(buffer.as_mut_ptr()),
-            &mut buffer_size,
-        )
-    };
-
-    if result != ERROR_SUCCESS {
-        return None;
-    }
-
-    let wide_buffer =
-        unsafe { slice::from_raw_parts(buffer.as_ptr() as *const u16, buffer_size as usize / 2) };
-    let os_str = OsString::from_wide(wide_buffer);
-
-    match os_str.to_string_lossy().into_owned() {
-        s if !s.is_empty() => Some(s.trim_end_matches('\0').to_string()),
-        _ => None,
-    }
 }
