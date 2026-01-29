@@ -1,6 +1,6 @@
 pub mod commands;
 
-use crate::utils::send_event;
+use crate::utils::{send_event, set_vrchat_active, set_vrchat_inactve};
 use chrono::{Local, NaiveDateTime, TimeZone};
 use log::{debug, info, trace, warn};
 use serde::{Deserialize, Serialize};
@@ -99,10 +99,17 @@ fn parse_datetime_from_line(line: &str) -> Option<u64> {
     let time = Local.from_local_datetime(&localtime).latest();
     time.map(|v| v.timestamp_millis() as u64)
 }
-async fn process_log_line(line: String, initial_load: bool) {
+async fn process_log_line(line: String, initial_load: bool,cancelation_token:&CancellationToken) {
+
     if line.is_empty() {
         return;
     }
+    if line.ends_with("VRCNP: Stopping server") {
+        
+        cancelation_token.cancel();
+        return;
+    }
+
     static mut INFO_OFFSET: usize = 32;
     unsafe {
         if !(line.len() > INFO_OFFSET + 5
@@ -115,6 +122,10 @@ async fn process_log_line(line: String, initial_load: bool) {
             .map_or(false, |c| c == '-'))
         {
             return;
+        }
+        if !initial_load {
+            trace!("[vrc_heartbeat] log set active");
+            set_vrchat_active().await;
         }
         let time = line.split_at("2026.01.27 21:55:57".len()).0;
         let line = line.split_at(INFO_OFFSET + 2).1;
@@ -236,7 +247,7 @@ fn start_log_watch_task(path: String) -> CancellationToken {
             // Process new lines
             for line in lines_iterator.by_ref() {
                 let line = line.unwrap();
-                process_log_line(line, first_run).await;
+                process_log_line(line, first_run,&cancellation_token_internal).await;
             }
 
             if first_run {
@@ -262,6 +273,8 @@ fn start_log_watch_task(path: String) -> CancellationToken {
         }
 
         info!("[Core] Log reader task terminated. ({})", path);
+        set_vrchat_inactve().await;
+        trace!("[vrc_heartbeat] log set inactive");
     });
     cancellation_token
 }

@@ -1,13 +1,14 @@
-use log::error;
+use log::{error, info, trace};
 use serde::Serialize;
 use std::ffi::OsStr;
 use std::sync::LazyLock;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use sysinfo::{Pid, ProcessRefreshKind, ProcessesToUpdate, Signal};
 use tauri::Emitter;
 use tokio::sync::Mutex;
 
 use crate::globals::{TAURI_APP_HANDLE, TAURI_CLI_MATCHES};
+use crate::osc::commands::OSC_SERVER;
 static SYSINFO: LazyLock<Mutex<sysinfo::System>> =
     LazyLock::new(|| Mutex::new(sysinfo::System::new()));
 
@@ -35,28 +36,83 @@ impl TrackedProcess {
     }
 }
 pub async fn init() {
-    // tokio::task::spawn(watch_vrchat_process());
+    tokio::task::spawn(watch_vrchat_process_osc());
 }
-// pub static VRCHAT_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
+pub static mut VRCHAT_ACTIVE: bool = false;
+//in case vrchat crashes
+async fn watch_vrchat_process_osc() {
+    loop {
+        tokio::time::sleep(Duration::from_secs(30)).await;
+        if unsafe {
+            SystemTime::now()
+                .duration_since(LAST_ACTIVE)
+                .unwrap_or_default()
+                < Duration::from_secs(30)
+        } {
+            unsafe {
+                log::debug!(
+                    "[vrc_heartbeat] vrchat seen recently:{:?} ago",
+                    SystemTime::now()
+                        .duration_since(LAST_ACTIVE)
+                        .unwrap_or_default()
+                );
+            }
+            continue;
+        }
+        unsafe {
+            log::debug!(
+                "[vrc_heartbeat] vrchat not seen for:{:?}",
+                SystemTime::now()
+                    .duration_since(LAST_ACTIVE)
+                    .unwrap_or_default()
+            );
+        }
 
-// async fn watch_vrchat_process() {
-//     loop {
-//         {
-//             let res = crate::utils::is_process_active(crate::utils::TrackedProcess::Vrchat).await;
-//             let mut vrc_active = VRCHAT_ACTIVE.lock().await;
-//             if *vrc_active != res {
-//                 *vrc_active = res;
-//                 crate::utils::send_event("VRCHAT_PROCESS_ACTIVE", res).await;
-//                 if res {
-//                     info!("[Core] Detected VRChat process has started");
-//                 } else {
-//                     info!("[Core] Detected VRChat process has stopped");
-//                 }
-//             }
-//         }
-//         tokio::time::sleep(Duration::from_secs(1)).await;
-//     }
-// }
+        {
+            let mut guard = OSC_SERVER.lock().await;
+            if let Some(server) = guard.as_mut() {
+                let active = server
+                    .get_parameter("/avatar/parameters/MuteSelf", "VRChat-Client-*")
+                    .await
+                    .map(|res| !res.is_empty())
+                    .unwrap_or(false);
+                log::debug!("[vrc_heartbeat] fetching mute state:{}", active);
+                unsafe {
+                    if VRCHAT_ACTIVE != active {
+                        if active {
+                            trace!("[vrc_heartbeat] osc set active");
+                            set_vrchat_active().await;
+                        } else {
+                            trace!("[vrc_heartbeat] osc set inactive");
+                            set_vrchat_inactve().await;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+static mut LAST_ACTIVE: SystemTime = SystemTime::UNIX_EPOCH;
+pub async fn set_vrchat_active() {
+    unsafe {
+        LAST_ACTIVE = SystemTime::now();
+        if !VRCHAT_ACTIVE {
+            info!("[core] Detected VRChat process has started");
+            crate::utils::send_event("VRCHAT_PROCESS_ACTIVE", true).await;
+            VRCHAT_ACTIVE = true;
+        }
+    }
+}
+pub async fn set_vrchat_inactve() {
+    unsafe {
+        if VRCHAT_ACTIVE {
+            info!("[core] Detected VRChat process has stopped");
+            crate::utils::send_event("VRCHAT_PROCESS_ACTIVE", false).await;
+            VRCHAT_ACTIVE = false;
+        }
+    }
+}
+
 pub async fn is_process_active(process: TrackedProcess) -> bool {
     static ACTIVE_PROCESS: Mutex<Vec<(TrackedProcess, Pid)>> = Mutex::const_new(Vec::new());
     let mut sysinfo_guard = SYSINFO.lock().await;
