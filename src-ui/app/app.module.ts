@@ -136,7 +136,6 @@ import { TurnOffDevicesOnBatteryLevelAutomationService } from './services/power-
 import { AudioDeviceService } from './services/audio-device.service';
 import { SystemMicMuteAutomationsViewComponent } from './views/dashboard-view/views/system-mic-mute-automations-view/system-mic-mute-automations-view.component';
 import { SystemMicMuteAutomationService } from './services/system-mic-mute-automation.service';
-import { OpenVRInputService } from './services/openvr-input.service';
 import { OverlayService } from './services/overlay/overlay.service';
 import { ControllerBindingComponent } from './components/controller-binding/controller-binding.component';
 import { TranslationLoaderViewComponent } from './modules/translation/views/translation-loader-view/translation-loader-view.component';
@@ -490,7 +489,6 @@ export class AppModule {
     private pulsoidService: PulsoidService,
     private quitWithSteamVRService: QuitWithSteamVRService,
     private audioDeviceService: AudioDeviceService,
-    private openvrInputService: OpenVRInputService,
     private overlayService: OverlayService,
     private windowsService: WindowsService,
     private hotkeyService: HotkeyService,
@@ -633,7 +631,6 @@ export class AppModule {
             this.logInit('Initializing Pulsoid', this.pulsoidService.init()),
             this.logInit('Initializing quitting with SteamVR', this.quitWithSteamVRService.init()),
             this.logInit('Initializing audio device services', this.audioDeviceService.init()),
-            this.logInit('Initializing OpenVR input', this.openvrInputService.init()),
             this.logInit('Initializing Windows services', this.windowsService.init()),
             this.logInit('Initializing hotkey service', this.hotkeyService.init()),
             this.logInit('Initializing hotkey handlers', this.hotkeyHandlerService.init()),

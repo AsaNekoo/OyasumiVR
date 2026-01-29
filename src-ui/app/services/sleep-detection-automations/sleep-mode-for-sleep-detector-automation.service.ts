@@ -10,7 +10,6 @@ import {
   BehaviorSubject,
   distinctUntilChanged,
   firstValueFrom,
-  map,
   Observable,
   pairwise,
   skip,
@@ -20,8 +19,6 @@ import { SleepDetectorStateReport } from '../../models/events';
 import { NotificationService } from '../notification.service';
 import { TranslateService } from '@ngx-translate/core';
 import { EventLogService } from '../event-log.service';
-import { OpenVRInputService } from '../openvr-input.service';
-import { OVRInputEventAction } from '../../models/ovr-input-event';
 import { SleepingPose } from '../../models/sleeping-pose';
 import { TelemetryService } from '../telemetry.service';
 import { getBuiltInNotificationSound } from 'src-ui/app/models/notification-sounds';
@@ -81,7 +78,6 @@ export class SleepModeForSleepDetectorAutomationService {
     private notifications: NotificationService,
     private translate: TranslateService,
     private eventLog: EventLogService,
-    private openvrInputService: OpenVRInputService,
     private telemetry: TelemetryService
   ) {}
 
@@ -108,24 +104,7 @@ export class SleepModeForSleepDetectorAutomationService {
 
         this.dismissSleepCheck();
       });
-      // Detect controller button presence indication
-      this.openvrInputService.state
-        .pipe(
-          map((s) => s[OVRInputEventAction.IndicatePresence]),
-          pairwise(),
-          map(([previous, current]) =>
-            current.some(
-              (currentDevice) =>
-                !previous.some((previousDevice) => previousDevice.index === currentDevice.index)
-            )
-          )
-        )
-        .subscribe(() => {
-          // Dismiss sleep check for controller button presence indication
-          this.dismissSleepCheck();
-          // Register last controller button presence indication time
-          this.lastControllerButtonPresenceIndication = Date.now();
-        });
+     
     });
   }
 
