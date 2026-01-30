@@ -234,8 +234,10 @@ impl LinuxAudioDeviceManager {
             .find(|device| device.id == device_id)
             .ok_or(LinuxAudioError::AudioDeviceNotFound)?;
         let mut channel_volume = ChannelVolume::empty();
-        channel_volume.push(Volume::from_linear(volume));
-        // channel_volume.push(Volume::from_linear(volume));
+        //idk but this formula works for me
+        channel_volume.push(Volume::from_u32_clamped(
+            (volume * (u16::MAX) as f32) as u32,
+        ));
         match device.device_type {
             AudioDeviceType::Capture => protocol::write_command_message(
                 connection.sock.get_mut(),
