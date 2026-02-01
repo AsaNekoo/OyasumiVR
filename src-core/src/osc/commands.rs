@@ -1,6 +1,6 @@
 use std::{net::SocketAddr, str::FromStr, sync::Arc, time::Duration};
 use log::debug;
-use rosc::{OscMessage, OscPacket, OscType};
+use vrchat_osc::rosc::{OscMessage, OscPacket, OscType};
 use tokio::{spawn, sync::Mutex};
 use vrchat_osc::{
     models::{OscNode, OscRootNode},
@@ -126,7 +126,7 @@ pub async fn set_osc_receive_address_whitelist(whitelist: Vec<String>) {
         }
     }
    
-    let vrchat_osc = VRChatOSC::new().await.unwrap();
+    let vrchat_osc = VRChatOSC::new(None).await.unwrap();
     let mut root_node = OscRootNode::new();
     for path in whitelist {
         root_node = root_node.add_node(OscNode {
@@ -136,7 +136,7 @@ pub async fn set_osc_receive_address_whitelist(whitelist: Vec<String>) {
     }
     vrchat_osc.on_connect(|service|{
         match service{
-            vrchat_osc::ServiceType::Osc(name, socket_addr) => {if name.to_utf8().starts_with("VRChat-Client-"){
+            vrchat_osc::ServiceType::Osc(name, socket_addr) => {if name.starts_with("VRChat-Client-"){
                 log::debug!("new osc service {}:{}",name,socket_addr);
                 spawn(send_event("VRC_OSC_ADDRESS_CHANGED", socket_addr.to_string()));
                  VRCHAT_OSC_ADDR.lock().unwrap().replace(socket_addr);
