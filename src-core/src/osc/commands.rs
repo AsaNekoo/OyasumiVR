@@ -152,7 +152,7 @@ pub async fn set_osc_receive_address_whitelist(whitelist: Vec<String>) {
     }).await;
     vrchat_osc
         .register("OyasumiVR", root_node, |msg| match msg {
-            rosc::OscPacket::Message(osc_message) => {
+            OscPacket::Message(osc_message) => {
                 // println!("{:?}",osc_message);
                 if !unsafe{WHITELIST.iter().any(|s|**s==*osc_message.addr.as_str())}{
                     //vrchat seems to be sending more then requested
@@ -192,7 +192,7 @@ pub async fn set_osc_receive_address_whitelist(whitelist: Vec<String>) {
                     },
                 ));
             }
-            rosc::OscPacket::Bundle(_osc_bundle) => warn_unimplemented!("osc bundle"),
+            OscPacket::Bundle(_osc_bundle) => warn_unimplemented!("osc bundle"),
         })
         .await
         .ok()
