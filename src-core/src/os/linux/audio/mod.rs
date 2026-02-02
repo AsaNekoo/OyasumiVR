@@ -1,4 +1,4 @@
-use std::{ffi::CString, io::BufReader, num::Wrapping, os::unix::net::UnixStream, sync::LazyLock};
+use std::{ffi::CString, io::BufReader, num::Wrapping, os::unix::net::UnixStream};
 
 use pulseaudio::protocol::{
     self, ChannelVolume, ProtocolError, SetDeviceMuteParams, SetDeviceVolumeParams, Volume,
@@ -8,15 +8,39 @@ use tokio::sync::Mutex;
 use crate::os::models::{AudioDeviceDto, AudioDeviceType};
 
 #[allow(dead_code)]
-pub static LINUX_AUDIO_DEVICE_MANAGER: LazyLock<Mutex<Option<LinuxAudioDeviceManager>>> =
-    LazyLock::new(|| {
-        let mut manager = LinuxAudioDeviceManager::default();
-        if manager.connect().is_err() || manager.refresh_devices().is_err() {
-            Mutex::const_new(None)
-        } else {
-            Mutex::const_new(Some(manager))
+pub static LINUX_AUDIO_DEVICE_MANAGER: Mutex<Option<LinuxAudioDeviceManager>> =
+    Mutex::const_new(None);
+pub async fn get_linux_audio_manager<'a>(
+) -> tokio::sync::MutexGuard<'a, Option<LinuxAudioDeviceManager>> {
+    let mut audio: tokio::sync::MutexGuard<'a, Option<LinuxAudioDeviceManager>> =
+        LINUX_AUDIO_DEVICE_MANAGER.lock().await;
+    match *audio {
+        Some(_) => audio,
+        None => {
+            let au = {
+                let mut manager = LinuxAudioDeviceManager::default();
+                let mut error = false;
+                if let Err(err) = manager.connect() {
+                    error = true;
+                    log::error!("[core] failed to connect to pulseaudio server: {:?}", err);
+                }
+                if let Err(err) = manager.refresh_devices() {
+                    error = true;
+                    log::error!("[core] failed to refresh audio devices: {:?}", err);
+                }
+                if error {
+                    None
+                } else {
+                    Some(manager)
+                }
+            };
+            if let Some(au) = au {
+                audio.replace(au);
+            };
+            audio
         }
-    });
+    }
+}
 #[allow(dead_code)]
 #[derive(Debug)]
 pub enum LinuxAudioError {
@@ -25,6 +49,7 @@ pub enum LinuxAudioError {
     PulseProtocolError(ProtocolError),
     NotConnected,
     AudioDeviceNotFound,
+    OutOfOrder,
 }
 impl From<ProtocolError> for LinuxAudioError {
     fn from(value: ProtocolError) -> Self {
@@ -104,19 +129,23 @@ impl LinuxAudioDeviceManager {
 
         // Write the auth "command" to the socket, and read the reply. The reply
         // contains the negotiated protocol version.
+        let seq_c = seq.next();
         protocol::write_command_message(
             sock.get_mut(),
-            seq.next(),
+            seq_c,
             &protocol::Command::Auth(auth),
             protocol::MAX_VERSION,
         )?;
-        let (_, auth_info) =
+        let (seq_r, auth_info) =
             protocol::read_reply_message::<protocol::AuthReply>(&mut sock, protocol::MAX_VERSION)?;
         self.connection.replace(AudioManagerConnectionInfo {
             protocol_version: auth_info.version,
             sock,
             seq,
         });
+        if seq_c != seq_r {
+            return Err(LinuxAudioError::OutOfOrder);
+        }
         Ok(())
     }
     pub fn refresh_devices(&mut self) -> Result<(), LinuxAudioError> {
@@ -130,54 +159,68 @@ impl LinuxAudioDeviceManager {
             protocol::Prop::ApplicationName,
             CString::new("list-sinks").unwrap(),
         );
-
+        let seq_c = connection.seq.next();
         protocol::write_command_message(
             connection.sock.get_mut(),
-            connection.seq.next(),
+            seq_c,
             &protocol::Command::SetClientName(props),
             connection.protocol_version,
         )?;
-        let _ = protocol::read_reply_message::<protocol::SetClientNameReply>(
+
+        let (seq_r, _) = protocol::read_reply_message::<protocol::SetClientNameReply>(
             &mut connection.sock,
             connection.protocol_version,
         )?;
-
+        if seq_c != seq_r {
+            return Err(LinuxAudioError::OutOfOrder);
+        }
+        let seq_c = connection.seq.next();
         //get microphones
         protocol::write_command_message(
             connection.sock.get_mut(),
-            connection.seq.next(),
+            seq_c,
             &protocol::Command::GetSourceInfoList,
             connection.protocol_version,
         )?;
 
-        let (_, source_list) = protocol::read_reply_message::<protocol::SourceInfoList>(
+        let (seq_r, source_list) = protocol::read_reply_message::<protocol::SourceInfoList>(
             &mut connection.sock,
             connection.protocol_version,
         )?;
+        if seq_c != seq_r {
+            return Err(LinuxAudioError::OutOfOrder);
+        }
 
         // get speakers
+        let seq_c = connection.seq.next();
         protocol::write_command_message(
             connection.sock.get_mut(),
-            connection.seq.next(),
+            seq_c,
             &protocol::Command::GetSinkInfoList,
             connection.protocol_version,
         )?;
-        let (_, sink_list) = protocol::read_reply_message::<protocol::SinkInfoList>(
+        let (seq_r, sink_list) = protocol::read_reply_message::<protocol::SinkInfoList>(
             &mut connection.sock,
             connection.protocol_version,
         )?;
-
+        if seq_c != seq_r {
+            return Err(LinuxAudioError::OutOfOrder);
+        }
+        let seq_c = connection.seq.next();
         //get server info to check default devices
         protocol::write_command_message(
             connection.sock.get_mut(),
-            connection.seq.next(),
+            seq_c,
             &protocol::Command::GetServerInfo,
             connection.protocol_version,
         )?;
-        let (_, server_info) = protocol::read_reply_message::<protocol::ServerInfo>(
+        let (seq_r, server_info) = protocol::read_reply_message::<protocol::ServerInfo>(
             &mut connection.sock,
             connection.protocol_version,
         )?;
+        if seq_c != seq_r {
+            return Err(LinuxAudioError::OutOfOrder);
+        }
 
         self.devices.clear();
         self.devices.extend(
@@ -238,10 +281,11 @@ impl LinuxAudioDeviceManager {
         channel_volume.push(Volume::from_u32_clamped(
             (volume * (u16::MAX) as f32) as u32,
         ));
+        let seq_c = connection.seq.next();
         match device.device_type {
             AudioDeviceType::Capture => protocol::write_command_message(
                 connection.sock.get_mut(),
-                connection.seq.next(),
+                seq_c,
                 &protocol::Command::SetSourceVolume(SetDeviceVolumeParams {
                     device_index: Some(device.index),
                     device_name: None,
@@ -251,7 +295,7 @@ impl LinuxAudioDeviceManager {
             )?,
             AudioDeviceType::Render => protocol::write_command_message(
                 connection.sock.get_mut(),
-                connection.seq.next(),
+                seq_c,
                 &protocol::Command::SetSinkVolume(SetDeviceVolumeParams {
                     device_index: Some(device.index),
                     device_name: None,
@@ -261,10 +305,13 @@ impl LinuxAudioDeviceManager {
             )?,
         }
         //wrong type but it seems to only reply with device not found error
-        let _ = protocol::read_reply_message::<protocol::CardInfoList>(
+        let (seq_r, _) = protocol::read_reply_message::<protocol::CardInfoList>(
             &mut connection.sock,
             connection.protocol_version,
         )?;
+        if seq_c != seq_r {
+            return Err(LinuxAudioError::OutOfOrder);
+        }
         device.volume = volume;
 
         Ok(())
@@ -279,10 +326,11 @@ impl LinuxAudioDeviceManager {
             .iter_mut()
             .find(|device| device.id == id)
             .ok_or(LinuxAudioError::AudioDeviceNotFound)?;
+        let seq_c = connection.seq.next();
         match device.device_type {
             AudioDeviceType::Capture => protocol::write_command_message(
                 connection.sock.get_mut(),
-                connection.seq.next(),
+                seq_c,
                 &protocol::Command::SetSourceMute(SetDeviceMuteParams {
                     device_index: Some(device.index),
                     device_name: None,
@@ -292,7 +340,7 @@ impl LinuxAudioDeviceManager {
             )?,
             AudioDeviceType::Render => protocol::write_command_message(
                 connection.sock.get_mut(),
-                connection.seq.next(),
+                seq_c,
                 &protocol::Command::SetSinkMute(SetDeviceMuteParams {
                     device_index: Some(device.index),
                     device_name: None,
@@ -303,10 +351,13 @@ impl LinuxAudioDeviceManager {
         }
         device.mute = mute;
         //wrong type but it seems to only reply with device not found error
-        let _ = protocol::read_reply_message::<protocol::CardInfoList>(
+        let (seq_r, _) = protocol::read_reply_message::<protocol::CardInfoList>(
             &mut connection.sock,
             connection.protocol_version,
         )?;
+        if seq_c != seq_r {
+            return Err(LinuxAudioError::OutOfOrder);
+        }
         Ok(())
     }
 }

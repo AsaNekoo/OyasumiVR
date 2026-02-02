@@ -1,6 +1,7 @@
 use super::models::Output;
 use super::models::WindowsPowerPolicy;
-use crate::os::linux::audio::LINUX_AUDIO_DEVICE_MANAGER;
+use crate::os::linux::audio::LinuxAudioError;
+use crate::os::linux::audio::get_linux_audio_manager;
 use crate::os::models::AudioDeviceDto;
 use crate::utils::VRCHAT_ACTIVE;
 use crate::warn_unimplemented;
@@ -197,11 +198,17 @@ pub async fn system_logout() {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
-    let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
+    let mut manager_guard = get_linux_audio_manager().await;
     if let Some(manager) = manager_guard.as_mut() {
         if refresh {
             if let Err(err) = manager.refresh_devices() {
-                error!("[Core] Failed to refresh audio devices: {:?}", err);
+                //something broke
+                if matches!(err, LinuxAudioError::OutOfOrder) {
+                    error!("[core] recived unexpected sequence number when refresh audio devices");
+                    *manager_guard = None;
+                }
+                error!("[core] Failed to refresh audio devices: {:?}", err);
+                return Vec::new();
             }
         }
         manager
@@ -220,10 +227,16 @@ pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_audio_device_volume(device_id: String, volume: f32) {
-    let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
+    let mut manager_guard =get_linux_audio_manager().await;
     if let Some(manager) = manager_guard.as_mut() {
         if let Err(error) = manager.set_audio_device_volume(device_id, volume) {
-            error!("[Core] Could not set audio device volume, {:?}", error);
+            //something broke
+            if matches!(error, LinuxAudioError::OutOfOrder) {
+                error!("[core] recived unexpected sequence number when refresh audio devices");
+                *manager_guard = None;
+            } else {
+                error!("[Core] Could not set audio device volume, {:?}", error);
+            }
         }
     } else {
         error!(
@@ -235,10 +248,16 @@ pub async fn set_audio_device_volume(device_id: String, volume: f32) {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_audio_device_mute(device_id: String, mute: bool) {
-    let mut manager_guard = LINUX_AUDIO_DEVICE_MANAGER.lock().await;
+    let mut manager_guard = get_linux_audio_manager().await;
     if let Some(manager) = manager_guard.as_mut() {
         if let Err(error) = manager.set_audio_device_mute(device_id, mute) {
-            error!("[Core] Could not set audio device mute state, {:?}", error);
+            //something broke
+            if matches!(error, LinuxAudioError::OutOfOrder) {
+                error!("[core] recived unexpected sequence number when refresh audio devices");
+                *manager_guard = None;
+            }else {
+                error!("[Core] Could not set audio device mute state, {:?}", error);
+            }
         }
     } else {
         error!("[Core] Could not set audio device mute state, as audio device manager was not initialized");
