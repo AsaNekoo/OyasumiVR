@@ -7,7 +7,6 @@ export interface AudioDevice {
   volume: number;
   mute: boolean;
   default: boolean;
-  defaultCommunications: boolean;
   parsedName?: AudioDeviceParsedName;
   persistentId?: string;
 }

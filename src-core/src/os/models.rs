@@ -25,5 +25,4 @@ pub struct AudioDeviceDto {
     pub volume: f32,
     pub mute: bool,
     pub default: bool,
-    pub default_communications: bool,
 }

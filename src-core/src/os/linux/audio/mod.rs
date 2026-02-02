@@ -81,7 +81,6 @@ impl From<LinuxAudioDevice> for AudioDeviceDto {
             volume: value.volume,
             mute: value.mute,
             default: value.default,
-            default_communications: true,
         }
     }
 }
