@@ -10,7 +10,9 @@
         </div>
         <div class="setting-row-action">
           <div class="input-wrapper">
-            <input type="time" (change)="time = timeInput.value" [value]="time" #timeInput />
+            <input type="time" 
+            [(ngModel)]="time"
+             #timeInput />
           </div>
         </div>
       </div>

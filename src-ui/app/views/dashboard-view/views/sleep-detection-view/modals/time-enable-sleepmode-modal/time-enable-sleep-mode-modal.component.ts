@@ -34,7 +34,11 @@ export class TimeEnableSleepModeModalComponent
     super();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (!this.time || !this.time.match(/[0-2][0-9]:[0-5][0-9]/g)) {
+      this.time = '00:00';
+    }
+  }
 
   save() {
     this.result = this;

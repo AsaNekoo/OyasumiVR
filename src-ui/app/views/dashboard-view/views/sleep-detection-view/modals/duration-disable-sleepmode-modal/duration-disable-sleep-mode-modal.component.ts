@@ -36,7 +36,11 @@ export class DurationDisableSleepModeModalComponent
     super();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (!this.duration||!this.duration.match(/[0-2][0-9]:[0-5][0-9]/g)) {
+      this.duration = '00:00';
+    }
+  }
 
   save() {
     this.result = this;

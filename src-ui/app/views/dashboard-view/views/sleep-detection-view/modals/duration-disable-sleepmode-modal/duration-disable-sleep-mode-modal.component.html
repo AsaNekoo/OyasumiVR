@@ -12,8 +12,7 @@
           <div class="input-wrapper">
             <input
               type="time"
-              (change)="duration = timeInput.value"
-              [value]="duration"
+              [(ngModel)]="duration"
               #timeInput
             />
           </div>
