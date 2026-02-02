@@ -31,7 +31,6 @@ bytes = "1.10.1"
 
 chrono = "0.4.41"
 config = "0.15.11"
-cronjob = "0.4.17"
 dirs = "6.0.0"
 discord-sdk = "0.4.0"
 enumset = "1.1.6"

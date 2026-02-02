@@ -41,7 +41,6 @@ import { SoftwareBrightnessControlService } from './brightness-control/software-
 import { CCTControlService } from './cct-control/cct-control.service';
 import { SetBrightnessOrCCTReason } from './brightness-control/brightness-control-models';
 import { error } from '@tauri-apps/plugin-log';
-import { listen } from '@tauri-apps/api/event';
 import { OpenVRService } from './openvr.service';
 import { invoke } from '@tauri-apps/api/core';
 
@@ -146,7 +145,7 @@ export class BrightnessCctAutomationService {
       )
       .subscribe();
     // Listen for minute starts
-    await listen<void>('CRON_MINUTE_START', () => this.onMinuteTick());
+     setInterval(this.onMinuteTick,1000*60);
 
     // Update sunrise/sunset times on startup and every 12 hours
     this.updateSunriseSunsetTimes();

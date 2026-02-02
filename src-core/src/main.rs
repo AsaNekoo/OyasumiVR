@@ -29,7 +29,6 @@ use config::Config;
 pub use flavour::BUILD_FLAVOUR;
 pub use grpc::models as Models;
 
-use cronjob::CronJob;
 use globals::{APTABASE_APP_KEY, FLAGS, TAURI_APP_HANDLE};
 use log::{error, info, warn, LevelFilter};
 
@@ -261,10 +260,6 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     discord::init().await;
     // Initialize system tray
     system_tray::init().await;
-    // Setup start of minute cronjob
-    let mut cron = CronJob::new("CRON_MINUTE_START", on_cron_minute_start);
-    cron.seconds("0");
-    CronJob::start_job_threaded(cron);
 
     // Start profiling if we're in debug mode
     // #[cfg(debug_assertions)]
@@ -297,9 +292,6 @@ async fn load_configs() {
     };
 }
 
-fn on_cron_minute_start(_: &str) {
-    futures::executor::block_on(utils::send_event("CRON_MINUTE_START", ()));
-}
 
 fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
     tauri::generate_handler![

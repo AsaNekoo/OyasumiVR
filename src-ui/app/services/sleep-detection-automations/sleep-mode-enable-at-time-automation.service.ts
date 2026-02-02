@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { AutomationConfigService } from '../automation-config.service';
-import { listen } from '@tauri-apps/api/event';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
   SleepModeEnableAtTimeAutomationConfig,
@@ -26,7 +25,7 @@ export class SleepModeEnableAtTimeAutomationService {
     this.automationConfig.configs
       .pipe(map((configs) => configs.SLEEP_MODE_ENABLE_AT_TIME))
       .subscribe((config) => (this.config = config));
-    await listen<void>('CRON_MINUTE_START', () => this.onTick());
+      setInterval(this.onTick,60000);
   }
 
   async onTick() {
