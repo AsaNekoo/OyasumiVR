@@ -17,7 +17,7 @@ export class EventLogMsiAfterburnerProfileSetEntryParser extends EventLogEntryPa
 
   override headerInfoTitleParams(entry: EventLogMsiAfterburnerProfileSet): { [s: string]: string } {
     return {
-      profile: entry.profile.toString(10),
+      profile: entry.profile,
     };
   }
 

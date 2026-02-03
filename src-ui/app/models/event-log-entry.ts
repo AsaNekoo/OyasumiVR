@@ -273,7 +273,7 @@ export interface EventLogWindowsPowerPolicySet extends EventLogBase {
 
 export interface EventLogMsiAfterburnerProfileSet extends EventLogBase {
   type: 'msiAfterburnerProfileSet';
-  profile: number;
+  profile: string;
   reason: 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED';
 }
 

@@ -88,9 +88,9 @@ export interface SetMsiAfterburnerProfileResponse {
    */
   success: boolean;
   /**
-   * @generated from protobuf field: optional OyasumiElevatedSidecar.SetMsiAfterburnerProfileError error = 2;
+   * @generated from protobuf field: optional OyasumiElevatedSidecar.GpuProfileError error = 2;
    */
-  error?: SetMsiAfterburnerProfileError;
+  error?: GpuProfileError;
 }
 /**
  * @generated from protobuf message OyasumiElevatedSidecar.NvmlDevice
@@ -186,49 +186,49 @@ export enum NvmlSetPowerManagementLimitError {
   NvmlSetPowerManagementLimitError_UnknownError = 3,
 }
 /**
- * @generated from protobuf enum OyasumiElevatedSidecar.SetMsiAfterburnerProfileError
+ * @generated from protobuf enum OyasumiElevatedSidecar.GpuProfileError
  */
-export enum SetMsiAfterburnerProfileError {
+export enum GpuProfileError {
   /**
-   * @generated from protobuf enum value: SetMsiAfterburnerProfileError_InvalidProfileIndex = 0;
+   * @generated from protobuf enum value: GpuProfileError_InvalidProfileIndex = 0;
    */
-  SetMsiAfterburnerProfileError_InvalidProfileIndex = 0,
+  GpuProfileError_InvalidProfileIndex = 0,
   /**
-   * @generated from protobuf enum value: SetMsiAfterburnerProfileError_ExeNotFound = 1;
+   * @generated from protobuf enum value: GpuProfileError_ExeNotFound = 1;
    */
-  SetMsiAfterburnerProfileError_ExeNotFound = 1,
+  GpuProfileError_ExeNotFound = 1,
   /**
-   * @generated from protobuf enum value: SetMsiAfterburnerProfileError_ExeCannotExecute = 2;
+   * @generated from protobuf enum value: GpuProfileError_ExeCannotExecute = 2;
    */
-  SetMsiAfterburnerProfileError_ExeCannotExecute = 2,
+  GpuProfileError_ExeCannotExecute = 2,
   /**
-   * @generated from protobuf enum value: SetMsiAfterburnerProfileError_ExeUnverifiable = 3;
+   * @generated from protobuf enum value: GpuProfileError_ExeUnverifiable = 3;
    */
-  SetMsiAfterburnerProfileError_ExeUnverifiable = 3,
+  GpuProfileError_ExeUnverifiable = 3,
   /**
-   * @generated from protobuf enum value: SetMsiAfterburnerProfileError_ExeNotSigned = 4;
+   * @generated from protobuf enum value: GpuProfileError_ExeNotSigned = 4;
    */
-  SetMsiAfterburnerProfileError_ExeNotSigned = 4,
+  GpuProfileError_ExeNotSigned = 4,
   /**
-   * @generated from protobuf enum value: SetMsiAfterburnerProfileError_ExeSignatureDisallowedNonEmbedded = 5;
+   * @generated from protobuf enum value: GpuProfileError_ExeSignatureDisallowedNonEmbedded = 5;
    */
-  SetMsiAfterburnerProfileError_ExeSignatureDisallowedNonEmbedded = 5,
+  GpuProfileError_ExeSignatureDisallowedNonEmbedded = 5,
   /**
-   * @generated from protobuf enum value: SetMsiAfterburnerProfileError_ExeSignatureDisallowedNoIssuer = 6;
+   * @generated from protobuf enum value: GpuProfileError_ExeSignatureDisallowedNoIssuer = 6;
    */
-  SetMsiAfterburnerProfileError_ExeSignatureDisallowedNoIssuer = 6,
+  GpuProfileError_ExeSignatureDisallowedNoIssuer = 6,
   /**
-   * @generated from protobuf enum value: SetMsiAfterburnerProfileError_ExeSignatureDisallowedNoSubject = 7;
+   * @generated from protobuf enum value: GpuProfileError_ExeSignatureDisallowedNoSubject = 7;
    */
-  SetMsiAfterburnerProfileError_ExeSignatureDisallowedNoSubject = 7,
+  GpuProfileError_ExeSignatureDisallowedNoSubject = 7,
   /**
-   * @generated from protobuf enum value: SetMsiAfterburnerProfileError_ExeSignatureDisallowedNoMatch = 8;
+   * @generated from protobuf enum value: GpuProfileError_ExeSignatureDisallowedNoMatch = 8;
    */
-  SetMsiAfterburnerProfileError_ExeSignatureDisallowedNoMatch = 8,
+  GpuProfileError_ExeSignatureDisallowedNoMatch = 8,
   /**
-   * @generated from protobuf enum value: SetMsiAfterburnerProfileError_UnknownError = 9;
+   * @generated from protobuf enum value: GpuProfileError_UnknownError = 9;
    */
-  SetMsiAfterburnerProfileError_UnknownError = 9,
+  GpuProfileError_UnknownError = 9,
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class PingResponse$Type extends MessageType<PingResponse> {
@@ -664,8 +664,8 @@ class SetMsiAfterburnerProfileResponse$Type extends MessageType<SetMsiAfterburne
         kind: 'enum',
         opt: true,
         T: () => [
-          'OyasumiElevatedSidecar.SetMsiAfterburnerProfileError',
-          SetMsiAfterburnerProfileError,
+          'OyasumiElevatedSidecar.GpuProfileError',
+          GpuProfileError,
         ],
       },
     ]);
@@ -693,7 +693,7 @@ class SetMsiAfterburnerProfileResponse$Type extends MessageType<SetMsiAfterburne
         case /* bool success */ 1:
           message.success = reader.bool();
           break;
-        case /* optional OyasumiElevatedSidecar.SetMsiAfterburnerProfileError error */ 2:
+        case /* optional OyasumiElevatedSidecar.GpuProfileError error */ 2:
           message.error = reader.int32();
           break;
         default:
@@ -722,7 +722,7 @@ class SetMsiAfterburnerProfileResponse$Type extends MessageType<SetMsiAfterburne
   ): IBinaryWriter {
     /* bool success = 1; */
     if (message.success !== false) writer.tag(1, WireType.Varint).bool(message.success);
-    /* optional OyasumiElevatedSidecar.SetMsiAfterburnerProfileError error = 2; */
+    /* optional OyasumiElevatedSidecar.GpuProfileError error = 2; */
     if (message.error !== undefined) writer.tag(2, WireType.Varint).int32(message.error);
     let u = options.writeUnknownFields;
     if (u !== false) (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

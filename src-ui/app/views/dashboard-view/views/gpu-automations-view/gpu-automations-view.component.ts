@@ -89,9 +89,9 @@ export class GpuAutomationsViewComponent implements OnInit {
         if (!sidecarRunning) return true;
         // Afterburner
         if (
-          (msiAfterburnerConfig.onSleepDisableProfile > 0 ||
-            msiAfterburnerConfig.onSleepEnableProfile > 0 ||
-            msiAfterburnerConfig.onSleepPreparation > 0) &&
+          (msiAfterburnerConfig.onSleepDisableProfile||
+            msiAfterburnerConfig.onSleepEnableProfile ||
+            msiAfterburnerConfig.onSleepPreparation) &&
           (
             [
               'NOT_FOUND',

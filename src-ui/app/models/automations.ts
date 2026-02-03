@@ -190,10 +190,9 @@ export interface GPUPowerLimitsAutomationConfig extends AutomationConfig {
 }
 
 export interface MSIAfterburnerAutomationConfig extends AutomationConfig {
-  msiAfterburnerPath: string;
-  onSleepEnableProfile: number;
-  onSleepDisableProfile: number;
-  onSleepPreparation: number;
+  onSleepEnableProfile: string|null;
+  onSleepDisableProfile: string|null;
+  onSleepPreparation: string|null;
 }
 
 // SLEEP MODE AUTOMATIONS
@@ -963,10 +962,9 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
   },
   MSI_AFTERBURNER: {
     enabled: false,
-    msiAfterburnerPath: 'C:\\Program Files (x86)\\MSI Afterburner\\MSIAfterburner.exe',
-    onSleepEnableProfile: 0,
-    onSleepDisableProfile: 0,
-    onSleepPreparation: 0,
+    onSleepEnableProfile: null,
+    onSleepDisableProfile: null,
+    onSleepPreparation: null,
   },
   BIGSCREEN_BEYOND_FAN_CONTROL: {
     enabled: true,

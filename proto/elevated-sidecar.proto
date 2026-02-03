@@ -43,7 +43,7 @@ message SetMsiAfterburnerProfileRequest {
 
 message SetMsiAfterburnerProfileResponse {
     bool success = 1;
-    optional SetMsiAfterburnerProfileError error = 2;
+    optional GpuProfileError error = 2;
 }
 
 // Types
@@ -66,17 +66,17 @@ enum NvmlSetPowerManagementLimitError {
   NvmlSetPowerManagementLimitError_UnknownError = 3;
 }
 
-enum SetMsiAfterburnerProfileError {
-    SetMsiAfterburnerProfileError_InvalidProfileIndex = 0;
-    SetMsiAfterburnerProfileError_ExeNotFound = 1;
-    SetMsiAfterburnerProfileError_ExeCannotExecute = 2;
-    SetMsiAfterburnerProfileError_ExeUnverifiable = 3;
-    SetMsiAfterburnerProfileError_ExeNotSigned = 4;
-    SetMsiAfterburnerProfileError_ExeSignatureDisallowedNonEmbedded = 5;
-    SetMsiAfterburnerProfileError_ExeSignatureDisallowedNoIssuer = 6;
-    SetMsiAfterburnerProfileError_ExeSignatureDisallowedNoSubject = 7;
-    SetMsiAfterburnerProfileError_ExeSignatureDisallowedNoMatch = 8;
-    SetMsiAfterburnerProfileError_UnknownError = 9;
+enum GpuProfileError {
+    GpuProfileError_InvalidProfileIndex = 0;
+    GpuProfileError_ExeNotFound = 1;
+    GpuProfileError_ExeCannotExecute = 2;
+    GpuProfileError_ExeUnverifiable = 3;
+    GpuProfileError_ExeNotSigned = 4;
+    GpuProfileError_ExeSignatureDisallowedNonEmbedded = 5;
+    GpuProfileError_ExeSignatureDisallowedNoIssuer = 6;
+    GpuProfileError_ExeSignatureDisallowedNoSubject = 7;
+    GpuProfileError_ExeSignatureDisallowedNoMatch = 8;
+    GpuProfileError_UnknownError = 9;
 }
 
 message NvmlDevice {

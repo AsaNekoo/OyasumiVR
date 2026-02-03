@@ -102,10 +102,8 @@ export class GpuAutomationsService {
                 ? this.currentMSIAfterburnerConfig.onSleepEnableProfile
                 : this.currentMSIAfterburnerConfig.onSleepDisableProfile,
               sleepModeEnabled ? 'SLEEP_MODE_ENABLED' : 'SLEEP_MODE_DISABLED',
-            ] as [number, 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED']
+            ] as [string, 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED']
         ),
-        // Stop if no profile is to be enabled
-        filter(([profile]) => profile > 0)
       )
       .subscribe(([profile, reason]) => this.setMSIAfterburnerProfile(profile, reason));
     this.sleep_preparation_service.onSleepPreparation.subscribe(() => {
@@ -126,7 +124,6 @@ export class GpuAutomationsService {
           () =>
             this._msiAfterburnerStatus.value === 'UNKNOWN'
         ),
-        map(([, curr]) => curr.msiAfterburnerPath),
         // Only while one of the profile automations is active (so we don't launch afterburner for nothing)
         switchMap(() =>
           this.msiAfterburnerConfig.pipe(
@@ -136,35 +133,32 @@ export class GpuAutomationsService {
         )
       )
       .subscribe(() => {
-        this.testmsi();
+        this.test_gpu_set();
       });
   }
 
   async setMSIAfterburnerProfile(
-    index: number,
+    profile: string|null,
     reason: 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED' | 'SLEEP_PREPARATION'
   ) {
-    if (index < 1 || index > 5) {
-      await error(`[GpuAutomations] Attempted to set invalid MSI Afterburner profile (${index})`);
-      return;
-    }
     if (this._msiAfterburnerStatus.value !== 'SUCCESS') {
+      console.warn("gpu backend failed");
       await warn(
         `[GpuAutomations] Could not set MSI Afterburner profile as no valid installation is currently configured`
       );
       return;
     }
     try {
-      await invoke<boolean>('msi_afterburner_set_profile', {
-        executablePath: this.currentMSIAfterburnerConfig.msiAfterburnerPath,
-        profile: index,
+      await invoke<boolean>('gpu_set_profile', {
+        profile: profile,
       });
       this.eventLog.logEvent({
         type: 'msiAfterburnerProfileSet',
-        profile: index,
+        profile: profile,
         reason,
       } as EventLogMsiAfterburnerProfileSet);
     } catch (e) {
+      console.warn("failed to set gpu profile:"+e);
       if (typeof e === 'string') {
         this.handleMSIAfterburnerError(e);
       } else {
@@ -175,14 +169,15 @@ export class GpuAutomationsService {
     }
   }
 
-  async testmsi() {
+  async test_gpu_set() {
     this._msiAfterburnerStatus.next('CHECKING');
     // Try running it
     try {
-      await invoke<boolean>('msi_afterburner_set_profile', {
-        profile: 0, // Profile 0 for testing without actually setting a profile
+      await invoke<boolean>('gpu_set_profile', {
+        profile: "", // Profile 0 for testing without actually setting a profile
       });
     } catch (e) {
+      console.warn("gpu backend failed"+e);
       if (typeof e === 'string') {
         this.handleMSIAfterburnerError(e);
       } else {
@@ -219,23 +214,23 @@ export class GpuAutomationsService {
     }
   }
 
-  async setMSIAfterburnerProfileOnSleepEnable(number: number) {
+  async setMSIAfterburnerProfileOnSleepEnable(profile: string) {
     await this.automationConfig.updateAutomationConfig<MSIAfterburnerAutomationConfig>(
       'MSI_AFTERBURNER',
-      { onSleepEnableProfile: number }
+      { onSleepEnableProfile: profile }
     );
   }
 
-  async setMSIAfterburnerProfileOnSleepDisable(number: number) {
+  async setMSIAfterburnerProfileOnSleepDisable(profile: string) {
     await this.automationConfig.updateAutomationConfig<MSIAfterburnerAutomationConfig>(
       'MSI_AFTERBURNER',
-      { onSleepDisableProfile: number }
+      { onSleepDisableProfile: profile }
     );
   }
-  async setMSIAfterburnerProfileOnSleepPreparation(number: number) {
+  async setMSIAfterburnerProfileOnSleepPreparation(profile: string) {
     await this.automationConfig.updateAutomationConfig<MSIAfterburnerAutomationConfig>(
       'MSI_AFTERBURNER',
-      { onSleepPreparation: number }
+      { onSleepPreparation: profile }
     );
   }
 }

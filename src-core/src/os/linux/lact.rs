@@ -1,7 +1,7 @@
 use lact_client::DaemonClient;
 use log::warn;
 
-use crate::{utils::send_event, Models::elevated_sidecar::SetMsiAfterburnerProfileError};
+use crate::{utils::send_event, Models::elevated_sidecar::GpuProfileError};
 // unsafe impl<T> Send for SendWapper<T> {}
 // pub struct SendWapper<T> {
 //     inner: T,
@@ -27,8 +27,48 @@ pub async fn init() {
     // let local = tokio::task::LocalSet::new()
 }
 //fixme: fix this attrocity
-pub async fn set_lact_profile(profile: u32) -> Result<bool, SetMsiAfterburnerProfileError> {
-    fn inner(profile: u32) -> Result<bool, SetMsiAfterburnerProfileError> {
+pub async fn set_lact_profile(profile: String) -> Result<bool, GpuProfileError> {
+    fn inner(profile: String) -> Result<bool, GpuProfileError> {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        rt.block_on(async {
+            match DaemonClient::connect().await {
+                Ok(v) => {
+                    if profile.is_empty(){
+                        return Ok(true);
+                    }
+                    // LACT.lock().await.replace(SendWapper { inner: v });
+                    log::debug!("[core] LACT client started");
+                    let profiles = v
+                        .list_profiles(false)
+                        .await
+                        .map_err(|_| GpuProfileError::UnknownError)?;
+                    let profile = profiles
+                        .profiles
+                        .iter()
+                        .find(|p|*p.0==profile)
+                        .ok_or(GpuProfileError::InvalidProfileIndex)?;
+                    v.set_profile(Some(profile.0.to_string()), false)
+                        .await
+                        .unwrap();
+                    Ok(true)
+                }
+                Err(err) => {
+                    warn!("[core] failed to connect to lact daemon{:?}", err);
+                    Err(GpuProfileError::ExeCannotExecute)
+                }
+            }
+        })
+    }
+  
+    std::thread::spawn(move || inner(profile)).join().unwrap()?;
+
+    Ok(true)
+}
+pub async fn get_lact_profiles() -> Result<Vec<String>, GpuProfileError> {
+    fn inner() -> Result<Vec<String>, GpuProfileError> {
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
@@ -38,30 +78,22 @@ pub async fn set_lact_profile(profile: u32) -> Result<bool, SetMsiAfterburnerPro
                 Ok(v) => {
                     // LACT.lock().await.replace(SendWapper { inner: v });
                     log::debug!("[core] LACT client started");
-                    let profiles = v
-                        .list_profiles(false)
+                    Ok(v.list_profiles(false)
                         .await
-                        .map_err(|_| SetMsiAfterburnerProfileError::UnknownError)?;
-                    let profile = profiles
-                    .profiles
-                    .iter()
-                    .find(|p| p.0.starts_with(&format!("{}_", profile)))
-                    .ok_or(SetMsiAfterburnerProfileError::InvalidProfileIndex)?;
-                    v.set_profile(Some(profile.0.to_string()), false)
-                    .await.unwrap();
-                    Ok(true)
+                        .map_err(|_| GpuProfileError::UnknownError)?
+                        .profiles
+                        .iter()
+                        .map(|p| p.0)
+                        .cloned()
+                        .collect())
                 }
                 Err(err) => {
                     warn!("[core] failed to connect to lact daemon{:?}", err);
-                    Err(SetMsiAfterburnerProfileError::ExeCannotExecute)
+                    Err(GpuProfileError::ExeCannotExecute)
                 }
             }
         })
     }
-    if profile==0{
-        return Ok(true);
-    }
-    std::thread::spawn(move || inner(profile)).join().unwrap()?;
 
-    Ok(true)
+    std::thread::spawn(inner).join().unwrap()
 }

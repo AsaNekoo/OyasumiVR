@@ -38,9 +38,9 @@ export class GpuAutomationMessageMonitor extends MessageMonitor {
           ([gpuAutomationsEnabled, msiAfterburnerConfig, msiAfterburnerStatus, sidecarRunning]) => {
             if (!gpuAutomationsEnabled || !sidecarRunning) return { error: false };
             if (
-              msiAfterburnerConfig.onSleepEnableProfile === 0 &&
-              msiAfterburnerConfig.onSleepDisableProfile === 0 &&
-              msiAfterburnerConfig.onSleepPreparation == 0
+              !msiAfterburnerConfig.onSleepEnableProfile &&
+              !msiAfterburnerConfig.onSleepDisableProfile &&
+              !msiAfterburnerConfig.onSleepPreparation
             )
               return { error: false };
             if (
@@ -89,8 +89,8 @@ export class GpuAutomationMessageMonitor extends MessageMonitor {
                   this.automationConfig.updateAutomationConfig<MSIAfterburnerAutomationConfig>(
                     'MSI_AFTERBURNER',
                     {
-                      onSleepEnableProfile: 0,
-                      onSleepDisableProfile: 0,
+                      onSleepEnableProfile: null,
+                      onSleepDisableProfile: null,
                     }
                   );
                 },

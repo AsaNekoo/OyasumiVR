@@ -31,7 +31,7 @@ fn configure_tonic_build() {
             "#[derive(serde::Serialize)]",
         )
         .type_attribute(
-            "SetMsiAfterburnerProfileError",
+            "GpuProfileError",
             "#[derive(serde::Serialize)]",
         )
         // Compile protobuf files

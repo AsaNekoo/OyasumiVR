@@ -15,6 +15,7 @@ import { vshrink } from '../../../../../utils/animations';
 import { SelectBoxItem } from '../../../../../components/select-box/select-box.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { is_windows } from 'src-ui/app/app.module';
+import { invoke } from '@tauri-apps/api/core';
 
 @Component({
   selector: 'app-msi-afterburner-pane',
@@ -41,13 +42,6 @@ export class MsiAfterburnerPaneComponent implements OnInit {
       id: '0',
       label: 'gpu-automations.msiAfterburner.none',
     },
-    ...new Array(5).fill(0).map((_, i) => ({
-      id: (i + 1).toString(),
-      label: {
-        string: 'gpu-automations.msiAfterburner.profile',
-        values: { index: (i + 1).toString() },
-      },
-    })),
   ];
   onDisableProfile: SelectBoxItem = this.profileOptions[0];
   onEnableProfile: SelectBoxItem = this.profileOptions[0];
@@ -58,14 +52,46 @@ export class MsiAfterburnerPaneComponent implements OnInit {
     private destroyRef: DestroyRef
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    try {
+      let profiles = await invoke<string[]>('gpu_get_profiles');
+      profiles.forEach((element) => {
+        this.profileOptions.push({
+          id: element,
+          label: element,
+        });
+      });
+    } catch (e) {
+      console.warn('failed to get gpu profile with' + e);
+    }
     this.gpuAutomations.msiAfterburnerConfig
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((config) => {
         this.config = config;
-        this.onEnableProfile = this.profileOptions[config.onSleepEnableProfile];
-        this.onDisableProfile = this.profileOptions[config.onSleepDisableProfile];
-        this.onPrepareProfile=this.profileOptions[config.onSleepPreparation];
+        let onEnableProfile = this.profileOptions.find(
+          (element) => element.id == this.config.onSleepEnableProfile
+        );
+        if (onEnableProfile) {
+          this.onEnableProfile = onEnableProfile;
+        } else {
+          this.onEnableProfile = this.profileOptions[0];
+        }
+        let onDisableProfile = this.profileOptions.find(
+          (element) => element.id == this.config.onSleepDisableProfile
+        );
+        if (onDisableProfile) {
+          this.onDisableProfile = onDisableProfile;
+        } else {
+          this.onDisableProfile = this.profileOptions[0];
+        }
+        let onPrepareProfile = this.profileOptions.find(
+          (element) => element.id == this.config.onSleepPreparation
+        );
+        if (onPrepareProfile) {
+          this.onPrepareProfile = onPrepareProfile;
+        } else {
+          this.onPrepareProfile = this.profileOptions[0];
+        }
       });
     this.gpuAutomations.msiAfterburnerStatus
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -96,20 +122,19 @@ export class MsiAfterburnerPaneComponent implements OnInit {
       : undefined;
   }
 
-
-
   changeProfile(event: 'ON_DISABLE' | 'ON_ENABLE' | 'ON_PREPARE', item: SelectBoxItem) {
+    console.warn(item);
     switch (event) {
       case 'ON_DISABLE':
         this.onDisableProfile = item;
-        this.gpuAutomations.setMSIAfterburnerProfileOnSleepDisable(parseInt(item.id));
+        this.gpuAutomations.setMSIAfterburnerProfileOnSleepDisable(item.id);
         break;
       case 'ON_ENABLE':
-        this.gpuAutomations.setMSIAfterburnerProfileOnSleepEnable(parseInt(item.id));
+        this.gpuAutomations.setMSIAfterburnerProfileOnSleepEnable(item.id);
         this.onEnableProfile = item;
         break;
       case 'ON_PREPARE':
-        this.gpuAutomations.setMSIAfterburnerProfileOnSleepPreparation(parseInt(item.id));
+        this.gpuAutomations.setMSIAfterburnerProfileOnSleepPreparation(item.id);
         this.onPrepareProfile = item;
         break;
     }
