@@ -16,8 +16,10 @@ export class SleepModeDisableAfterTimeAutomationService {
     AUTOMATION_CONFIGS_DEFAULT.SLEEP_MODE_DISABLE_AFTER_TIME
   );
   sleepLastEnabled = -1;
+  sleepLastDisabled = -1;
   sleepEnabled = false;
-  threshold = -1;
+  sleep_duration = -1;
+  awake_duration: number | null = null;
 
   constructor(
     private automationConfig: AutomationConfigService,
@@ -31,20 +33,34 @@ export class SleepModeDisableAfterTimeAutomationService {
         this.config = config;
         if (config.duration) {
           const [hours, minutes] = config.duration.split(':').map((v) => parseInt(v));
-          this.threshold = hours * 60 * 60 * 1000 + minutes * 60 * 1000;
+          this.sleep_duration = hours * 60 * 60 * 1000 + minutes * 60 * 1000;
+        }
+        if (config.awake) {
+          const [hours, minutes] = config.awake.split(':').map((v) => parseInt(v));
+          this.awake_duration = hours * 60 * 60 * 1000 + minutes * 60 * 1000;
         }
       });
     this.sleep.mode.pipe(distinctUntilChanged()).subscribe((mode) => {
       this.sleepEnabled = mode;
-      this.sleepLastEnabled = mode ? Date.now() : -1;
+      if (mode) {
+        if (this.awake_duration) {
+          if (Date.now() - this.sleepLastDisabled > this.awake_duration) {
+            this.sleepLastEnabled = Date.now();
+          }
+        } else {
+          this.sleepLastEnabled = Date.now();
+        }
+      } else {
+        this.sleepLastDisabled = Date.now();
+      }
     });
     interval(60000).subscribe(() => this.onTick());
   }
 
   async onTick() {
     if (!this.config.enabled || !this.config.duration) return;
-    if (this.threshold <= 0 || this.sleepLastEnabled <= 0) return;
-    if (this.sleepEnabled && Date.now() - this.sleepLastEnabled >= this.threshold) {
+    if (this.sleep_duration <= 0 || this.sleepLastEnabled <= 0) return;
+    if (this.sleepEnabled && Date.now() - this.sleepLastEnabled >= this.sleep_duration) {
       this.sleepEnabled = false;
       this.sleepLastEnabled = -1;
       await this.sleep.disableSleepMode({

@@ -235,6 +235,7 @@ export interface SleepModeDisableAtTimeAutomationConfig extends AutomationConfig
 
 export interface SleepModeDisableAfterTimeAutomationConfig extends AutomationConfig {
   duration: string | null;
+  awake: string | null;
 }
 
 export interface SleepModeDisableOnDevicePowerOnAutomationConfig extends AutomationConfig {
@@ -576,6 +577,7 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
   SLEEP_MODE_DISABLE_AFTER_TIME: {
     enabled: false,
     duration: null,
+    awake: null
   },
   SLEEP_MODE_DISABLE_ON_DEVICE_POWER_ON: {
     enabled: false,

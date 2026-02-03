@@ -10,10 +10,20 @@
         </div>
         <div class="setting-row-action">
           <div class="input-wrapper">
-            <input
-              type="text"
-              [(ngModel)]="duration"
-            />
+            <input type="text" [(ngModel)]="duration" />
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-row-label" translate>
+          <span translate>sleep-detection.modals.disableAfterTime.awake.title</span>
+          <!-- <span translate>sleep-detection.modals.disableAfterTime.awake.description</span> -->
+          <span>{{ getStringForDurationAwake(awake) }}</span>
+        </div>
+        <div class="setting-row-action">
+          <div class="input-wrapper">
+            <input type="text" [(ngModel)]="awake" />
           </div>
         </div>
       </div>

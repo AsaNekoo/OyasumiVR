@@ -2504,6 +2504,14 @@
         },
         "title": "After a specific amount of time"
       },
+      "awakeFor": {
+        "description": {
+          "hours": "Awake for {hours, plural, one {1 hour} other {# hours}}",
+          "hoursAndMinutes": "Awake for {hours, plural, one {1 hour} other {# hours}} and {minutes, plural, one {1 minute} other {# minutes}}",
+          "minutes": "Awake for {minutes, plural, one {1 minute} other {# minutes}}"
+        },
+        "title": "Awake for a specific amount of time"
+      },
       "atTime": "At a specific time",
       "description": "Automatically disable sleep mode based on various other triggers",
       "onDevicePowerOn": "When a device is turned on",
@@ -2533,7 +2541,11 @@
       "disableAfterTime": {
         "description": "Disable the sleep mode after it has been enabled for a certain amount of time.",
         "time": "Duration",
-        "title": "Disable sleep mode"
+        "title": "Disable sleep mode",
+        "awake":{
+          "title": "Max Awake",
+          "description": "Awake at least for"
+        }
       },
       "disableAtTime": {
         "description": "Disable sleep mode at a specific time of day.",
