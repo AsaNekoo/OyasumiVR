@@ -33,6 +33,8 @@ tonic-prost-build = "*"
 codegen-units = 64
 debug = true
 [profile.production]
+strip=true
+debug=false
 inherits = "release"
 panic = "abort"
 codegen-units = 1

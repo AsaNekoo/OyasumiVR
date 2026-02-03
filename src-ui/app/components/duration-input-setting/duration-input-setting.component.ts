@@ -10,7 +10,8 @@ import { fade } from '../../utils/animations';
   standalone: false,
 })
 export class DurationInputSettingComponent {
-  value = model<number>(0);
+  public value = model<number>(0);
+  
   hours = computed(() => Math.floor(this.value() / 3600000));
   minutes = computed(() => Math.floor((this.value() % 3600000) / 60000));
   seconds = computed(() => Math.floor((this.value() % 60000) / 1000));
@@ -25,6 +26,7 @@ export class DurationInputSettingComponent {
   @ViewChild('secondInput') secondInput?: ElementRef;
   inputOpen = false;
   @Input() disabled = false;
+  @Input() seconds_show=true;
 
   openInput() {
     if (this.disabled) {

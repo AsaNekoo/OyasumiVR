@@ -18,7 +18,9 @@
       <div class="input-container-labels">
         <span>H</span>
         <span>M</span>
-        <span>S</span>
+        @if (seconds_show) {
+          <span>S</span>
+        }
       </div>
       <div class="input-container-inputs">
         <input
@@ -37,14 +39,16 @@
           (input)="setMinutes(minuteInput.value)"
           #minuteInput
         />
-        <input
-          type="number"
-          [value]="seconds()"
-          min="0"
-          max="60"
-          (input)="setSeconds(secondInput.value)"
-          #secondInput
-        />
+        @if (seconds_show) {
+          <input
+            type="number"
+            [value]="seconds()"
+            min="0"
+            max="60"
+            (input)="setSeconds(secondInput.value)"
+            #secondInput
+          />
+        }
       </div>
     </div>
   }
