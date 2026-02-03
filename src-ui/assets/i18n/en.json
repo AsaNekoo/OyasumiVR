@@ -1202,8 +1202,8 @@
       }
     },
     "lact": {
-      "description": "OyasumiVR can automatically apply LACT gpu profiles. <br>You can download LACT <a href=\"https://github.com/ilya-zlobintsev/LACT\" target=\"_blank\">here</a>.<br> lact controll socket has to be accesible to the user running oyasumi executable",
-      "enabledWarning": "Please be aware that incorrectly configuring your GPU in LACT could result in your system becoming unstable. Disable this feature if you do not know what you are doing.",
+      "description": "OyasumiVR can automatically apply LACT gpu profiles. <br>You can download LACT <a href=\"https://github.com/ilya-zlobintsev/LACT\" target=\"_blank\">here</a>.<br> lact controll socket has to be accesible to the user running oyasumi",
+      "enabledWarning": "Please be aware that incorrectly configuring your GPU in LACT could result in your system becoming unstable.",
       "sleepModeDisable": {
         "description": "Apply the following LACT profile",
         "title": "When sleep mode is disabled"
