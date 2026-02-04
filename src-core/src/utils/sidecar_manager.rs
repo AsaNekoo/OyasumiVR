@@ -138,32 +138,16 @@ impl SidecarManager {
             }
         }
         let child = {
-            let cef_path = PathBuf::from("resources/sidecars/cef");
-            static START_LOCK: Mutex<()> = Mutex::const_new(());
-            const LINUX_CEF_DOWNLOAD: &str = include_str!("linux_download_cef.sh");
-            let g = START_LOCK.lock().await;
-            if !cef_path.exists() {
-                log::info!("downloading chromium embeded framework, this might take a while");
-                std::fs::write("/tmp/oyasumi_download_cef.sh", LINUX_CEF_DOWNLOAD).unwrap();
-                std::process::Command::new("bash")
-                    .arg("/tmp/oyasumi_download_cef.sh")
-                    .current_dir(fs::canonicalize(".").unwrap())
-                    .spawn()
-                    .unwrap()
-                    .wait()
-                    .unwrap();
-                fs::remove_file("/tmp/oyasumi_download_cef.sh").unwrap();
-                if !cef_path.exists() {
-                    std::fs::write("download_cef.sh", LINUX_CEF_DOWNLOAD).unwrap();
-                    panic!("failed to download cef saving download script to disk");
-                }
+            let cef_path=PathBuf::from("resources/sidecars/cef");
+            if !cef_path.exists(){
+                error!("cef path doesn't exist");
+                return 0;
             }
             let cef_path = fs::canonicalize(cef_path).unwrap();
             use std::{fs, path::PathBuf};
 
             exe_path = fs::canonicalize(exe_path).unwrap();
             exe_dir = fs::canonicalize(exe_dir).unwrap();
-            drop(g);
             std::process::Command::new(exe_path)
                 .env("CEF_PATH", cef_path.clone().to_str().unwrap())
                 .env("LD_LIBRARY_PATH", cef_path.clone().to_str().unwrap())
