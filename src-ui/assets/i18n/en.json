@@ -1153,7 +1153,7 @@
       "noLimit": "Unlimited"
     },
     "steamvrRequired": "OyasumiVR can show more accurate frame limit targets for your specific VR headset while SteamVR is running. Launch SteamVR to view more info.",
-    "supportedHardwareWarning": "Note that SteamVR only supports frame limiting on native SteamVR headsets, like the Valve Index, Vive (Pro), or Bigscreen Beyond. Non-native headsets, like Quest devices, are unsupported.",
+    "supportedHardwareWarning": "Oyasumi uses mangohud for frame rate limiting",
     "title": "Frame Limit Automations"
   },
   "gpu-automations": {
