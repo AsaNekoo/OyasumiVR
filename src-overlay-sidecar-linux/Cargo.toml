@@ -26,6 +26,7 @@ hyper = "1.8.1"
 axum = { version = "0.8.7", features = ["http1", "http2", "tokio"], default-features = false }
 portpicker = "0.1.1"
 image = { version = "0.25.9", default-features = false, features = ["png"] }
+oyasumi_shared = { version = "0.1.0", path = "../src-shared-rust" }
 # xr_overlay_cef = {  path="../../xr_overlay/cef_app/" }
 [build-dependencies]
 tonic-prost-build = "*"

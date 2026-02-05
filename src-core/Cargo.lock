@@ -5002,6 +5002,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "oyasumi_shared"
+version = "0.1.0"
+
+[[package]]
 name = "oyasumivr"
 version = "25.6.12"
 dependencies = [
@@ -5026,6 +5030,7 @@ dependencies = [
  "mime_guess",
  "mpris",
  "nalgebra",
+ "oyasumi_shared",
  "oyasumivr_macros",
  "prost",
  "public-ip",

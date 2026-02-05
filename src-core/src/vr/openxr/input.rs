@@ -4,6 +4,7 @@ use std::{
 };
 
 use glam::Vec2;
+use oyasumi_shared::XR_BINDING_FILE_PATH;
 use tokio::sync::Mutex;
 use xr_overlay::{
     input::{
@@ -25,12 +26,12 @@ pub fn get_input_handlers(
     const DEFAULT_BINDINGS_CONFIG: &str =
         include_str!("../../../../bindings_config.toml");
 
-        if  !PathBuf::from("bindings_config.toml").exists()  &&!PathBuf::from("src-core").exists() {
-            fs::write("bindings_config.toml", DEFAULT_BINDINGS_CONFIG).unwrap();
+        if  !XR_BINDING_FILE_PATH.exists()  &&!PathBuf::from("src-core").exists() {
+            fs::write(&*XR_BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG).unwrap();
         }
     let config = match PathBuf::from("src-core").exists() {
         true => DEFAULT_BINDINGS_CONFIG.to_string(),
-        false => read_to_string("bindings_config.toml").unwrap(),
+        false => read_to_string(&*XR_BINDING_FILE_PATH).unwrap(),
     };
 
     let config = parse_config(config, Some(|k| ["main", "overlay"].contains(&k)));

@@ -91,6 +91,7 @@ uuid = { version = "1.18.1", features = [
 vrchat_osc = "2.0"
 serde_repr = "0.1.20"
 glam = "0.30.9"
+oyasumi_shared = { version = "0.1.0", path = "../src-shared-rust" }
 
 
 

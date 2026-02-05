@@ -6,6 +6,7 @@ use std::{
 };
 
 use log::{info, trace};
+use oyasumi_shared::XR_BINDING_FILE_PATH;
 use tonic::transport::Channel;
 use xr_overlay_cef::{
     cef::{ImplBrowser, ImplFrame},
@@ -18,7 +19,7 @@ use crate::{
     overlay_ipc::start_websocket_server,
     ui::serve_ui,
     vr::{
-        BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard,
+        DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard,
         start_vr,
     },
 };
@@ -107,8 +108,8 @@ fn main() {
     if *NO_VR.get().unwrap() {
         disable_vr();
     }
-    if ARGS.get().as_ref().unwrap().core_pid != 0 && !BINDING_FILE_PATH.is_file() {
-        fs::write(&*BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG).unwrap();
+    if ARGS.get().as_ref().unwrap().core_pid != 0 && !XR_BINDING_FILE_PATH.is_file() {
+        fs::write(&*XR_BINDING_FILE_PATH, DEFAULT_BINDINGS_CONFIG).unwrap();
     }
     let vr_thread = match start_vr() {
         Some(v) => v,
