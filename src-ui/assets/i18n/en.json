@@ -1898,7 +1898,7 @@
   },
   "playbackAutomations": {
     "title": "Playback Automations",
-    "description": "OyasumiVR can automatically pause mrpis compatible players"
+    "description": "OyasumiVR can automatically pause mpris compatible players"
   },
   "runAutomations": {
     "commandsToRun": "Commands to run",
