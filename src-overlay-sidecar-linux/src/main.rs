@@ -6,7 +6,7 @@ use std::{
 };
 
 use log::{info, trace};
-use oyasumi_shared::XR_BINDING_FILE_PATH;
+use oyasumi_shared::{XR_BINDING_FILE_PATH, get_log_path};
 use tonic::transport::Channel;
 use xr_overlay_cef::{
     cef::{ImplBrowser, ImplFrame},
@@ -18,10 +18,7 @@ use crate::{
     grpc::{start_grpc_server, start_grpc_web_server},
     overlay_ipc::start_websocket_server,
     ui::serve_ui,
-    vr::{
-        DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard,
-        start_vr,
-    },
+    vr::{DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard, start_vr},
 };
 pub mod globals;
 pub mod grpc;
@@ -56,8 +53,17 @@ pub struct Args {
 fn main() {
     unsafe { std::env::set_var("RUST_BACKTRACE", "1") };
     let hook = std::panic::take_hook();
+    let panic_log_path = get_log_path().join("overlay_panic.log");
     std::panic::set_hook(Box::new(move |e| {
-        std::fs::write(format!("overlay_panic_{}_{:?}.log",std::process::id(),std::thread::current().id()), format!("{:?}",e)).ok();
+        std::fs::write(
+            panic_log_path.join(PathBuf::from(format!(
+                "overlay_panic_{}_{:?}.log",
+                std::process::id(),
+                std::thread::current().id()
+            ))),
+            format!("{:?}", e),
+        )
+        .ok();
         hook(e);
     }));
     env_logger::Builder::new()

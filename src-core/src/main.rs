@@ -22,23 +22,20 @@ mod vr;
 mod vrc_log_parser;
 mod vrcx;
 
-
-use std::sync::atomic::Ordering;
+use std::{path::PathBuf, sync::LazyLock};
 
 use config::Config;
 pub use flavour::BUILD_FLAVOUR;
 pub use grpc::models as Models;
 
-use globals::{APTABASE_APP_KEY, FLAGS, TAURI_APP_HANDLE};
+use globals::{FLAGS, TAURI_APP_HANDLE};
 use log::{error, info, warn, LevelFilter};
 
-use serde_json::json;
+use oyasumi_shared::get_log_path;
 use tauri::{plugin::TauriPlugin, Manager, Wry};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::RotationStrategy;
 
-
-use crate::globals::APTABASE_HOST;
 #[macro_export]
 macro_rules! warn_unimplemented {
     () => {
@@ -51,6 +48,22 @@ macro_rules! warn_unimplemented {
 #[tokio::main]
 async fn main() {
     std::fs::write("/proc/self/oom_score_adj", "1000").ok();
+    let panic_log_path = Box::new(get_log_path().join("panic.log"));
+    let hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |info| {
+        let msg = info.payload_as_str().unwrap_or_default();
+        let location = info
+            .location()
+            .map(|loc| format!("{}:{}:{}", loc.file(), loc.line(), loc.column()))
+            .unwrap_or_default();
+
+        // Write msg and location to file
+
+        println!("Writing panic log to {:#?}", panic_log_path);
+        let _ = std::fs::write(&*panic_log_path, format!("{} ({})\n", msg, location));
+        error!("PANIC: {} ({})", msg, location);
+        hook(info);
+    }));
     // Attach to parent console if we're running from a command line
     // Construct OyasumiVR Tauri application
     tauri::Builder::default()
@@ -70,7 +83,6 @@ async fn main() {
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_store::Builder::default().build())
-        .plugin(configure_tauri_plugin_aptabase())
         .setup(|app| {
             let matches = match app.cli().matches() {
                 Ok(matches) => Some(matches),
@@ -115,45 +127,6 @@ fn configure_tauri_plugin_single_instance() -> TauriPlugin<Wry> {
     })
 }
 
-fn configure_tauri_plugin_aptabase() -> TauriPlugin<Wry> {
-    tauri_plugin_aptabase::Builder::new(APTABASE_APP_KEY)
-        .with_options(tauri_plugin_aptabase::InitOptions {
-            #[allow(clippy::const_is_empty)]
-            host: if APTABASE_HOST.is_empty() {
-                None
-            } else {
-                Some(APTABASE_HOST.to_string())
-            },
-            flush_interval: tauri_plugin_aptabase::InitOptions::default().flush_interval,
-        })
-        .with_panic_hook(Box::new(|client, info, msg| {
-            let location = info
-                .location()
-                .map(|loc| format!("{}:{}:{}", loc.file(), loc.line(), loc.column()))
-                .unwrap_or_default();
-
-            // Upload crash report if telemetry is enabled
-            if telemetry::TELEMETRY_ENABLED.load(Ordering::Relaxed) {
-                println!("Uploading panic data to Aptabase: {} ({})", msg, location);
-                let _ = client.track_event(
-                    "rust_panic",
-                    Some(json!({
-                      "info": format!("{} ({})", msg, location),
-                    })),
-                );
-            }
-
-            // Write msg and location to file
-            let panic_log_path = {
-                let full_path = std::env::current_exe().unwrap();
-                full_path.parent().unwrap().to_path_buf().join("panic.log")
-            };
-            println!("Writing panic log to {:#?}", panic_log_path);
-            let _ = std::fs::write(panic_log_path, format!("{} ({})\n", msg, location));
-        }))
-        .build()
-}
-
 fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
     let mut builder = tauri_plugin_log::Builder::new()
         .clear_targets()
@@ -191,14 +164,13 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
             ))
             .level_for("xr_overlay", LevelFilter::Trace)
             .level(LevelFilter::Debug)
-            // .level_for("vrchat_osc", LevelFilter::Warn);
+        // .level_for("vrchat_osc", LevelFilter::Warn);
     }
 
     builder.build()
 }
 
 async fn app_setup(app_handle: tauri::AppHandle) {
-
     info!(
         "[Core] Starting OyasumiVR in {} mode",
         crate::utils::cli_core_mode().await
@@ -215,14 +187,14 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     load_configs().await;
     // Set up app reference
     *TAURI_APP_HANDLE.lock().await = Some(app_handle.clone());
-    
+
     // Open devtools if we're in debug mode
     #[cfg(debug_assertions)]
     {
         let window = app_handle.get_webview_window("main").unwrap();
         window.open_devtools();
     }
- 
+
     // Get dependencies
     let cache_dir = app_handle.path().app_cache_dir().unwrap();
     // Register deep link schemas if needed
@@ -267,7 +239,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     //     utils::profiling::enable_profiling();
     // }
     // Start profiling if the flag for it is set
-    #[cfg(all(not(debug_assertions),feature = "profiling"))]
+    #[cfg(all(not(debug_assertions), feature = "profiling"))]
     if globals::is_flag_set("ENABLE_PROFILING").await {
         utils::profiling::enable_profiling();
     }
@@ -291,7 +263,6 @@ async fn load_configs() {
         },
     };
 }
-
 
 fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
     tauri::generate_handler![

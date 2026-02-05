@@ -1,7 +1,6 @@
 use std::{net::SocketAddr, time::Duration};
 
 use log::{error, info};
-use tokio::{sync::Mutex, task::JoinHandle};
 use tonic::transport::Server;
 use tonic_web::GrpcWebLayer;
 use tower_http::cors::{AllowHeaders, AllowOrigin};
@@ -17,7 +16,7 @@ use crate::{
     },
     overlay_ipc::OverlayIPCAddNotification,
     vr::{
-        DASBOARD_VISIBLE, NOTIFICATION_OVERLAY, OVERLAY, XR_CTX, hide_dashboard, set_mic_active,
+        DASBOARD_VISIBLE, NOTIFICATION_OVERLAY, OVERLAY, hide_dashboard, set_mic_active,
         show_dashboard,
     },
 };

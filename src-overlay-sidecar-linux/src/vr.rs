@@ -310,7 +310,7 @@ impl MicMuteIndicator {
             .duration_since(self.last_mic_activity_change)
             .as_millis() as f32;
 
-        let mut max_opacity = self.max_opacity
+        let max_opacity = self.max_opacity
             * if self.mute_state {
                 1.0
             } else {
