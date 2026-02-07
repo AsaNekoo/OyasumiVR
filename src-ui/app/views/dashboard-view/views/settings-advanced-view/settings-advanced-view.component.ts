@@ -7,7 +7,6 @@ import {
   SETTINGS_KEY_AUTOMATION_CONFIGS,
   SETTINGS_KEY_PULSOID_API,
   SETTINGS_KEY_SLEEP_MODE,
-  SETTINGS_KEY_TELEMETRY_SETTINGS,
   SETTINGS_KEY_THEMING_SETTINGS,
   SETTINGS_KEY_VRCHAT_API,
   SETTINGS_STORE,
@@ -215,7 +214,6 @@ export class SettingsAdvancedViewComponent {
               case 'miscData':
                 info('[Settings] Clearing misc data');
                 await SETTINGS_STORE.delete(SETTINGS_KEY_THEMING_SETTINGS);
-                await SETTINGS_STORE.delete(SETTINGS_KEY_TELEMETRY_SETTINGS);
                 break;
               case 'logs':
                 info('[Settings] Clearing log files');
@@ -223,7 +221,7 @@ export class SettingsAdvancedViewComponent {
                 break;
               case 'eventLog':
                 info('[Settings] Clearing event log');
-                await this.eventLogService.clearLog();
+                await this.eventLogService.clearLog(); 
                 break;
             }
           })
