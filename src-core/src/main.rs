@@ -45,8 +45,9 @@ macro_rules! warn_unimplemented {
 }
 #[tokio::main]
 async fn main() {
+    unsafe { std::env::set_var("RUST_BACKTRACE", "1") };
     std::fs::write("/proc/self/oom_score_adj", "1000").ok();
-    let panic_log_path = Box::new(get_log_path().join("panic.log"));
+    let log_path = Box::new(get_log_path());
     let hook = std::panic::take_hook();
     std::panic::set_hook(Box::new(move |info| {
         let msg = info.payload_as_str().unwrap_or_default();
@@ -54,10 +55,11 @@ async fn main() {
             .location()
             .map(|loc| format!("{}:{}:{}", loc.file(), loc.line(), loc.column()))
             .unwrap_or_default();
-
+        let panic_log_path=log_path.join("panic.log");
+        let base_log_path=log_path.join("OyasumiVR.log");
         // Write msg and location to file
-
         println!("Writing panic log to {:#?}", panic_log_path);
+        println!("please open an issue https://github.com/sofoxe1/OyasumiVR/issues and include: {:#?} and {:#?}",panic_log_path, base_log_path);
         let _ = std::fs::write(&*panic_log_path, format!("{} ({})\n", msg, location));
         error!("PANIC: {} ({})", msg, location);
         hook(info);
