@@ -21,7 +21,6 @@ mod vr;
 mod vrc_log_parser;
 mod vrcx;
 
-use std::{path::PathBuf, sync::LazyLock};
 
 use config::Config;
 pub use flavour::BUILD_FLAVOUR;
