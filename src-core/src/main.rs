@@ -16,7 +16,6 @@ mod osc;
 mod overlay_sidecar;
 mod steam;
 mod system_tray;
-mod telemetry;
 mod utils;
 mod vr;
 mod vrc_log_parser;
@@ -348,7 +347,6 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         commands::time::get_sunrise_sunset_time,
         grpc::commands::get_core_grpc_port,
         grpc::commands::get_core_grpc_web_port,
-        telemetry::commands::set_telemetry_enabled,
         vrcx::commands::vrcx_log,
         os::commands::set_power_policy_provider,
         os::commands::get_power_policy_providers,
