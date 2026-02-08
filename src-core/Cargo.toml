@@ -92,6 +92,7 @@ serde_repr = "0.1.20"
 glam = "0.30.9"
 oyasumi_shared = { version = "0.1.0", path = "../src-shared-rust" }
 dbus = "0.9.10"
+term_size = "0.3.2"
 
 
 

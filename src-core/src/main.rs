@@ -61,8 +61,10 @@ async fn main() {
         let panic_log_path=log_path.join("panic.log");
         let base_log_path=log_path.join("OyasumiVR.log");
         // Write msg and location to file
-        println!("Writing panic log to {:#?}", panic_log_path);
-        println!("please open an issue https://github.com/sofoxe1/OyasumiVR/issues and include: {:#?} and {:#?}",panic_log_path, base_log_path);
+        eprintln!("Writing panic log to {:#?}", panic_log_path);
+        eprintln!("\n{}","#".repeat(term_size::dimensions().unwrap_or_default().1));
+        eprintln!("please open an issue https://github.com/sofoxe1/OyasumiVR/issues and include: {:#?} and {:#?}",panic_log_path, base_log_path);
+        eprintln!("{}\n","#".repeat(term_size::dimensions().unwrap_or_default().1));
         let _ = std::fs::write(&*panic_log_path, format!("{} ({})\n", msg, location));
         error!("PANIC: {} ({})", msg, location);
         hook(info);
