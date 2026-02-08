@@ -1,4 +1,5 @@
-use nalgebra::{Quaternion, UnitQuaternion};
+use glam::Quat;
+// use nalgebra::{Quaternion, UnitQuaternion};
 
 use crate::utils::{get_time, send_event};
 
@@ -11,7 +12,7 @@ struct YawEvent {
 
 pub struct GestureDetector {
     events: Vec<YawEvent>,
-    events_timestamps:Vec<u64>,
+    events_timestamps: Vec<u64>,
     last_detection: u64,
 }
 
@@ -26,20 +27,19 @@ impl GestureDetector {
 
     pub async fn log_pose(&mut self, _position: [f32; 3], quaternion: [f32; 4]) {
         // Determine yaw
-        let now=get_time();
-        let q = UnitQuaternion::from_quaternion(Quaternion::new(
-            quaternion[3],
-            quaternion[0],
-            quaternion[1],
-            quaternion[2],
-        ));
-        let yaw = (2.0 * q.as_ref().imag().y.atan2(q.as_ref().scalar())).to_degrees()
-            + 180.0;
+        let now = get_time();
+        debug_assert!(Quat::from_array(quaternion).is_normalized());
+        // let q = UnitQuaternion::from_quaternion(Quaternion::new(
+        //     quaternion[3],
+        //     quaternion[0],
+        //     quaternion[1],
+        //     quaternion[2],
+        // ));
+
+        let yaw = (2.0 * quaternion[0].atan2(quaternion[2])).to_degrees() + 180.0;
         // Log yaw event
-        let event = YawEvent {
-            yaw,
-        };
-        debug_assert_eq!(self.events.len(),self.events_timestamps.len());
+        let event = YawEvent { yaw };
+        debug_assert_eq!(self.events.len(), self.events_timestamps.len());
         self.events.push(event);
         self.events_timestamps.push(now);
         // Remove old events
@@ -70,15 +70,11 @@ impl GestureDetector {
         if now - self.last_detection >= 5000 && self.detect_head_shake(&movements) {
             self.last_detection = now;
             log::info!("[core] head shake detected");
-            send_event(
-                "GESTURE_DETECTED",
-                "",
-            )
-            .await;
+            send_event("GESTURE_DETECTED", "").await;
         }
     }
 
-    fn detect_head_shake(&self, movements:&[f32]) -> bool {
+    fn detect_head_shake(&self, movements: &[f32]) -> bool {
         let mut data = movements;
         let mut offset_dir = 1.0;
         let mut change: Option<usize>;
@@ -107,7 +103,7 @@ impl GestureDetector {
 
     fn detect_angular_change(&self, data: &[f32], mut offset: f32) -> Option<usize> {
         let mut delta = 0.0;
-        let mut flip=1.0;
+        let mut flip = 1.0;
         // Flip data if we're looking for a negative offset
         if offset < 0.0 {
             flip = -1.0;
@@ -118,7 +114,7 @@ impl GestureDetector {
         for (i, item) in data.iter().enumerate() {
             //compiler actually unrools it into two loops
             //https://godbolt.org/z/ohfvf48PM
-            delta += item*flip;
+            delta += item * flip;
             // if delta is negative, reset to 0
             if delta < 0.0 {
                 delta = 0.0;
