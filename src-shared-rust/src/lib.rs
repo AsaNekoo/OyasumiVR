@@ -24,3 +24,19 @@ pub fn get_log_path() -> PathBuf {
     }
     path
 }
+pub static RESOURCES_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
+    if PathBuf::from("resources/sidecars/cef/libcef.so").exists() {
+        let path = fs::canonicalize(PathBuf::from("resources")).unwrap();
+        log::info!("using resource path: {:#?}", path);
+        return path;
+    }
+    if PathBuf::from("/usr/share/oyasumi/cef/libcef.so").exists() {
+        let path = PathBuf::from("/usr/share/oyasumi");
+        log::info!("using resource path: {:#?}", path);
+        return path;
+    }
+
+    panic!(
+        "can not find the resources folder it has to be either next to executable or /usr/share/oyasumi"
+    );
+});

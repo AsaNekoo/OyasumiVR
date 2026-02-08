@@ -6,14 +6,15 @@ mod notifications;
 mod sounds_gen;
 use dbus::blocking::Connection;
 use log::{debug, error};
-use rodio::{source::Source, Decoder};
+use oyasumi_shared::RESOURCES_PATH;
+use rodio::{Decoder, source::Source};
 use rodio::{OutputStream, Sink};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 use std::sync::LazyLock;
-use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;
+use tokio::sync::mpsc::Sender;
 type PlaySoundSender = LazyLock<Mutex<Option<Sender<(String, f32)>>>>;
 pub static DBUS_CONNECTION: Mutex<Option<Connection>> = Mutex::const_new(None);
 pub async fn connect_dbus() -> bool {
@@ -60,7 +61,11 @@ pub async fn init_sound_playback() {
         // Load sound files
         let mut sounds = HashMap::new();
         sounds_gen::SOUND_FILES.iter().for_each(|sound| {
-            let path = format!("resources/sounds/{}.ogg", sound);
+            let path = format!(
+                "{}/sounds/{}.ogg",
+                RESOURCES_PATH.to_string_lossy().to_string(),
+                sound
+            );
             let file = match File::open(path.clone()) {
                 Ok(f) => f,
                 Err(e) => {

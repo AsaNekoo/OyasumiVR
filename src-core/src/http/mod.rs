@@ -1,10 +1,11 @@
 pub mod commands;
 
 use hyper::{
-    service::{make_service_fn, service_fn},
     Body, Method, Request, Response, Server,
+    service::{make_service_fn, service_fn},
 };
 use log::{error, info};
+use oyasumi_shared::RESOURCES_PATH;
 use std::{convert::Infallible, net::SocketAddr, sync::LazyLock};
 use tokio::sync::Mutex;
 
@@ -78,7 +79,11 @@ async fn handle_font_request(path: &str) -> Result<Response<Body>, Infallible> {
             .unwrap());
     }
     // Determine font path
-    let font_path = format!("resources/fonts/{}", font_name);
+    let font_path = format!(
+        "{}/fonts/{}",
+        RESOURCES_PATH.to_string_lossy().to_string(),
+        font_name
+    );
     // Check if font exists
     if !std::path::Path::new(&font_path).exists() {
         return Ok(Response::builder()

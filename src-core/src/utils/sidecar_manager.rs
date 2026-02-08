@@ -1,4 +1,5 @@
 use log::{error, info, warn};
+use oyasumi_shared::RESOURCES_PATH;
 use std::sync::Arc;
 use std::time::Duration;
 use sysinfo::{Pid, ProcessRefreshKind, System};
@@ -138,13 +139,13 @@ impl SidecarManager {
             }
         }
         let child = {
-            let cef_path=PathBuf::from("resources/sidecars/cef");
+            let cef_path=RESOURCES_PATH.join("sidecars/cef");
             if !cef_path.exists(){
                 error!("cef path doesn't exist");
                 return 0;
             }
             let cef_path = fs::canonicalize(cef_path).unwrap();
-            use std::{fs, path::PathBuf};
+            use std::fs;
 
             exe_path = fs::canonicalize(exe_path).unwrap();
             exe_dir = fs::canonicalize(exe_dir).unwrap();

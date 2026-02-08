@@ -2,10 +2,10 @@ pub mod commands;
 
 use crate::utils::sidecar_manager::SidecarManager;
 use crate::{
-    utils::send_event,
     Models::overlay_sidecar::oyasumi_overlay_sidecar_client::OyasumiOverlaySidecarClient,
-    Models::oyasumi_core::OverlaySidecarStartArgs,
+    Models::oyasumi_core::OverlaySidecarStartArgs, utils::send_event,
 };
+use oyasumi_shared::RESOURCES_PATH;
 use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use tonic::transport::Channel;
@@ -17,15 +17,15 @@ static SIDECAR_MANAGER: LazyLock<Mutex<Option<SidecarManager>>> = LazyLock::new(
 pub async fn init() {
     let (tx, mut rx) = tokio::sync::mpsc::channel(10);
 
-        *SIDECAR_MANAGER.lock().await = Some(SidecarManager::new(
-            "OVERLAY".to_string(),
-            "resources/sidecars/".to_string(),
-            "oyasumivr-overlay-sidecar".to_string(),
-            tx,
-            true, 
-            vec![],
-        ));
-    
+    *SIDECAR_MANAGER.lock().await = Some(SidecarManager::new(
+        "OVERLAY".to_string(),
+        RESOURCES_PATH.join("sidecars").to_string_lossy().to_string(),
+        "oyasumivr-overlay-sidecar".to_string(),
+        tx,
+        true,
+        vec![],
+    ));
+
     // Listen for sidecar stop signals
     tokio::spawn(async move {
         while (rx.recv().await).is_some() {
