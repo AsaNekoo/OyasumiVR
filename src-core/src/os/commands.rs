@@ -3,6 +3,8 @@ use super::models::WindowsPowerPolicy;
 use crate::os::linux::audio::LinuxAudioError;
 use crate::os::linux::audio::get_linux_audio_manager;
 use crate::os::models::AudioDeviceDto;
+use crate::os::notifications;
+use crate::os::notifications::os::IsInhibited;
 use crate::utils::VRCHAT_ACTIVE;
 use crate::warn_unimplemented;
 use log::error;
@@ -227,7 +229,7 @@ pub async fn get_audio_devices(refresh: bool) -> Vec<AudioDeviceDto> {
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn set_audio_device_volume(device_id: String, volume: f32) {
-    let mut manager_guard =get_linux_audio_manager().await;
+    let mut manager_guard = get_linux_audio_manager().await;
     if let Some(manager) = manager_guard.as_mut() {
         if let Err(error) = manager.set_audio_device_volume(device_id, volume) {
             //something broke
@@ -255,12 +257,14 @@ pub async fn set_audio_device_mute(device_id: String, mute: bool) {
             if matches!(error, LinuxAudioError::OutOfOrder) {
                 error!("[core] recived unexpected sequence number when refresh audio devices");
                 *manager_guard = None;
-            }else {
+            } else {
                 error!("[Core] Could not set audio device mute state, {:?}", error);
             }
         }
     } else {
-        error!("[Core] Could not set audio device mute state, as audio device manager was not initialized");
+        error!(
+            "[Core] Could not set audio device mute state, as audio device manager was not initialized"
+        );
     }
 }
 
@@ -314,4 +318,16 @@ pub async fn pause_mpris_players() {
             log::warn!("failed to pause: {:?} with: {:?}", player.bus_name(), err);
         }
     }
+}
+#[tauri::command]
+pub async fn n_os_is_inhibited() -> IsInhibited {
+    notifications::os::is_inibited().await
+}
+#[tauri::command]
+pub async fn n_os_inhibit(reason: String) -> bool {
+    notifications::os::inhibit(reason).await
+}
+#[tauri::command]
+pub async fn n_os_un_inhibit() -> bool {
+    notifications::os::un_inhibit().await
 }

@@ -1,9 +1,11 @@
 pub mod commands;
 pub mod elevation;
-mod models;
-mod sounds_gen;
 pub mod linux;
-use log::error;
+mod models;
+mod notifications;
+mod sounds_gen;
+use dbus::blocking::Connection;
+use log::{debug, error};
 use rodio::{source::Source, Decoder};
 use rodio::{OutputStream, Sink};
 use std::collections::HashMap;
@@ -13,13 +15,27 @@ use std::sync::LazyLock;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;
 type PlaySoundSender = LazyLock<Mutex<Option<Sender<(String, f32)>>>>;
-
+pub static DBUS_CONNECTION: Mutex<Option<Connection>> = Mutex::const_new(None);
+pub async fn connect_dbus() -> bool {
+    let mut lock = DBUS_CONNECTION.lock().await;
+    if lock.is_some() {
+        return true;
+    }
+    match Connection::new_session() {
+        Ok(v) => {
+            lock.replace(v);
+            debug!("[core] connected to dbus");
+            true
+        }
+        Err(err) => {
+            error!("[core] failed to coonect to dbus: {:?}", err);
+            false
+        }
+    }
+}
 static PLAY_SOUND_TX: PlaySoundSender = LazyLock::new(Mutex::default);
 
-pub async fn init_audio_device_manager() {
-  
-}
-
+pub async fn init_audio_device_manager() {}
 
 pub async fn init_sound_playback() {
     // Create channels
