@@ -64,6 +64,7 @@ fn main() {
             format!("{:?}", e),
         )
         .ok();
+        println!("Writing panic log to {:#?} open an issue https://github.com/sofoxe1/OyasumiVR/issues and inclue all files starting with 'overlay_panic'", panic_log_path);
         hook(e);
     }));
     env_logger::Builder::new()

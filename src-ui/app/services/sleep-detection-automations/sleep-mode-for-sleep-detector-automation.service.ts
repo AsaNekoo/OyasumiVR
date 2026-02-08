@@ -20,7 +20,6 @@ import { NotificationService } from '../notification.service';
 import { TranslateService } from '@ngx-translate/core';
 import { EventLogService } from '../event-log.service';
 import { SleepingPose } from '../../models/sleeping-pose';
-import { TelemetryService } from '../telemetry.service';
 import { getBuiltInNotificationSound } from 'src-ui/app/models/notification-sounds';
 import { invoke } from '@tauri-apps/api/core';
 
@@ -78,7 +77,6 @@ export class SleepModeForSleepDetectorAutomationService {
     private notifications: NotificationService,
     private translate: TranslateService,
     private eventLog: EventLogService,
-    private telemetry: TelemetryService
   ) {}
 
   async init() {
@@ -232,9 +230,7 @@ export class SleepModeForSleepDetectorAutomationService {
           calibrationValue: distanceInLast10Seconds,
         }
       );
-      await this.telemetry.trackEvent('SLEEP_DETECTOR_CALIBRATED', {
-        calibrationValue: distanceInLast10Seconds,
-      });
+      
     }
     return distanceInLast10Seconds;
   }

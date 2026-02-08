@@ -16,13 +16,11 @@ mod osc;
 mod overlay_sidecar;
 mod steam;
 mod system_tray;
-mod telemetry;
 mod utils;
 mod vr;
 mod vrc_log_parser;
 mod vrcx;
 
-use std::{path::PathBuf, sync::LazyLock};
 
 use config::Config;
 pub use flavour::BUILD_FLAVOUR;
@@ -47,8 +45,9 @@ macro_rules! warn_unimplemented {
 }
 #[tokio::main]
 async fn main() {
+    unsafe { std::env::set_var("RUST_BACKTRACE", "1") };
     std::fs::write("/proc/self/oom_score_adj", "1000").ok();
-    let panic_log_path = Box::new(get_log_path().join("panic.log"));
+    let log_path = Box::new(get_log_path());
     let hook = std::panic::take_hook();
     std::panic::set_hook(Box::new(move |info| {
         let msg = info.payload_as_str().unwrap_or_default();
@@ -56,10 +55,11 @@ async fn main() {
             .location()
             .map(|loc| format!("{}:{}:{}", loc.file(), loc.line(), loc.column()))
             .unwrap_or_default();
-
+        let panic_log_path=log_path.join("panic.log");
+        let base_log_path=log_path.join("OyasumiVR.log");
         // Write msg and location to file
-
         println!("Writing panic log to {:#?}", panic_log_path);
+        println!("please open an issue https://github.com/sofoxe1/OyasumiVR/issues and include: {:#?} and {:#?}",panic_log_path, base_log_path);
         let _ = std::fs::write(&*panic_log_path, format!("{} ({})\n", msg, location));
         error!("PANIC: {} ({})", msg, location);
         hook(info);
@@ -348,7 +348,6 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         commands::time::get_sunrise_sunset_time,
         grpc::commands::get_core_grpc_port,
         grpc::commands::get_core_grpc_web_port,
-        telemetry::commands::set_telemetry_enabled,
         vrcx::commands::vrcx_log,
         os::commands::set_power_policy_provider,
         os::commands::get_power_policy_providers,

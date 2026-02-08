@@ -11,17 +11,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SelectBoxItem } from 'src-ui/app/components/select-box/select-box.component';
 import { LighthouseDevicePowerState } from 'src-ui/app/models/lighthouse-device';
 import { StartWithSteamVRHowToModalComponent } from './start-with-steamvr-how-to-modal/start-with-steamvr-how-to-modal.component';
-import { TelemetryService } from 'src-ui/app/services/telemetry.service';
 import { LighthouseConsoleService } from 'src-ui/app/services/lighthouse-console.service';
 import { AppSettingsService } from 'src-ui/app/services/app-settings.service';
 import { ModalService } from 'src-ui/app/services/modal.service';
 
 import { LANGUAGES } from '../../../../globals';
 import { vshrink } from '../../../../utils/animations';
-import {
-  TELEMETRY_SETTINGS_DEFAULT,
-  TelemetrySettings,
-} from '../../../../models/telemetry-settings';
 import { OVRInputEventAction } from 'src-ui/app/models/ovr-input-event';
 import { is_windows } from 'src-ui/app/app.module';
 
@@ -33,7 +28,7 @@ import { is_windows } from 'src-ui/app/app.module';
   standalone: false,
 })
 export class SettingsGeneralViewComponent implements OnInit {
-  is_windows:boolean=true;
+  is_windows: boolean = true;
   appSettings: AppSettings = structuredClone(APP_SETTINGS_DEFAULT);
   languages = LANGUAGES;
   lighthouseConsoleStatus: ExecutableReferenceStatus = 'UNKNOWN';
@@ -43,7 +38,6 @@ export class SettingsGeneralViewComponent implements OnInit {
     loadingIndicator?: boolean;
   };
   lighthouseConsolePathInputChange: Subject<string> = new Subject();
-  telemetrySettings: TelemetrySettings = structuredClone(TELEMETRY_SETTINGS_DEFAULT);
   lighthousePowerOffModeOptions: SelectBoxItem[] = [
     {
       id: 'standby',
@@ -93,14 +87,13 @@ export class SettingsGeneralViewComponent implements OnInit {
 
   constructor(
     private lighthouse: LighthouseConsoleService,
-    private telemetry: TelemetryService,
     private modalService: ModalService,
     private destroyRef: DestroyRef,
     private settingsService: AppSettingsService
   ) {}
 
   ngOnInit(): void {
-    this.is_windows=is_windows;
+    this.is_windows = is_windows;
     this.settingsService.settings
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((settings) => (this.appSettings = settings));
@@ -112,11 +105,7 @@ export class SettingsGeneralViewComponent implements OnInit {
       .subscribe(async (path) => {
         await this.lighthouse.setConsolePath(path);
       });
-    this.telemetry.settings
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((telemetrySettings) => {
-        this.telemetrySettings = telemetrySettings;
-      });
+
     this.settingsService.settings
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((settings) => {
@@ -178,9 +167,7 @@ export class SettingsGeneralViewComponent implements OnInit {
     this.settingsService.updateSettings({ askForAdminOnStart: enabled });
   }
 
-  setTelemetryEnabled(enabled: boolean) {
-    this.telemetry.updateSettings({ enabled });
-  }
+
 
   setExitInSystemTray(exitInSystemTray: boolean) {
     this.settingsService.updateSettings({ exitInSystemTray });

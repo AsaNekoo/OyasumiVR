@@ -38,7 +38,6 @@ import { DeviceListItemComponent } from './components/device-list/device-list-it
 import { SleepingAnimationsAutomationService } from './services/osc-automations/sleeping-animations-automation.service';
 import { ElevatedSidecarService } from './services/elevated-sidecar.service';
 import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal.component';
-import { TelemetryService } from './services/telemetry.service';
 import { LanguageSelectModalComponent } from './components/language-select-modal/language-select-modal.component';
 import { AppSettingsService } from './services/app-settings.service';
 import { firstValueFrom } from 'rxjs';
@@ -173,7 +172,6 @@ import { BigscreenBeyondLedAutomationService } from './services/hmd-specific-aut
 import { BigscreenBeyondFanAutomationService } from './services/hmd-specific-automations/bigscreen-beyond-fan-automation.service';
 import { BSBFanSpeedControlModalComponent } from './components/bsb-fan-speed-control-modal/bsb-fan-speed-control-modal.component';
 import { DiscordService } from './services/discord.service';
-import { trackEvent } from '@aptabase/tauri';
 import { pTimeout, sleep } from './utils/promise-utils';
 import { PlayerListPresetModalComponent } from './components/player-list-preset-modal/player-list-preset-modal.component';
 import { PlayerCountSleepVisualizationComponent } from './components/player-count-sleep-visualization/player-count-sleep-visualization.component';
@@ -459,7 +457,6 @@ export class AppModule {
     private oscService: OscService,
     private oscControlService: OscControlService,
     private elevatedSidecarService: ElevatedSidecarService,
-    private telemetryService: TelemetryService,
     private appSettingsService: AppSettingsService,
     private modalService: ModalService,
     private vrchatService: VRChatService,
@@ -571,12 +568,6 @@ export class AppModule {
       return result;
     } catch (e) {
       await error(`[Init] Running '${action}' failed: ` + e);
-      await trackEvent('app_init_error', {
-        action,
-        error: `${e}`,
-        timeout: TIMEOUT,
-        metadata: `action=${action}, timeout=${TIMEOUT}, error=${e}`,
-      });
       throw e;
     }
   }
@@ -603,8 +594,6 @@ export class AppModule {
             this.logInit('Initializing deep linking', this.deepLinkService.init()),
           ]);
           await this.logInit('Initializing system tray', this.systemTrayService.init());
-          // Initialize telemetry
-          await Promise.all([this.logInit('Initializing telemetry', this.telemetryService.init())]);
           // Initialize "base" services
           await Promise.all([
             this.logInit('Initializing OpenVR', this.openvrService.init()),

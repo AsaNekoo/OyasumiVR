@@ -48,7 +48,6 @@
     "@angular/platform-browser": "~20.3.14",
     "@angular/platform-browser-dynamic": "~20.3.14",
     "@angular/router": "~20.3.14",
-    "@aptabase/tauri": "github:aptabase/tauri-plugin-aptabase",
     "@fontsource/fira-code": "^5.2.7",
     "@fontsource/noto-sans-jp": "^5.2.8",
     "@fontsource/noto-sans-kr": "^5.2.8",

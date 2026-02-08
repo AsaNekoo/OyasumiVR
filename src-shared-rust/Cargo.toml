@@ -1,0 +1,7 @@
+[package]
+name = "oyasumi_shared"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+xdg = "3.0.0"

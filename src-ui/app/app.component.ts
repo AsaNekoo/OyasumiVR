@@ -6,7 +6,6 @@ import { AppSettingsService } from './services/app-settings.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, map, skip, tap } from 'rxjs';
 import { fade } from './utils/animations';
-import { TelemetryService } from './services/telemetry.service';
 import { isHolidaysEventActive } from './utils/event-utils';
 
 @Component({
@@ -23,7 +22,6 @@ export class AppComponent implements OnInit {
     public openvr: OpenVRService,
     translate: TranslateService,
     private settings: AppSettingsService,
-    private telemetry: TelemetryService
   ) {
     this.settings.settings
       .pipe(
@@ -32,7 +30,6 @@ export class AppComponent implements OnInit {
         distinctUntilChanged(),
         tap((userLanguage) => translate.use(userLanguage)),
         debounceTime(10000),
-        tap((userLanguage) => this.telemetry.trackEvent('use_language', { language: userLanguage }))
       )
       .subscribe();
     // Snowverlay
