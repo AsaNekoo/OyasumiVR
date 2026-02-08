@@ -36,7 +36,9 @@
     "generate:grpc-web-client": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./scripts/ts-proto-gen.ps1 && prettier --loglevel silent --write src-grpc-web-client/**/*",
     "postinstall": "cd src-overlay-ui && npm install && cd ..",
     "init": "npm install && node scripts/init.js",
-    "ci": "npm ci && node scripts/init.js"
+    "ci": "npm ci && node scripts/init.js",
+    "release": "run-s build &&node scripts/package.js",
+    "package": "node scripts/package.js"
   },
   "private": true,
   "dependencies": {
