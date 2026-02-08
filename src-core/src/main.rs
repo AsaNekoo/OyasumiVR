@@ -46,6 +46,9 @@ macro_rules! warn_unimplemented {
 #[tokio::main]
 async fn main() {
     unsafe { std::env::set_var("RUST_BACKTRACE", "1") };
+    //workaround for webkit bug https://github.com/tauri-apps/tauri/issues/9394
+    unsafe { std::env::set_var("__NV_DISABLE_EXPLICIT_SYNC", "1") };
+    //tell oom killer that oyasumi can be killed as one of the first
     std::fs::write("/proc/self/oom_score_adj", "1000").ok();
     let log_path = Box::new(get_log_path());
     let hook = std::panic::take_hook();
