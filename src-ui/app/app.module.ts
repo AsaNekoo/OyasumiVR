@@ -84,8 +84,8 @@ import localeRU from '@angular/common/locales/ru';
 import localeUK from '@angular/common/locales/uk';
 import localeDE from '@angular/common/locales/de';
 import { ResolutionAutomationsViewComponent } from './views/dashboard-view/views/resolution-automations-view/resolution-automations-view.component';
-import { RenderResolutionAutomationService } from './services/render-resolution-automation.service';
-import { ChaperoneFadeDistanceAutomationService } from './services/fade-distance-automation.service';
+// import { RenderResolutionAutomationService } from './services/render-resolution-automation.service';
+// import { ChaperoneFadeDistanceAutomationService } from './services/fade-distance-automation.service';
 import { OscGeneralAutomationsService } from './services/osc-automations/osc-general-automations.service';
 import { SystemTrayService } from './services/system-tray.service';
 import pMinDelay from 'p-min-delay';
@@ -168,8 +168,8 @@ import { SnowverlayComponent } from './components/snowverlay/snowverlay.componen
 import { HmdAutomationsViewComponent } from './views/dashboard-view/views/hmd-automations-view/hmd-automations-view.component';
 import { HmdAutomationsBigscreenBeyondTabComponent } from './views/dashboard-view/views/hmd-automations-view/tabs/hmd-automations-bigscreen-beyond-tab/hmd-automations-bigscreen-beyond-tab.component';
 import { ColorPickerComponent } from './components/color-picker/color-picker.component';
-import { BigscreenBeyondLedAutomationService } from './services/hmd-specific-automations/bigscreen-beyond-led-automation.service';
-import { BigscreenBeyondFanAutomationService } from './services/hmd-specific-automations/bigscreen-beyond-fan-automation.service';
+// import { BigscreenBeyondLedAutomationService } from './services/hmd-specific-automations/bigscreen-beyond-led-automation.service';
+// import { BigscreenBeyondFanAutomationService } from './services/hmd-specific-automations/bigscreen-beyond-fan-automation.service';
 import { BSBFanSpeedControlModalComponent } from './components/bsb-fan-speed-control-modal/bsb-fan-speed-control-modal.component';
 import { DiscordService } from './services/discord.service';
 import { pTimeout, sleep } from './utils/promise-utils';
@@ -259,6 +259,7 @@ import { SPLASH_MIN_DURATION } from './globals';
 import { MpriService } from './services/mpris.service';
 import { PlaybackAutomationsViewComponent } from './views/dashboard-view/views/mpris-automations-view/mpris-automations-view.component';
 import { NotificationsAutomationsViewComponent } from './views/dashboard-view/views/notifications-automations-view/notifications-automations-view.component';
+import { DNDService } from './services/do_not_disturb_service';
 
 [
   localeEN,
@@ -533,17 +534,18 @@ export class AppModule {
     private brightnessControlAutomationService: BrightnessCctAutomationService,
     private cctControlService: CCTControlService,
     // Render resolution automations
-    private renderResolutionAutomationService: RenderResolutionAutomationService,
+    // private renderResolutionAutomationService: RenderResolutionAutomationService,
     // Chaperone fade dinstance automations
-    private chaperoneFadeDistanceAutomationService: ChaperoneFadeDistanceAutomationService,
+    // private chaperoneFadeDistanceAutomationService: ChaperoneFadeDistanceAutomationService,
     // Miscellaneous automations
     private frameLimitAutomationsService: FrameLimitAutomationsService,
     private joinNotificationsService: JoinNotificationsService,
     private audioDeviceAutomationsService: AudioDeviceAutomationsService,
     private systemMicMuteAutomationsService: SystemMicMuteAutomationService,
     private nightmareDetectionAutomationService: NightmareDetectionAutomationService,
-    private bigscreenBeyondLedAutomationService: BigscreenBeyondLedAutomationService,
-    private bigscreenBeyondFanAutomationService: BigscreenBeyondFanAutomationService,
+    private notificationsAutomationsService:DNDService,
+    // private bigscreenBeyondLedAutomationService: BigscreenBeyondLedAutomationService,
+    // private bigscreenBeyondFanAutomationService: BigscreenBeyondFanAutomationService,
     private vrchatAvatarAutomationsService: VRChatAvatarAutomationsService,
     private vrchatGroupAutomationsService: VRChatGroupAutomationsService,
     private runAutomationsService: RunAutomationsService,
@@ -719,6 +721,7 @@ export class AppModule {
               this.sleepModeDisableOnPlayerJoinLeaveAutomationService.init()
             ),
             this.logInit('Initializing sleep mode automation (#11)', this.mprisService.init()),
+            this.logInit('Initializing sleep mode automation (#12)', this.notificationsAutomationsService.init()),
             // Power automations
             this.logInit(
               'Initializing device power automations (SteamVR/OyasumiVR)',

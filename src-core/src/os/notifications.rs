@@ -53,6 +53,11 @@ pub mod os {
         }
     }
     pub async fn inhibit(reason: String) -> bool {
+        //notifications are already inhibited by oyasumi
+        if unsafe { INHIBIT_TOKEN } != u32::MAX {
+            log::debug!("[core] dnd already set");
+            return true;
+        }
         if connect_dbus().await
             && let Some(conn) = DBUS_CONNECTION.lock().await.as_ref()
         {
@@ -86,14 +91,16 @@ pub mod os {
                 .method_call(
                     "org.freedesktop.Notifications",
                     "UnInhibit",
-                    ((unsafe { INHIBIT_TOKEN },),),
+                    (unsafe { INHIBIT_TOKEN },),
                 )
                 .unwrap_or_else(|err| {
                     log::error!("failed to UnInhibit notifications: {:?}", err);
                     sucess = false;
                 });
+            unsafe { INHIBIT_TOKEN = u32::MAX };
             sucess
         } else {
+            unsafe { INHIBIT_TOKEN = u32::MAX };
             log::error!("[core] failed to UnInhibit notifications not connected to dbus");
             false
         }
