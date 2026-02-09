@@ -25,7 +25,7 @@ export class SleepModeDisableAtTimeAutomationService {
     this.automationConfig.configs
       .pipe(map((configs) => configs.SLEEP_MODE_DISABLE_AT_TIME))
       .subscribe((config) => (this.config = config));
-      setInterval(this.onTick,60000);
+      setInterval(()=>this.onTick(),60000);
   }
 
   async onTick() {
