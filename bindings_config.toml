@@ -1,4 +1,4 @@
-#for incomplete documentaion look at https://codeberg.org/sofoxe1/xr_overlay/src/branch/main/examples/cef_overlay/src/bindings_configs.toml
+#for incomplete documentaion look at https://codeberg.org/sofoxe1/xr_overlay/src/branch/main/examples/cef_overlay/src/bindings_overwrites.toml
 [oculus_touch]
 oyasumi_overlay_switch=[{path="left/input/x/touch"},{path="left/input/y/touch"},{path="right/input/thumbstick/click"}]
 microphone_switch=[{path="left/input/thumbstick/click"},{path="right/input/thumbstick/click"}]
