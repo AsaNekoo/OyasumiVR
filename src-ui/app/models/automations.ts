@@ -78,7 +78,7 @@ export interface AutomationConfigs {
   CHAPERONE_FADE_DISTANCE_ON_SLEEP_MODE_DISABLE: ChaperoneFadeDistanceOnSleepModeAutomationConfig;
 
   // AUDIO & COMMUNICATION
-  PLAYBACK_AUTOMATIONS:PlaybackAutomationConfig;
+  PLAYBACK_AUTOMATIONS: PlaybackAutomationConfig;
   AUDIO_DEVICE_AUTOMATIONS: AudioDeviceAutomationsConfig;
   SYSTEM_MIC_MUTE_AUTOMATIONS: SystemMicMuteAutomationsConfig;
   JOIN_NOTIFICATIONS: JoinNotificationsAutomationsConfig;
@@ -107,6 +107,9 @@ export interface AutomationConfigs {
   MSI_AFTERBURNER: MSIAfterburnerAutomationConfig;
   BIGSCREEN_BEYOND_FAN_CONTROL: BigscreenBeyondFanControlAutomationsConfig;
   BIGSCREEN_BEYOND_RGB_CONTROL: BigscreenBeyondRgbControlAutomationsConfig;
+
+  // MISC
+  NOTIFICATIONS: NotificationsAutomationsConfig;
 }
 
 export interface AutomationConfig {
@@ -190,9 +193,9 @@ export interface GPUPowerLimitsAutomationConfig extends AutomationConfig {
 }
 
 export interface MSIAfterburnerAutomationConfig extends AutomationConfig {
-  onSleepEnableProfile: string|null;
-  onSleepDisableProfile: string|null;
-  onSleepPreparation: string|null;
+  onSleepEnableProfile: string | null;
+  onSleepDisableProfile: string | null;
+  onSleepPreparation: string | null;
 }
 
 // SLEEP MODE AUTOMATIONS
@@ -396,10 +399,10 @@ export interface SetAudioVolumeAutomation extends BaseAudioVolumeAutomation {
   type: 'SET_VOLUME';
   volume: number;
 }
-export interface PlaybackAutomationConfig extends AutomationConfig{
-  pause_on_sleep_enable:boolean,
-  pause_on_sleep_disable:boolean,
-  pause_on_sleep_preparation:boolean,
+export interface PlaybackAutomationConfig extends AutomationConfig {
+  pause_on_sleep_enable: boolean;
+  pause_on_sleep_disable: boolean;
+  pause_on_sleep_preparation: boolean;
 }
 export interface AudioDeviceAutomationsConfig extends AutomationConfig {
   onSleepEnableAutomations: AudioVolumeAutomation[];
@@ -430,6 +433,21 @@ export interface SystemMicMuteAutomationsConfig extends AutomationConfig {
   voiceActivationMode: 'VRCHAT' | 'HARDWARE';
   hardwareVoiceActivationThreshold: number;
   vrchatWorldJoinBehaviour: VRChatMicrophoneWorldJoinBehaviour;
+}
+export enum NotificationSetting {
+  Keep,
+  Inhibit,
+  UnInhibit,
+}
+export interface NotificationsAutomationsConfig extends AutomationConfig {
+  SystemOnSleepModeEnable: NotificationSetting;
+  SystemOnSleepPrepare: NotificationSetting;
+  SystemOnSleepModeDisable: NotificationSetting;
+
+  DiscordEnabled: boolean;
+  DiscordOnSleepModeEnable: NotificationSetting;
+  DiscordOnSleepPrepare: NotificationSetting;
+  DiscordOnSleepModeDisable: NotificationSetting;
 }
 
 export interface AutoAcceptInviteRequestsAutomationConfig extends AutomationConfig {
@@ -576,7 +594,7 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
   SLEEP_MODE_DISABLE_AFTER_TIME: {
     enabled: false,
     duration: null,
-    awake: null
+    awake: null,
   },
   SLEEP_MODE_DISABLE_ON_DEVICE_POWER_ON: {
     enabled: false,
@@ -987,12 +1005,22 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
   },
   LINUX_POWER_POLICY_PROVIDER: {
     enabled: true,
-    provider: "powerprofilesctl"
+    provider: 'powerprofilesctl',
   },
-  PLAYBACK_AUTOMATIONS:{
+  PLAYBACK_AUTOMATIONS: {
     pause_on_sleep_enable: false,
     pause_on_sleep_disable: false,
     pause_on_sleep_preparation: false,
-    enabled: true //not used
-  }
+    enabled: true, //not used
+  },
+  NOTIFICATIONS: {
+    SystemOnSleepModeEnable: NotificationSetting.Keep,
+    SystemOnSleepPrepare: NotificationSetting.Keep,
+    SystemOnSleepModeDisable: NotificationSetting.Keep,
+    DiscordEnabled: false,
+    DiscordOnSleepModeEnable: NotificationSetting.Keep,
+    DiscordOnSleepPrepare: NotificationSetting.Keep,
+    DiscordOnSleepModeDisable: NotificationSetting.Keep,
+    enabled: false,
+  },
 };
