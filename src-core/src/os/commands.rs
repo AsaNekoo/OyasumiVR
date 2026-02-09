@@ -319,13 +319,11 @@ pub async fn pause_mpris_players() {
         }
     }
 }
+
 #[tauri::command]
-pub async fn n_os_is_inhibited() -> IsInhibited {
-    notifications::os::is_inibited().await
-}
-#[tauri::command]
-pub async fn n_os_inhibit(reason: String) -> bool {
-    notifications::os::inhibit(reason).await
+// pub async fn n_os_inhibit(reason: String) -> bool {
+pub async fn n_os_inhibit() -> bool {
+    notifications::os::inhibit("".into()).await
 }
 #[tauri::command]
 pub async fn n_os_un_inhibit() -> bool {
