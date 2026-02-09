@@ -9,6 +9,7 @@ import { getBuiltInNotificationSound, NotificationSound } from './notification-s
 import { DeviceSelection } from './device-manager';
 
 export type AutomationType =
+  | 'NOTIFICATIONS_AUTOMATIONS'
   | 'GPU_POWER_LIMITS'
   | 'MSI_AFTERBURNER'
   | 'SLEEP_MODE_ENABLE_FOR_SLEEP_DETECTOR'
@@ -109,7 +110,7 @@ export interface AutomationConfigs {
   BIGSCREEN_BEYOND_RGB_CONTROL: BigscreenBeyondRgbControlAutomationsConfig;
 
   // MISC
-  NOTIFICATIONS: NotificationsAutomationsConfig;
+  NOTIFICATIONS_AUTOMATIONS: NotificationsAutomationsConfig;
 }
 
 export interface AutomationConfig {
@@ -1013,7 +1014,7 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
     pause_on_sleep_preparation: false,
     enabled: true, //not used
   },
-  NOTIFICATIONS: {
+  NOTIFICATIONS_AUTOMATIONS: {
     SystemOnSleepModeEnable: NotificationSetting.Keep,
     SystemOnSleepPrepare: NotificationSetting.Keep,
     SystemOnSleepModeDisable: NotificationSetting.Keep,
