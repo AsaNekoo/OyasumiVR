@@ -38,6 +38,7 @@ import { SettingsBrightnessCctViewComponent } from './views/dashboard-view/views
 import { RunAutomationsViewComponent } from './views/dashboard-view/views/run-automations-view/run-automations-view.component';
 import { DeviceManagerViewComponent } from './views/dashboard-view/views/device-manager-view/device-manager-view.component';
 import { PlaybackAutomationsViewComponent } from './views/dashboard-view/views/mpris-automations-view/mpris-automations-view.component';
+import { NotificationsAutomationsViewComponent } from './views/dashboard-view/views/notifications-automations-view/notifications-automations-view.component';
 
 const routes: Routes = [
   {
@@ -76,6 +77,10 @@ const routes: Routes = [
       {
         path: 'systemMicMuteAutomations',
         component: SystemMicMuteAutomationsViewComponent,
+      },
+      {
+        path: 'notificationsAutomations',
+        component: NotificationsAutomationsViewComponent,
       },
       {
         path: 'audioVolumeAutomations',

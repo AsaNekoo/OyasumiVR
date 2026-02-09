@@ -258,6 +258,7 @@ import { StoreSnapshotService } from './services/store-snapshot.service';
 import { SPLASH_MIN_DURATION } from './globals';
 import { MpriService } from './services/mpris.service';
 import { PlaybackAutomationsViewComponent } from './views/dashboard-view/views/mpris-automations-view/mpris-automations-view.component';
+import { NotificationsAutomationsViewComponent } from './views/dashboard-view/views/notifications-automations-view/notifications-automations-view.component';
 
 [
   localeEN,
@@ -360,6 +361,7 @@ export function createTranslateLoader(http: HttpClient) {
     MiscTestingComponent,
     VRChatMicMuteAutomationsViewComponent,
     SystemMicMuteAutomationsViewComponent,
+    NotificationsAutomationsViewComponent,
     TranslationLoaderViewComponent,
     TranslationEditorViewComponent,
     TextareaAutoResizeDirective,

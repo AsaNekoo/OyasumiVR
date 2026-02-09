@@ -218,6 +218,7 @@
     },
     "dashboard-navbar": {
       "about": "About OyasumiVR",
+      "notificationsAutomations": "Notifications",
       "audioVolumeAutomations": "Audio Volume Automations",
       "autoInviteRequestAccept": "Invites & Invite Requests",
       "brightnessAutomations": "Brightness Automations",
