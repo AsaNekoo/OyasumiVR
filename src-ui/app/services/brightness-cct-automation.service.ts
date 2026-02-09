@@ -145,7 +145,7 @@ export class BrightnessCctAutomationService {
       )
       .subscribe();
     // Listen for minute starts
-     setInterval(this.onMinuteTick,1000*60);
+     setInterval(()=>this.onMinuteTick(),1000*60);
 
     // Update sunrise/sunset times on startup and every 12 hours
     this.updateSunriseSunsetTimes();
