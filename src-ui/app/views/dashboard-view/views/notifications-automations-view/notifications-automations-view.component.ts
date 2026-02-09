@@ -1,15 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SelectBoxItem } from '../../../../components/select-box/select-box.component';
 import { AutomationConfigService } from '../../../../services/automation-config.service';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
   NotificationsAutomationsConfig,
+  NotificationSetting,
   SystemMicMuteAutomationsConfig,
-  SystemMicMuteControllerBindingBehavior,
-  SystemMicMuteStateOption,
-  VRChatMicrophoneWorldJoinBehaviour,
 } from '../../../../models/automations';
-import { OVRInputEventAction } from '../../../../models/ovr-input-event';
 import { fade, vshrink } from '../../../../utils/animations';
 import { map } from 'rxjs';
 
@@ -20,159 +17,64 @@ import { map } from 'rxjs';
   animations: [vshrink(), fade()],
   standalone: false,
 })
-export class NotificationsAutomationsViewComponent implements OnInit, OnDestroy {
+export class NotificationsAutomationsViewComponent implements OnInit {
   config: NotificationsAutomationsConfig = structuredClone(
     AUTOMATION_CONFIGS_DEFAULT.NOTIFICATIONS_AUTOMATIONS
   );
+  inhibitOptions: SelectBoxItem[] = [
+    {
+      id: NotificationSetting.Keep.toString(),
+      label: 'notificationsAutomations.selectBox.keep',
+    },
+    {
+      id: NotificationSetting.Inhibit.toString(),
+      label: 'notificationsAutomations.selectBox.enable',
+    },
+    {
+      id: NotificationSetting.UnInhibit.toString(),
+      label: 'notificationsAutomations.selectBox.disable',
+    },
+  ];
+  SystemOnSleepEnableInhibitOption: SelectBoxItem = this.inhibitOptions[0];
+  SystemOnSleepDisableInhibitOption: SelectBoxItem = this.inhibitOptions[0];
+  SystemOnSleepPreparationInhibitOption: SelectBoxItem = this.inhibitOptions[0];
 
-
-
-
-
-  constructor(
-    private automationConfigService: AutomationConfigService,
-  ) {}
+  constructor(private automationConfigService: AutomationConfigService) {}
 
   async ngOnInit() {
-    this.automationConfigService.configs.pipe(
-      map((configs) => configs.NOTIFICATIONS_AUTOMATIONS),
-    ).subscribe((config)=>{
-      this.config = config;
-    });
-   
+    // this.SystemOnSleepEnableInhibitOption = this.inhibitOptions[this.config.SystemOnSleepModeEnable];
+    // this.SystemOnSleepDisableInhibitOption = this.inhibitOptions[this.config.SystemOnSleepModeDisable];
+    // this.SystemOnSleepPreparationInhibitOption = this.inhibitOptions[this.config.SystemOnSleepPrepare];
+    this.automationConfigService.configs
+      .pipe(map((configs) => configs.NOTIFICATIONS_AUTOMATIONS))
+      .subscribe((config) => {
+        console.warn(config);
+        this.config = config;
+        this.SystemOnSleepEnableInhibitOption = this.inhibitOptions[config.SystemOnSleepModeEnable];
+        this.SystemOnSleepDisableInhibitOption =
+          this.inhibitOptions[config.SystemOnSleepModeDisable];
+        this.SystemOnSleepPreparationInhibitOption =
+          this.inhibitOptions[config.SystemOnSleepPrepare];
+      });
   }
 
-  ngOnDestroy() {
-  }
-
-  async onChangeAudioDevice($event: SelectBoxItem | undefined) {
-    if (!$event) return;
-    await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
-      'SYSTEM_MIC_MUTE_AUTOMATIONS',
-      {
-        audioDevicePersistentId: $event.id,
-      }
-    );
-  }
-
-  async onChangeControlButtonBehaviorOption($event: SelectBoxItem | undefined) {
-    // if (!$event) return;
-    // this.systemMicMuteAutomationService.setDefaultControlButtonBehavior(
-    //   $event.id as SystemMicMuteControllerBindingBehavior
-    // );
-  }
-
-  async onChangeMuteOption(
+  async onChangeSystemInhibitOption(
     automation: 'ON_SLEEP_ENABLE' | 'ON_SLEEP_DISABLE' | 'ON_SLEEP_PREPARATION',
     option: SelectBoxItem | undefined
   ) {
     if (!option) return;
     const keyMap = {
-      ON_SLEEP_ENABLE: 'onSleepModeEnableState',
-      ON_SLEEP_DISABLE: 'onSleepModeDisableState',
-      ON_SLEEP_PREPARATION: 'onSleepPreparationState',
+      ON_SLEEP_ENABLE: 'SystemOnSleepModeEnable',
+      ON_SLEEP_DISABLE: 'SystemOnSleepModeDisable',
+      ON_SLEEP_PREPARATION: 'SystemOnSleepPrepare',
     };
-    const key = keyMap[automation];
-    await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
-      'SYSTEM_MIC_MUTE_AUTOMATIONS',
-      {
-        [key]: option!.id as SystemMicMuteStateOption,
-      }
-    );
-  }
-
-  async onChangeControlButtonBehaviorAutomationOption(
-    automation: 'ON_SLEEP_ENABLE' | 'ON_SLEEP_DISABLE' | 'ON_SLEEP_PREPARATION',
-    option: SelectBoxItem | undefined
-  ) {
-    if (!option) return;
-    const keyMap = {
-      ON_SLEEP_ENABLE: 'onSleepModeEnableControllerBindingBehavior',
-      ON_SLEEP_DISABLE: 'onSleepModeDisableControllerBindingBehavior',
-      ON_SLEEP_PREPARATION: 'onSleepPreparationControllerBindingBehavior',
-    };
+    console.log("save"+(parseInt(option!.id) as NotificationSetting));
     const key = keyMap[automation];
     await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
       'NOTIFICATIONS_AUTOMATIONS',
       {
-        [key]: option!.id as SystemMicMuteControllerBindingBehavior | 'NONE',
+        [key]: parseInt(option!.id) as NotificationSetting,
       }
     );
   }
-
-  async onChangeOverlayMuteIndicator() {
-    // await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
-    //   'NOTIFICATIONS_AUTOMATIONS',
-    //   {
-    //     overlayMuteIndicator: !this.config.overlayMuteIndicator,
-    //   }
-    // );
-  }
-
-  async onChangeOverlayMuteIndicatorFade() {
-    // await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
-    //   'SYSTEM_MIC_MUTE_AUTOMATIONS',
-    //   {
-    //     overlayMuteIndicatorFade: !this.config.overlayMuteIndicatorFade,
-    //   }
-    // );
-  }
-
-  async onChangeControllerBinding() {
-    // await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
-    //   'SYSTEM_MIC_MUTE_AUTOMATIONS',
-    //   {
-    //     controllerBinding: !this.config.controllerBinding,
-    //   }
-    // );
-  }
-
-  async onChangeMuteSoundVolume(volume: number) {
-    await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
-      'SYSTEM_MIC_MUTE_AUTOMATIONS',
-      {
-        muteSoundVolume: volume,
-      }
-    );
-  }
-
-  async onChangeOverlayMuteIndicatorOpacity(opacity: number) {
-    await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
-      'SYSTEM_MIC_MUTE_AUTOMATIONS',
-      {
-        overlayMuteIndicatorOpacity: opacity,
-      }
-    );
-  }
-
-  async onChangeHardwareVoiceActivationThreshold(threshold: number) {
-    await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
-      'SYSTEM_MIC_MUTE_AUTOMATIONS',
-      {
-        hardwareVoiceActivationThreshold: threshold,
-      }
-    );
-  }
-
-  async onChangeVoiceActivationMode(option: SelectBoxItem | undefined) {
-    if (!option) return;
-    await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
-      'SYSTEM_MIC_MUTE_AUTOMATIONS',
-      {
-        voiceActivationMode: option!.id as 'VRCHAT' | 'HARDWARE',
-      }
-    );
-  }
-
-  async onChangeWorldJoinBehaviourOption(option: SelectBoxItem | undefined) {
-    if (!option) return;
-    await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
-      'SYSTEM_MIC_MUTE_AUTOMATIONS',
-      {
-        vrchatWorldJoinBehaviour: option!.id as VRChatMicrophoneWorldJoinBehaviour,
-      }
-    );
-  }
-
-  protected readonly OVRInputEventAction = OVRInputEventAction;
 }

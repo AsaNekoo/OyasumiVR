@@ -436,9 +436,9 @@ export interface SystemMicMuteAutomationsConfig extends AutomationConfig {
   vrchatWorldJoinBehaviour: VRChatMicrophoneWorldJoinBehaviour;
 }
 export enum NotificationSetting {
-  Keep,
-  Inhibit,
-  UnInhibit,
+  Keep=0,
+  Inhibit=1,
+  UnInhibit=2,
 }
 export interface NotificationsAutomationsConfig extends AutomationConfig {
   SystemOnSleepModeEnable: NotificationSetting;

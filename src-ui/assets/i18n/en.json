@@ -2804,14 +2804,22 @@
   },
   "notificationsAutomations":{
     "title": "Notifications Automations",
-    "description":"OyasumiVR can automatically inhibit system notifications",
+    "description":"OyasumiVR can automatically enable do not disturb",
     "system":{
-      "title": "System"
+      "title": "System",
+      "disable_description":"Oyasumi can only cancel DND if it was set by it",
+      "description": "System DND is managed with org.freedesktop.Notifications.Inhibit"
+      
     },
     "discord":{
       "title": "Discord",
       "warning": "This feature violates discord TOS use at your own risk",
       "warning2": "unfortunetty adding an api for programaticly muting all notifications or at least respecting system DND (dbus is really difficult to use and poorly documented) is not yet a solved problem and still requires years of research for which Discord simply doesn't have the money so this workaround is needed (same goes for vesktop developers)\nDiscord doesn't seem to care about self bots if you are not malicious but they could always change their mind"
+    },
+    "selectBox":{
+      "keep":"Keep",
+      "enable": "Enable DND",
+      "disable": "Disable DND"
     }
   },
   "systemMicMuteAutomations": {

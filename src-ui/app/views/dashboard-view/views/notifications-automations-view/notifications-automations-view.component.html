@@ -6,6 +6,8 @@
 
       <div class="setting-category">
         <h3 translate>notificationsAutomations.system.title</h3>
+        <!-- <p translate>notificationsAutomations.system.description</p> -->
+        <p translate>notificationsAutomations.system.disable_description</p>
         <div class="settings">
           <div class="setting-row">
             <div class="setting-row-label" translate>
@@ -18,7 +20,9 @@
               <app-select-box
                 type="SMALL"
                 class="action-dropdown"
-                (selectedChange)="onChangeMuteOption('ON_SLEEP_ENABLE', $event)"
+                [items]="inhibitOptions"
+                [selected]="SystemOnSleepEnableInhibitOption"
+                (selectedChange)="onChangeSystemInhibitOption('ON_SLEEP_ENABLE', $event)"
               ></app-select-box>
             </div>
           </div>
@@ -33,7 +37,9 @@
               <app-select-box
                 type="SMALL"
                 class="action-dropdown"
-                (selectedChange)="onChangeMuteOption('ON_SLEEP_DISABLE', $event)"
+                [items]="inhibitOptions"
+                [selected]="SystemOnSleepDisableInhibitOption"
+                (selectedChange)="onChangeSystemInhibitOption('ON_SLEEP_DISABLE', $event)"
               ></app-select-box>
             </div>
           </div>
@@ -48,7 +54,9 @@
               <app-select-box
                 type="SMALL"
                 class="action-dropdown"
-                (selectedChange)="onChangeMuteOption('ON_SLEEP_PREPARATION', $event)"
+                [items]="inhibitOptions"
+                [selected]="SystemOnSleepPreparationInhibitOption"
+                (selectedChange)="onChangeSystemInhibitOption('ON_SLEEP_PREPARATION', $event)"
               ></app-select-box>
             </div>
           </div>
