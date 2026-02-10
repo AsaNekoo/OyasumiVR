@@ -20,6 +20,7 @@ use crate::{
     ui::serve_ui,
     vr::{DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard, start_vr},
 };
+
 pub mod globals;
 pub mod grpc;
 pub mod input;
@@ -27,6 +28,7 @@ pub mod model;
 pub mod overlay_ipc;
 pub mod ui;
 pub mod vr;
+pub mod config;
 pub mod core_grpc {
     tonic::include_proto!("oyasumi_core");
 }

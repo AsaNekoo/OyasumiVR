@@ -1,5 +1,5 @@
 [misc]
-sort_order=4089
+xr_sort_order=4089
 app_name="Oyasumi VR Overlay"
 
 [pointers]
@@ -8,11 +8,10 @@ draw_only_when_on_overlay = true
 left_color = [1.0, 1.0, 1.0, 0.2]
 right_color = [1.0, 1.0, 1.0, 0.2]
 [main_overlay]
-grab_move_speed = 0.01
+move_speed = 0.01
 #this set the browser refresh rate
-#current is the vr frame rate
-framerate = "current/2"
-# overlay_fps="current*2"
+framerate = "/2" #half the runtime framerate
+# overlay_fps="*2"
 # overlay_fps=30
 # ...
 position = [0.0, 0.0, -0.4]
@@ -20,7 +19,7 @@ resolution = [1024, 1024]
 size = [0.6, 0.6]
 #posible values are: stage,view,local
 reference_space="stage"
-#posible values are: last_controller (relative position), hmd (relative position), keep
+#posible values are: last_controller (relative position), hmd (relative position), left_controller (relative position), right_controller (relative controller) keep
 show_mode="last_controller"
 
 [notification_overlay]
@@ -33,6 +32,4 @@ reference_space="view"
 [mute_indicator_overlay]
 size = [0.04, 0.04]
 position = [-0.3, -0.3, -0.6]
-notifications_position = [0.0, 0.3, 0.6]
-mute_indicator = [-0.3, -0.3, -0.6]
 reference_space="view"

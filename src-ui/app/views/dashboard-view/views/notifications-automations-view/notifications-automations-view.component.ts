@@ -42,13 +42,9 @@ export class NotificationsAutomationsViewComponent implements OnInit {
   constructor(private automationConfigService: AutomationConfigService) {}
 
   async ngOnInit() {
-    // this.SystemOnSleepEnableInhibitOption = this.inhibitOptions[this.config.SystemOnSleepModeEnable];
-    // this.SystemOnSleepDisableInhibitOption = this.inhibitOptions[this.config.SystemOnSleepModeDisable];
-    // this.SystemOnSleepPreparationInhibitOption = this.inhibitOptions[this.config.SystemOnSleepPrepare];
     this.automationConfigService.configs
       .pipe(map((configs) => configs.NOTIFICATIONS_AUTOMATIONS))
       .subscribe((config) => {
-        console.warn(config);
         this.config = config;
         this.SystemOnSleepEnableInhibitOption = this.inhibitOptions[config.SystemOnSleepModeEnable];
         this.SystemOnSleepDisableInhibitOption =
@@ -68,7 +64,6 @@ export class NotificationsAutomationsViewComponent implements OnInit {
       ON_SLEEP_DISABLE: 'SystemOnSleepModeDisable',
       ON_SLEEP_PREPARATION: 'SystemOnSleepPrepare',
     };
-    console.log("save"+(parseInt(option!.id) as NotificationSetting));
     const key = keyMap[automation];
     await this.automationConfigService.updateAutomationConfig<SystemMicMuteAutomationsConfig>(
       'NOTIFICATIONS_AUTOMATIONS',
