@@ -208,7 +208,7 @@ fn openxr_callback(event: AppEvent) {
 }
 static SWITCH_HAND: std::sync::Mutex<xr_overlay::xr_input::Hand> =
     std::sync::Mutex::new(xr_overlay::xr_input::Hand::Left);
-fn openxr_show_hand() -> DeviceRole {
+pub fn openxr_show_hand() -> DeviceRole {
     (*SWITCH_HAND.lock().unwrap()).into()
 }
 pub static mut DASBOARD_VISIBLE: bool = false;
