@@ -145,7 +145,16 @@ export class BrightnessCctAutomationService {
       )
       .subscribe();
     // Listen for minute starts
-     setInterval(()=>this.onMinuteTick(),1000*60);
+    var sunsetInterval: NodeJS.Timeout | null = null;
+    this.automationConfigService.configs
+      .pipe(map((configs) => configs.BRIGHTNESS_AUTOMATIONS))
+      .subscribe((config) => {
+        if ((!config.AT_SUNRISE.enabled || !config.AT_SUNSET.enabled) && sunsetInterval) {
+          clearInterval(sunsetInterval);
+        } else {
+          sunsetInterval = setInterval(() => this.onMinuteTick(), 1000 * 60);
+        }
+      });
 
     // Update sunrise/sunset times on startup and every 12 hours
     this.updateSunriseSunsetTimes();
@@ -154,7 +163,7 @@ export class BrightnessCctAutomationService {
       .subscribe(() => this.updateSunriseSunsetTimes());
 
     // Automatically fetch sunset/sunrise times when none are configured
-    interval(1000 * 60 * 5)
+    interval(1000 * 60 * 10)
       .pipe(
         startWith(null),
         delay(2000),

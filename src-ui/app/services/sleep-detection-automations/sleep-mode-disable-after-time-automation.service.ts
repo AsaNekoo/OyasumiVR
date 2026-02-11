@@ -54,7 +54,7 @@ export class SleepModeDisableAfterTimeAutomationService {
         this.sleepLastDisabled = Date.now();
       }
     });
-    interval(30000).subscribe(() => this.onTick());
+    interval(60000).subscribe(() => this.onTick());
   }
 
   async onTick() {
