@@ -7,6 +7,7 @@ import {
 
 import { map } from 'rxjs';
 import { SleepService } from '../sleep.service';
+import { time_to_wait } from 'src-ui/app/utils/time';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,7 @@ export class SleepModeEnableAtTimeAutomationService {
   private config: SleepModeEnableAtTimeAutomationConfig = structuredClone(
     AUTOMATION_CONFIGS_DEFAULT.SLEEP_MODE_ENABLE_AT_TIME
   );
+  private timeout: NodeJS.Timeout | null = null;
 
   constructor(
     private automationConfig: AutomationConfigService,
@@ -24,23 +26,30 @@ export class SleepModeEnableAtTimeAutomationService {
   async init() {
     this.automationConfig.configs
       .pipe(map((configs) => configs.SLEEP_MODE_ENABLE_AT_TIME))
-      .subscribe((config) => (this.config = config));
-      setInterval(()=>this.onTick(),60000);
+      .subscribe((config) => {
+        if (!config || !config.time) {
+          console.error('SleepModeDisableAtTimeAutomationService config is null!');
+          return;
+        }
+        if (config.enabled && this.config != config) {
+          if (!config.enabled && this.timeout) {
+            clearTimeout(this.timeout);
+            return;
+          }
+          const duration = time_to_wait(config.time);
+          this.config = config;
+
+          console.log('firing SleepModeEnableAtTimeAutomationService in:' + duration + 'ms');
+          this.timeout = setTimeout(() => this.enable(), duration);
+        }
+        this.config = config;
+      });
   }
 
-  async onTick() {
-    if (!this.config.enabled || !this.config.time) return;
-    const d = new Date();
-    const currentHour = d.getHours();
-    const currentMinute = d.getMinutes();
-    const [scheduledHour, scheduledMinute] = this.config.time
-      .split(':')
-      .map((component) => parseInt(component));
-    if (currentHour === scheduledHour && currentMinute === scheduledMinute) {
-      this.sleep.enableSleepMode({
-        type: 'AUTOMATION',
-        automation: 'SLEEP_MODE_ENABLE_AT_TIME',
-      });
-    }
+  async enable() {
+    this.sleep.enableSleepMode({
+      type: 'AUTOMATION',
+      automation: 'SLEEP_MODE_ENABLE_AT_TIME',
+    });
   }
 }
