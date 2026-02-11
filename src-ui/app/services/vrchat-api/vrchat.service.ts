@@ -76,10 +76,13 @@ export class VRChatService {
   }
 
   private async watchVRChatProcess() {
-    await listen<boolean>('VRCHAT_PROCESS_ACTIVE', (event) =>
-      this._vrchatProcessActive.next(event.payload)
-    );
-    this._vrchatProcessActive.next(await invoke<boolean>('is_vrchat_active'));
+    await listen<boolean>('VRCHAT_PROCESS_ACTIVE', (event) => {
+      console.debug('vrchat running event:' + event.payload);
+      this._vrchatProcessActive.next(event.payload);
+    });
+    const s = await invoke<boolean>('is_vrchat_active');
+    console.debug('vrchat running start:' + s);
+    this._vrchatProcessActive.next(s);
   }
 
   private async subscribeToLogEvents() {

@@ -383,6 +383,7 @@ export class VRChatAPI {
     }
     // Send
     try {
+      console.log("inviting user");
       await this.apiCallQueue.queueTask<Response>({
         typeId: 'INVITE',
         runnable: async () => {

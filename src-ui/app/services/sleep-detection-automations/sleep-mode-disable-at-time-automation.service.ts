@@ -27,7 +27,7 @@ export class SleepModeDisableAtTimeAutomationService {
       .pipe(map((configs) => configs.SLEEP_MODE_DISABLE_AT_TIME))
       .subscribe((config) => {
         if (!config || !config.time) {
-          console.error('SleepModeDisableAtTimeAutomationService config is null!');
+          console.debug('SleepModeDisableAtTimeAutomationService config is null!');
           return;
         }
         if (config.enabled && this.config != config) {

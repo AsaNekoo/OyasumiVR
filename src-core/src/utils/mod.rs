@@ -96,7 +96,7 @@ pub async fn set_vrchat_active() {
     unsafe {
         LAST_ACTIVE = SystemTime::now();
         if !VRCHAT_ACTIVE {
-            info!("[core] Detected VRChat process has started");
+            info!("[vrc_heartbeat] Detected VRChat process has started");
             crate::utils::send_event("VRCHAT_PROCESS_ACTIVE", true).await;
             VRCHAT_ACTIVE = true;
         }
@@ -105,7 +105,7 @@ pub async fn set_vrchat_active() {
 pub async fn set_vrchat_inactve() {
     unsafe {
         if VRCHAT_ACTIVE {
-            info!("[core] Detected VRChat process has stopped");
+            info!("[vrc_heartbeat] Detected VRChat process has stopped");
             crate::utils::send_event("VRCHAT_PROCESS_ACTIVE", false).await;
             VRCHAT_ACTIVE = false;
         }
