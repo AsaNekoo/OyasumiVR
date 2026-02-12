@@ -1,5 +1,6 @@
 use std::{
     fs,
+    net::TcpStream,
     path::PathBuf,
     sync::{LazyLock, Mutex, OnceLock},
     time::Duration,
@@ -47,7 +48,7 @@ macro_rules! warn_unimplemented {
 }
 static NO_VR: OnceLock<bool> = OnceLock::new();
 static ARGS: OnceLock<Args> = OnceLock::new();
-pub static CONFIG:OnceLock<OverlayConfig>=OnceLock::new();
+pub static CONFIG: OnceLock<OverlayConfig> = OnceLock::new();
 #[derive(Clone, Copy, Debug)]
 pub struct Args {
     core_grpc_port: u16,
@@ -82,10 +83,10 @@ fn main() {
         .filter_module("tungstenite", log::LevelFilter::Warn)
         .parse_default_env()
         .init();
-    if !OVERLAY_CONFIG_PATH.exists(){
+    if !OVERLAY_CONFIG_PATH.exists() {
         fs::write(&*OVERLAY_CONFIG_PATH, DEFAULT_OVERLAY_CONFIG).unwrap();
     }
-   
+
     trace!("args: {:?}", std::env::args());
     trace!(
         "thread_id:{:?},pid:{:?}",
@@ -184,7 +185,15 @@ async fn tokio_main() {
         .port;
     info!("got http port:{:?}", http_port);
     let ui_port = match ARGS.get().as_ref().unwrap().core_grpc_port == 0 {
-        true => 5173,
+        true => {
+            if TcpStream::connect("127.0.0.1:5177").is_ok() {
+                log::debug!("using: 127.0.0.1:5177 for ui");
+                5176
+            }else {
+                log::debug!("serving ui");
+                serve_ui().await
+            }
+        }
         false => serve_ui().await,
     };
     let url = format!(

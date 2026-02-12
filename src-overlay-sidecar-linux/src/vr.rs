@@ -34,8 +34,8 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
         match xr_overlay::xr::Init::default()
             .enable_drm_support()
             .user_presence_support(true)
-            .sort_order(CONFIG.wait().misc.xr_sort_order)
-            .with_app_name(&CONFIG.wait().misc.app_name)
+            .sort_order(4089)
+            .with_app_name("Oyasumi VR Overlay")
             .init_overlay()
         {
             Ok(v) => break v,

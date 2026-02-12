@@ -12,7 +12,7 @@ pub const DEFAULT_OVERLAY_CONFIG: &str = include_str!("../../overlay_config.toml
 #[derive(Clone, Debug)]
 pub struct OverlayConfig {
     pub pointers: PointersConfig,
-    pub misc: MiscSettings,
+    // pub misc: MiscSettings,
     pub main_overlay: MainOverlay,
     pub notification_overlay: NotificationsOverlay,
     pub mute_indicator_overlay: MuteIndicatorOverlay,
@@ -26,10 +26,10 @@ impl OverlayConfig {
                 right_color: [1.0, 1.0, 1., 0.2],
                 draw_only_when_on_overlay: true,
             },
-            misc: MiscSettings {
-                app_name: "Oyasumi VR Overlay".into(),
-                xr_sort_order: 4089,
-            },
+            // misc: MiscSettings {
+            //     app_name: "Oyasumi VR Overlay".into(),
+            //     xr_sort_order: 4089,
+            // },
             main_overlay: MainOverlay {
                 framerate: fps / 2,
                 position: [0., 0., -0.4],
@@ -188,17 +188,17 @@ impl OverlayConfig {
                 de.mute_indicator_overlay.reference_space = parse_reference_space(reference_space)?;
             }
         }
-        if let Some(misc) = t.get("misc").map(|t| t.as_table().unwrap()) {
-            if let Some(sort) = misc
-                .get("xr_sort_order")
-                .map(|s| s.as_integer().unwrap() as u32)
-            {
-                de.misc.xr_sort_order = sort;
-            }
-            if let Some(app) = misc.get("app_name").map(|s| s.as_str().unwrap()) {
-                de.misc.app_name = app.into();
-            }
-        }
+        // if let Some(misc) = t.get("misc").map(|t| t.as_table().unwrap()) {
+        //     if let Some(sort) = misc
+        //         .get("xr_sort_order")
+        //         .map(|s| s.as_integer().unwrap() as u32)
+        //     {
+        //         de.misc.xr_sort_order = sort;
+        //     }
+        //     if let Some(app) = misc.get("app_name").map(|s| s.as_str().unwrap()) {
+        //         de.misc.app_name = app.into();
+        //     }
+        // }
         if let Some(pointers) = t.get("pointers").map(|t| t.as_table().unwrap()) {
             if let Some(left) = pointers.get("left_color").map(|a| {
                 a.as_array()
@@ -298,8 +298,8 @@ pub struct MuteIndicatorOverlay {
 }
 #[derive(Clone, Debug)]
 pub struct MiscSettings {
-    pub app_name: Box<str>,
-    pub xr_sort_order: u32,
+    // pub app_name: Box<str>,
+    // pub xr_sort_order: u32,
 }
 pub fn parse_reference_space(str: &str) -> Result<ReferenceSpaceT, ConfigParseError> {
     Ok(match str {

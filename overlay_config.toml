@@ -1,7 +1,3 @@
-[misc]
-xr_sort_order=4089
-app_name="Oyasumi VR Overlay"
-
 [pointers]
 draw_only_when_on_overlay = true
 #alpha is broken
