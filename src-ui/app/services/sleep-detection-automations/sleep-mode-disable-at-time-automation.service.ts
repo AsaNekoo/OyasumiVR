@@ -50,5 +50,6 @@ export class SleepModeDisableAtTimeAutomationService {
       type: 'AUTOMATION',
       automation: 'SLEEP_MODE_DISABLE_AT_TIME',
     });
+    this.timeout = setTimeout(() => this.disable(), 24 * 3600 * 1000);
   }
 }
