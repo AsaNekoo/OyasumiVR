@@ -11,16 +11,17 @@ use crate::vr::openxr_show_hand;
 pub const DEFAULT_OVERLAY_CONFIG: &str = include_str!("../../overlay_config.toml");
 #[derive(Clone, Debug)]
 pub struct OverlayConfig {
-    pointers: PointersConfig,
-    misc: MiscSettings,
-    main_overlay: MainOverlay,
-    notification_overlay: NotificationsOverlay,
-    mute_indicator_overlay: MuteIndicatorOverlay,
+    pub pointers: PointersConfig,
+    pub misc: MiscSettings,
+    pub main_overlay: MainOverlay,
+    pub notification_overlay: NotificationsOverlay,
+    pub mute_indicator_overlay: MuteIndicatorOverlay,
 }
 impl OverlayConfig {
     pub fn default(fps: u8) -> Self {
         Self {
             pointers: PointersConfig {
+                overlay_move_speed: 0.01,
                 left_color: [1.0, 1.0, 1., 0.2],
                 right_color: [1.0, 1.0, 1., 0.2],
                 draw_only_when_on_overlay: true,
@@ -30,7 +31,6 @@ impl OverlayConfig {
                 xr_sort_order: 4089,
             },
             main_overlay: MainOverlay {
-                move_speed: 0.01,
                 framerate: fps / 2,
                 position: [0., 0., -0.4],
                 resolution: [1024, 1024],
@@ -75,9 +75,7 @@ impl OverlayConfig {
                 }
                 de.main_overlay.framerate = fps;
             }
-            if let Some(move_speed) = main.get("move_speed").map(|s| s.as_float().unwrap() as f32) {
-                de.main_overlay.move_speed = move_speed;
-            }
+
             if let Some(position) = main.get("position").map(|a| {
                 a.as_array()
                     .unwrap()
@@ -226,6 +224,12 @@ impl OverlayConfig {
             {
                 de.pointers.draw_only_when_on_overlay = on_hit;
             }
+            if let Some(move_speed) = pointers
+                .get("overlay_move_speed")
+                .map(|s| s.as_float().unwrap() as f32)
+            {
+                de.pointers.overlay_move_speed = move_speed;
+            }
         }
 
         Ok(de)
@@ -236,10 +240,10 @@ pub struct PointersConfig {
     pub left_color: [f32; 4],
     pub right_color: [f32; 4],
     pub draw_only_when_on_overlay: bool,
+    pub overlay_move_speed: f32,
 }
 #[derive(Clone)]
 pub struct MainOverlay {
-    pub move_speed: f32,
     pub framerate: u8,
     pub position: [f32; 3],
     pub resolution: [u32; 2],
@@ -250,18 +254,31 @@ pub struct MainOverlay {
 impl Debug for MainOverlay {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MainOverlay")
-            .field("move_speed", &self.move_speed)
             .field("framerate", &self.framerate)
             .field("position", &self.position)
             .field("resolution", &self.resolution)
             .field("size", &self.size)
             .field("reference_space", &self.reference_space)
-            .field("show_mode", &match self.show_mode{
-                ShowMode::Keep => "Keep",
-                ShowMode::Callback { callback:_, relative:_ } => "Callback",
-                ShowMode::DeviceCallback { role_callback:_, pos:_, rot:_ } => "DeviceCallback",
-                ShowMode::Device { role:_, pos:_, rot:_ } => "Device",
-            })
+            .field(
+                "show_mode",
+                &match self.show_mode {
+                    ShowMode::Keep => "Keep",
+                    ShowMode::Callback {
+                        callback: _,
+                        relative: _,
+                    } => "Callback",
+                    ShowMode::DeviceCallback {
+                        role_callback: _,
+                        pos: _,
+                        rot: _,
+                    } => "DeviceCallback",
+                    ShowMode::Device {
+                        role: _,
+                        pos: _,
+                        rot: _,
+                    } => "Device",
+                },
+            )
             .finish()
     }
 }

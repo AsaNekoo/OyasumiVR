@@ -1,22 +1,26 @@
 use std::{
+    fs,
     sync::{Arc, OnceLock, RwLock},
     thread::JoinHandle,
     time::Duration,
 };
 
-use log::trace;
+use log::{info, trace};
+use oyasumi_shared::OVERLAY_CONFIG_PATH;
 use xr_overlay::{
     openxr::Vector3f,
     runner::{
         AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, OverlayCreateInfo,
         OverlayHandle, ShowMode, events::AppEvent,
     },
-    xr::ReferenceSpaceT,
 };
 use xr_overlay_cef::{CefOverlayCreateInfo, create_cef_overlay};
 
 pub const DEFAULT_BINDINGS_CONFIG: &str = include_str!("../../bindings_config.toml");
-use crate::{KILL, globals::textures, input::get_controller_create_info, killed, model::Overlay};
+use crate::{
+    CONFIG, KILL, config::OverlayConfig, globals::textures, input::get_controller_create_info,
+    killed, model::Overlay,
+};
 pub static OVERLAY: OnceLock<Overlay> = OnceLock::new();
 pub static NOTIFICATION_OVERLAY: OnceLock<Overlay> = OnceLock::new();
 pub static MIC_MUTE_OVERLAY: OnceLock<OverlayHandle> = OnceLock::new();
@@ -30,8 +34,8 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
         match xr_overlay::xr::Init::default()
             .enable_drm_support()
             .user_presence_support(true)
-            .sort_order(4089)
-            .with_app_name("Oyasumi VR Overlay")
+            .sort_order(CONFIG.wait().misc.xr_sort_order)
+            .with_app_name(&CONFIG.wait().misc.app_name)
             .init_overlay()
         {
             Ok(v) => break v,
@@ -40,54 +44,53 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             }
         };
     };
+
+    let config = OverlayConfig::default_with_config(
+        &fs::read_to_string(&*OVERLAY_CONFIG_PATH).unwrap(),
+        ctx.xr.session.get_display_refresh_rate().unwrap() as u8,
+    )
+    .unwrap();
+    CONFIG.set(config.clone()).unwrap();
+    info!("parsed config: {:#?}", config);
+
     let app = AppRunner::new(AppRunnerCreateInfo {
         ctx,
         space_type: xr_overlay::xr::ReferenceSpaceT::STAGE,
         callback: openxr_callback,
         input: Some(AppRunnerCreateInfoInput {
-            l_pointer_color: [1., 1., 1., 0.2],
-            r_pointer_color: [1., 1., 1., 0.],
+            l_pointer_color: config.pointers.left_color,
+            r_pointer_color: config.pointers.right_color,
             controllers: get_controller_create_info(),
-            draw_pointers_only_when_hit: true,
-            overlay_move_speed: 0.01,
+            draw_pointers_only_when_hit: config.pointers.draw_only_when_on_overlay,
+            overlay_move_speed: config.pointers.overlay_move_speed,
         }),
     });
+
     let app = Arc::new(RwLock::new(app));
     XR_CTX.set(app.clone()).unwrap();
-    let pos = Vector3f {
-        x: 0.,
-        y: -0.,
-        z: -0.4,
-    };
-    let notifica_pos = Vector3f {
-        x: 0.,
-        y: -0.3,
-        z: -0.6,
-    };
-    let mic_pos = Vector3f {
-        x: -0.3,
-        y: -0.3,
-        z: -0.6,
-    };
-    let framerate = app.read().unwrap().current_refresh_rate() as u32/2;
+    let pos = config.main_overlay.position;
+    let notifica_pos = config.notification_overlay.position;
+    let mic_pos = config.mute_indicator_overlay.position;
+
     let overlay = create_cef_overlay(
         app.clone(),
         CefOverlayCreateInfo {
-            size: [0.6, 0.6].into(),
+            size: config.main_overlay.size.into(),
             spawn_visible: true,
             interactable: true,
             movable: true,
             allow_visibility_switch: true,
-            pos,
-            framerate,
-            resolution: [1024, 1024],
-            show_mode: ShowMode::DeviceCallback {
-                role_callback: openxr_show_hand,
-                pos,
-                rot: None,
+            pos: Vector3f {
+                x: pos[0],
+                y: pos[1],
+                z: pos[2],
             },
+            framerate: config.main_overlay.framerate as u32,
+            resolution: config.main_overlay.resolution,
+            show_mode: config.main_overlay.show_mode,
             name: Some("oyasumi".into()),
             disable_dragging: true,
+            reference_space: Some(config.main_overlay.reference_space),
             ..Default::default()
         },
     );
@@ -96,26 +99,36 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
         CefOverlayCreateInfo {
             movable: false,
             interactable: false,
-            size: [0.5, 0.5].into(),
+            size: config.notification_overlay.size.into(),
             spawn_visible: true,
-            pos: notifica_pos,
-            framerate,
-            resolution: [1024, 1024],
+            pos: Vector3f {
+                x: notifica_pos[0],
+                y: notifica_pos[1],
+                z: notifica_pos[2],
+            },
+            framerate: config.notification_overlay.framerate as u32,
+            resolution: config.notification_overlay.resolution,
             name: Some("notifications".into()),
-            reference_space: Some(ReferenceSpaceT::VIEW),
+            reference_space: Some(config.notification_overlay.reference_space),
             ..Default::default()
         },
     );
     let mic_overlay = app.write().unwrap().add_overlay(OverlayCreateInfo {
-        type_: xr_overlay::runner::OverlayCreateInfoType::Unmanaged { size: [0.04,0.04].into() },
-        pos: mic_pos,
+        type_: xr_overlay::runner::OverlayCreateInfoType::Unmanaged {
+            size: config.mute_indicator_overlay.size.into(),
+        },
+        pos: Vector3f {
+            x: mic_pos[0],
+            y: mic_pos[1],
+            z: mic_pos[2],
+        },
         spawn_visible: true,
         show_mode: ShowMode::default(),
         name: Some("mic_mute".to_owned()),
-        reference_space: Some(ReferenceSpaceT::VIEW),
-        allow_visibility_switch:false,
-        movable:false,
-        interactable:false,
+        reference_space: Some(config.mute_indicator_overlay.reference_space),
+        allow_visibility_switch: false,
+        movable: false,
+        interactable: false,
         ..Default::default()
     });
     MIC_MUTE_OVERLAY.set(mic_overlay).unwrap();
@@ -310,12 +323,7 @@ impl MicMuteIndicator {
             .duration_since(self.last_mic_activity_change)
             .as_millis() as f32;
 
-        let max_opacity = self.max_opacity
-            * if self.mute_state {
-                1.0
-            } else {
-                0.1
-            };
+        let max_opacity = self.max_opacity * if self.mute_state { 1.0 } else { 0.1 };
 
         let opacity = if self.mic_active && !self.mute_state {
             self.max_opacity / 100.
@@ -332,7 +340,9 @@ impl MicMuteIndicator {
             max_opacity / 100.
         };
 
-        if self.mute_image_state != Some(self.mute_state) || (self.last_opacity - opacity).abs() > 0.001 {
+        if self.mute_image_state != Some(self.mute_state)
+            || (self.last_opacity - opacity).abs() > 0.001
+        {
             self.mute_image_state = Some(self.mute_state);
             self.last_opacity = opacity;
 
@@ -348,7 +358,7 @@ impl MicMuteIndicator {
             );
         }
 
-         // Scale
+        // Scale
         let t_state = ((time_since_last_state_change - 200.) / (350. - 200.)).clamp(0., 1.);
         let scale_state_change_factor = t_state * t_state;
 
@@ -365,10 +375,11 @@ impl MicMuteIndicator {
         let scale = ((1.0 - scale_factor) * 0.25 + 1.0) * self.base_scale;
 
         if (self.last_set_scale - scale).abs() > 0.001 {
-            XR_CTX.wait().write().unwrap().set_size(
-                self.overlay_handle,
-                [scale, scale].into(),
-            );
+            XR_CTX
+                .wait()
+                .write()
+                .unwrap()
+                .set_size(self.overlay_handle, [scale, scale].into());
             self.last_set_scale = scale;
         }
     }

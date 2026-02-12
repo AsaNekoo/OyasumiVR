@@ -7,8 +7,8 @@ draw_only_when_on_overlay = true
 #alpha is broken
 left_color = [1.0, 1.0, 1.0, 0.2]
 right_color = [1.0, 1.0, 1.0, 0.2]
+overlay_move_speed = 0.01
 [main_overlay]
-move_speed = 0.01
 #this set the browser refresh rate
 framerate = "/2" #half the runtime framerate
 # overlay_fps="*2"

@@ -47,6 +47,7 @@ macro_rules! warn_unimplemented {
 }
 static NO_VR: OnceLock<bool> = OnceLock::new();
 static ARGS: OnceLock<Args> = OnceLock::new();
+pub static CONFIG:OnceLock<OverlayConfig>=OnceLock::new();
 #[derive(Clone, Copy, Debug)]
 pub struct Args {
     core_grpc_port: u16,
@@ -84,8 +85,7 @@ fn main() {
     if !OVERLAY_CONFIG_PATH.exists(){
         fs::write(&*OVERLAY_CONFIG_PATH, DEFAULT_OVERLAY_CONFIG).unwrap();
     }
-    let config = OverlayConfig::default_with_config(&fs::read_to_string(&*OVERLAY_CONFIG_PATH).unwrap(), 72).unwrap();
-    info!("parsed config: {:#?}", config);
+   
     trace!("args: {:?}", std::env::args());
     trace!(
         "thread_id:{:?},pid:{:?}",
