@@ -6,7 +6,7 @@ use std::{
 };
 
 use log::{info, trace};
-use oyasumi_shared::{XR_BINDING_FILE_PATH, get_log_path};
+use oyasumi_shared::{OVERLAY_CONFIG_PATH, XR_BINDING_FILE_PATH, get_log_path};
 use tonic::transport::Channel;
 use xr_overlay_cef::{
     cef::{ImplBrowser, ImplFrame},
@@ -14,6 +14,7 @@ use xr_overlay_cef::{
 };
 
 use crate::{
+    config::{DEFAULT_OVERLAY_CONFIG, OverlayConfig},
     core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
     grpc::{start_grpc_server, start_grpc_web_server},
     overlay_ipc::start_websocket_server,
@@ -21,6 +22,7 @@ use crate::{
     vr::{DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard, start_vr},
 };
 
+pub mod config;
 pub mod globals;
 pub mod grpc;
 pub mod input;
@@ -28,7 +30,6 @@ pub mod model;
 pub mod overlay_ipc;
 pub mod ui;
 pub mod vr;
-pub mod config;
 pub mod core_grpc {
     tonic::include_proto!("oyasumi_core");
 }
@@ -66,7 +67,10 @@ fn main() {
             format!("{:?}", e),
         )
         .ok();
-        println!("Writing panic log to {:#?} open an issue https://github.com/sofoxe1/OyasumiVR/issues and inclue all files starting with 'overlay_panic'", panic_log_path);
+        println!(
+            "Writing panic log to {:#?} open an issue https://github.com/sofoxe1/OyasumiVR/issues and inclue all files starting with 'overlay_panic'",
+            panic_log_path
+        );
         hook(e);
     }));
     env_logger::Builder::new()
@@ -77,6 +81,11 @@ fn main() {
         .filter_module("tungstenite", log::LevelFilter::Warn)
         .parse_default_env()
         .init();
+    if !OVERLAY_CONFIG_PATH.exists(){
+        fs::write(&*OVERLAY_CONFIG_PATH, DEFAULT_OVERLAY_CONFIG).unwrap();
+    }
+    let config = OverlayConfig::default_with_config(&fs::read_to_string(&*OVERLAY_CONFIG_PATH).unwrap(), 72).unwrap();
+    info!("parsed config: {:#?}", config);
     trace!("args: {:?}", std::env::args());
     trace!(
         "thread_id:{:?},pid:{:?}",

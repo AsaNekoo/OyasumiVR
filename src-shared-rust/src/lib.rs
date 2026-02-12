@@ -3,6 +3,8 @@ use std::{fs, path::PathBuf, sync::LazyLock};
 use xdg::BaseDirectories;
 pub static XR_BINDING_FILE_PATH: LazyLock<PathBuf> =
     LazyLock::new(|| get_config_path().join(PathBuf::from("bindings_config.toml")));
+pub static OVERLAY_CONFIG_PATH: LazyLock<PathBuf> =
+    LazyLock::new(|| get_config_path().join(PathBuf::from("overlay_config.toml")));
 static BASE_DIRS: LazyLock<BaseDirectories> = LazyLock::new(|| BaseDirectories::new());
 pub fn get_config_path() -> PathBuf {
     let mut path = BASE_DIRS
@@ -31,7 +33,7 @@ pub static RESOURCES_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
         return path;
     }
     if let Some(mut path) = BASE_DIRS.get_data_home() {
-        path=path.join("co.raphii.oyasumi/resources");
+        path = path.join("co.raphii.oyasumi/resources");
         if path.exists() {
             log::info!("using resource path: {:#?}", path);
             return path;
