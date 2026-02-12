@@ -1,23 +1,13 @@
 use lact_client::DaemonClient;
 use log::warn;
+use tokio::task::LocalSet;
 
 use crate::{utils::send_event, Models::elevated_sidecar::GpuProfileError};
-// unsafe impl<T> Send for SendWapper<T> {}
-// pub struct SendWapper<T> {
-//     inner: T,
-// }
-// impl<T> Deref for SendWapper<T> {
-//     type Target = T;
+unsafe impl<T> Send for SendWapper<T> {}
+pub struct SendWapper<T> {
+    inner: T,
+}
 
-//     fn deref(&self) -> &Self::Target {
-//         &self.inner
-//     }
-// }
-// impl<T> DerefMut for SendWapper<T> {
-//     fn deref_mut(&mut self) -> &mut Self::Target {
-//         &mut self.inner
-//     }
-// }
 pub async fn init() {
     send_event("ELEVATED_SIDECAR_STARTED", 0).await;
     // let h=tokio::runtime::Handle::current();
@@ -28,18 +18,12 @@ pub async fn init() {
 }
 //fixme: fix this attrocity
 pub async fn set_lact_profile(profile: String) -> Result<bool, GpuProfileError> {
-    fn inner(profile: String) -> Result<bool, GpuProfileError> {
-        let rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .unwrap();
-        rt.block_on(async {
+    async fn inner(profile: String) -> Result<bool, GpuProfileError> {
             match DaemonClient::connect().await {
                 Ok(v) => {
                     if profile.is_empty(){
                         return Ok(true);
                     }
-                    // LACT.lock().await.replace(SendWapper { inner: v });
                     log::debug!("[core] LACT client started");
                     let profiles = v
                         .list_profiles(false)
@@ -60,23 +44,16 @@ pub async fn set_lact_profile(profile: String) -> Result<bool, GpuProfileError> 
                     Err(GpuProfileError::ExeCannotExecute)
                 }
             }
-        })
+        // })
     }
-  
-    std::thread::spawn(move || inner(profile)).join().unwrap()?;
-
-    Ok(true)
+    inner(profile).await
+    // tokio::task::spawn_local(async move {inner(profile).await}).await.unwrap()
 }
 pub async fn get_lact_profiles() -> Result<Vec<String>, GpuProfileError> {
-    fn inner() -> Result<Vec<String>, GpuProfileError> {
-        let rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .unwrap();
-        rt.block_on(async {
+    async fn inner() -> Result<Vec<String>, GpuProfileError> {
+     
             match DaemonClient::connect().await {
                 Ok(v) => {
-                    // LACT.lock().await.replace(SendWapper { inner: v });
                     log::debug!("[core] LACT client started");
                     Ok(v.list_profiles(false)
                         .await
@@ -92,8 +69,6 @@ pub async fn get_lact_profiles() -> Result<Vec<String>, GpuProfileError> {
                     Err(GpuProfileError::ExeCannotExecute)
                 }
             }
-        })
     }
-
-    std::thread::spawn(inner).join().unwrap()
+        inner().await
 }
