@@ -1,8 +1,8 @@
 use log::{error, info, warn};
 use oyasumi_shared::RESOURCES_PATH;
-use std::sync::Arc;
+use std::{path::PathBuf, sync::Arc};
 use std::time::Duration;
-use sysinfo::{Pid, ProcessRefreshKind, System};
+// use sysinfo::{Pid, ProcessRefreshKind, System};
 use tokio::sync::{mpsc, Mutex};
 const LAUNCH_RETRY_INTERVALS: [Duration; 9] = [
     Duration::from_millis(100),
@@ -238,7 +238,7 @@ impl SidecarManager {
     }
 
     fn watch_process(&mut self) {
-        let mut s = System::new_all();
+        // let mut s = System::new();
         let self_arc = Arc::new(Mutex::new(self.clone()));
 
         tokio::spawn(async move {
@@ -256,20 +256,21 @@ impl SidecarManager {
             };
             loop {
                 loop {
-                    tokio::time::sleep(Duration::from_secs(1)).await;
+                    tokio::time::sleep(Duration::from_secs(5)).await;
                     let self_guard = self_arc.lock().await;
                     let current_sidecar_pid =
                         { self_guard.sidecar_pid.lock().await.as_ref().map(|pid| *pid) };
-                    s.refresh_processes_specifics(
-                        sysinfo::ProcessesToUpdate::Some(&[Pid::from_u32(
-                            current_sidecar_pid.unwrap_or_default(),
-                        )]),
-                        true,
-                        ProcessRefreshKind::nothing().without_tasks(),
-                    );
+                    // s.refresh_processes_specifics(
+                    //     sysinfo::ProcessesToUpdate::Some(&[Pid::from_u32(
+                    //         current_sidecar_pid.unwrap_or_default(),
+                    //     )]),
+                    //     true,
+                    //     ProcessRefreshKind::nothing().without_tasks(),
+                    // );
                     // Check if the child process is no longer found
-                    if s.process(Pid::from(pid as usize)).is_none() {
+                    if !PathBuf::from(format!("/proc/{}",pid)).exists() {
                         // Check if the sidecar pid is still the same.
+                        // if s.process(Pid::from(pid as usize)).is_none() {
                         // If it is, then we can assume the sidecar stopped.
                         // If not, it likely got replaced by another instance of the sidecar.
                         if match current_sidecar_pid {
