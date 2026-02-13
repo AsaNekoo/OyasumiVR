@@ -27,6 +27,19 @@
           </div>
         </div>
       </div>
+
+      <div class="setting-row">
+        <div class="setting-row-label" translate>
+          <span translate>sleep-detection.modals.disableAfterTime.sleep.title</span>
+          <!-- <span translate>sleep-detection.modals.disableAfterTime.sleep.description</span> -->
+          <span>{{ getStringForDurationSleep(sleep) }}</span>
+        </div>
+        <div class="setting-row-action">
+          <div class="input-wrapper">
+            <input type="text" [(ngModel)]="sleep" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="pane-actions spread">

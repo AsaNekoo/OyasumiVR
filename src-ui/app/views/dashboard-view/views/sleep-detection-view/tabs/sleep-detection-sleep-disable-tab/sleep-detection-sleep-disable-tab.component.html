@@ -42,6 +42,12 @@
               {{ getStringForDurationAwake(automationConfigs.SLEEP_MODE_DISABLE_AFTER_TIME.awake) }}
             </span>
           }
+          <br>
+          @if (automationConfigs.SLEEP_MODE_DISABLE_AFTER_TIME.sleep) {
+            <span @fade>
+              {{ getStringForDurationSleep(automationConfigs.SLEEP_MODE_DISABLE_AFTER_TIME.sleep) }}
+            </span>
+          }
         </span>
       </div>
       <div class="setting-row-action">

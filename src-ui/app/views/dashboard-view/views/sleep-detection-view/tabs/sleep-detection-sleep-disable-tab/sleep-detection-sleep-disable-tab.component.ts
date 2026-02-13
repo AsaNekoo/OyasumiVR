@@ -53,6 +53,7 @@ export class SleepDetectionSleepDisableTabComponent
       .addModal(DurationDisableSleepModeModalComponent, {
         duration: this.automationConfigs.SLEEP_MODE_DISABLE_AFTER_TIME.duration,
         awake: this.automationConfigs.SLEEP_MODE_DISABLE_AFTER_TIME.awake,
+        sleep: this.automationConfigs.SLEEP_MODE_DISABLE_AFTER_TIME.sleep,
       })
       .pipe(filter(Boolean))
       .subscribe((data) => {
@@ -61,6 +62,7 @@ export class SleepDetectionSleepDisableTabComponent
           {
             duration: data.duration,
             awake: data.awake,
+            sleep: data.sleep
           }
         );
       });

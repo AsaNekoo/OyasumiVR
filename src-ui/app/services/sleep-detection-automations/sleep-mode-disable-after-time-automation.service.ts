@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { AutomationConfigService } from '../automation-config.service';
 import {
@@ -20,6 +19,7 @@ export class SleepModeDisableAfterTimeAutomationService {
 
   private timeout: NodeJS.Timeout | null = null;
   private ClearTimeout: NodeJS.Timeout | null = null;
+  private SleepEnableTimeout: NodeJS.Timeout | null = null;
   constructor(
     private automationConfig: AutomationConfigService,
     private sleep: SleepService
@@ -38,13 +38,27 @@ export class SleepModeDisableAfterTimeAutomationService {
         return;
       }
       if (mode) {
-        if (this.ClearTimeout) {
-          clearTimeout(this.ClearTimeout);
+        if (this.SleepEnableTimeout) {
+          clearTimeout(this.SleepEnableTimeout);
         }
-        if (!this.timeout) {
-          this.timeout = setTimeout(() => this.disable(), time_to_ms(this.config.duration));
-        }
+        this.SleepEnableTimeout = setTimeout(() => {
+          if (!this.config.duration) {
+            console.error(
+              'SleepModeDisableAfterTimeAutomationService this.config.duration is null! (2)'
+            );
+            return;
+          }
+          if (this.ClearTimeout) {
+            clearTimeout(this.ClearTimeout);
+          }
+          if (!this.timeout) {
+            this.timeout = setTimeout(() => this.disable(), time_to_ms(this.config.duration)-time_to_ms(this.config.sleep));
+          }
+        }, time_to_ms(this.config.sleep));
       } else {
+        if (this.SleepEnableTimeout){
+          clearTimeout(this.SleepEnableTimeout);
+        }
         if (this.ClearTimeout) {
           clearTimeout(this.ClearTimeout);
         }

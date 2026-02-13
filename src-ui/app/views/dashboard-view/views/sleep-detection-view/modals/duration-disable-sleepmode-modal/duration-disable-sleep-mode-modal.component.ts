@@ -2,16 +2,18 @@ import { Component, HostBinding, OnInit } from '@angular/core';
 import { BaseModalComponent } from 'src-ui/app/components/base-modal/base-modal.component';
 import { fade, fadeUp, triggerChildren, vshrink } from '../../../../../../utils/animations';
 import { TranslateService } from '@ngx-translate/core';
-import { getStringForDuration, getStringForDurationAwake } from '../../tabs/sleep-detection-tab.component';
+import { getStringForDuration, getStringForDurationAwake, getStringForDurationSleep } from '../../tabs/sleep-detection-tab.component';
 
 export interface DurationDisableSleepModeModalInputModel {
   duration: string | null;
   awake: string | null;
+  sleep: string;
 }
 
 export interface DurationDisableSleepModeModalOutputModel {
   duration: string | null;
   awake: string | null;
+  sleep: string;
 }
 
 @Component({
@@ -30,6 +32,7 @@ export class DurationDisableSleepModeModalComponent
 {
   duration: string | null = null;
   awake: string | null = null;
+  sleep: string ="00:15";
 
   @HostBinding('[@fadeUp]') get fadeUp() {
     return;
@@ -46,9 +49,16 @@ export class DurationDisableSleepModeModalComponent
     if (this.awake && this.awake.length == 4) {
       this.awake = '0' + this.awake;
     }
+    if (this.sleep && this.sleep.length == 4) {
+      this.sleep = '0' + this.sleep;
+    }
     if (!this.duration || !this.duration.match(/[0-2][0-9]:[0-5][0-9]/g)) {
       console.warn('mallformed duration:' + this.duration);
       this.duration = '00:00';
+    }
+    if (!this.sleep || !this.sleep.match(/[0-2][0-9]:[0-5][0-9]/g)) {
+      console.warn('mallformed sleep time:' + this.sleep);
+      this.sleep = '00:15';
     }
     if (!this.awake || !this.awake.match(/[0-2][0-9]:[0-5][0-9]/g)) {
       console.warn('mallformed awake time:' + this.awake);
@@ -72,5 +82,11 @@ export class DurationDisableSleepModeModalComponent
       return '';
     }
     return getStringForDurationAwake(this.translate, awake);
+  }
+  protected getStringForDurationSleep(sleep: string | null) {
+    if (!sleep) {
+      return '';
+    }
+    return getStringForDurationSleep(this.translate, sleep);
   }
 }

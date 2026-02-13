@@ -2513,6 +2513,14 @@
         },
         "title": "Awake for a specific amount of time"
       },
+      "sleepFor": {
+        "description": {
+          "hours": "Sleeping for {hours, plural, one {1 hour} other {# hours}}",
+          "hoursAndMinutes": "Sleeping for {hours, plural, one {1 hour} other {# hours}} and {minutes, plural, one {1 minute} other {# minutes}}",
+          "minutes": "Sleeping for {minutes, plural, one {1 minute} other {# minutes}}"
+        },
+        "title": "Awake for a specific amount of time"
+      },
       "atTime": "At a specific time",
       "description": "Automatically disable sleep mode based on various other triggers",
       "onDevicePowerOn": "When a device is turned on",
@@ -2543,7 +2551,11 @@
         "description": "Disable the sleep mode after it has been enabled for a certain amount of time.",
         "time": "Duration",
         "title": "Disable sleep mode",
-        "awake":{
+        "sleep": {
+          "title": "Min Sleep",
+          "description": "A Sleep at least for"
+        },
+        "awake": {
           "title": "Max Awake",
           "description": "Awake at least for"
         }
@@ -2802,22 +2814,21 @@
     },
     "title": "Status Automations"
   },
-  "notificationsAutomations":{
+  "notificationsAutomations": {
     "title": "Notifications Automations",
-    "description":"OyasumiVR can automatically enable do not disturb",
-    "system":{
+    "description": "OyasumiVR can automatically enable do not disturb",
+    "system": {
       "title": "System",
-      "disable_description":"Oyasumi can only cancel DND if it was set by it",
+      "disable_description": "Oyasumi can only cancel DND if it was set by it",
       "description": "System DND is managed with org.freedesktop.Notifications.Inhibit"
-      
     },
-    "discord":{
+    "discord": {
       "title": "Discord",
       "warning": "This feature violates discord TOS use at your own risk",
       "warning2": "unfortunetty adding an api for programaticly muting all notifications or at least respecting system DND (dbus is really difficult to use and poorly documented) is not yet a solved problem and still requires years of research for which Discord simply doesn't have the money so this workaround is needed (same goes for vesktop developers)\nDiscord doesn't seem to care about self bots if you are not malicious but they could always change their mind"
     },
-    "selectBox":{
-      "keep":"Keep",
+    "selectBox": {
+      "keep": "Keep",
       "enable": "Enable DND",
       "disable": "Disable DND"
     }

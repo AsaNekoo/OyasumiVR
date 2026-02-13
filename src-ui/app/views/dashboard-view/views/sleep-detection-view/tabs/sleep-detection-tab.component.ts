@@ -46,6 +46,9 @@ export abstract class SleepDetectionTabComponent implements OnInit {
   protected getStringForDurationAwake(duration: string): string {
     return getStringForDurationAwake(this.translate, duration);
   }
+  protected getStringForDurationSleep(duration: string): string {
+    return getStringForDurationSleep(this.translate, duration);
+  }
 
   protected deviceClassesToString(classes: OVRDeviceClass[], tlkey_prefix: string): string {
     return classes.map((c) => this.translate.instant(tlkey_prefix + c)).join(', ');
@@ -90,6 +93,28 @@ export function getStringForDurationAwake(translate: TranslateService, duration:
     });
   } else if (minutes) {
     return translate.instant('sleep-detection.disableAutomations.awakeFor.description.minutes', {
+      minutes,
+    });
+  } else {
+    return '';
+  }
+}
+export function getStringForDurationSleep(translate: TranslateService, duration: string): string {
+  const [hours, minutes] = duration.split(':').map((v) => parseInt(v));
+  if (hours && minutes) {
+    return translate.instant(
+      'sleep-detection.disableAutomations.sleepFor.description.hoursAndMinutes',
+      {
+        hours,
+        minutes,
+      }
+    );
+  } else if (hours) {
+    return translate.instant('sleep-detection.disableAutomations.sleepFor.description.hours', {
+      hours,
+    });
+  } else if (minutes) {
+    return translate.instant('sleep-detection.disableAutomations.sleepFor.description.minutes', {
       minutes,
     });
   } else {
