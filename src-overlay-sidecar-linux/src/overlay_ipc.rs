@@ -35,6 +35,7 @@ fn get_ipc_script(port: u16) -> String {
 }
 //OyasumiOverlayIPCIn
 impl Overlay {
+    #[inline]
     pub fn execute_js(&self, js: &str) {
         log::trace!("running javascript:\n {}", js);
         self.browser
@@ -42,9 +43,11 @@ impl Overlay {
             .unwrap()
             .execute_java_script(Some(&js.into()), None, 0);
     }
+    #[inline]
     pub fn hide_dashboard(&self) {
         self.execute_js("window.OyasumiIPCIn.hideDashboard();");
     }
+    #[inline]
     pub fn show_dashboard(&self) {
         self.execute_js("window.OyasumiIPCIn.showDashboard();");
     }
@@ -54,6 +57,7 @@ impl Overlay {
             string.unwrap_or_default()
         ));
     }
+    #[inline]
     pub fn add_notification(&self, notification: OverlayIPCAddNotification) -> String {
         log::info!("add_notification: {:?}",notification);
         let id = Alphabetic.sample_string(&mut rand::rng(), 16);
@@ -66,18 +70,22 @@ impl Overlay {
         self.execute_js(&format!("window.OyasumiIPCIn.addNotification({});", args));
         id
     }
+    #[inline]
     pub fn clear_notification(&self, id: &str) {
         self.execute_js(&format!("window.OyasumiIPCIn.clearNotification(\"{}\");", id));
     }
+    #[inline(never)]
     pub fn inject_ipc(&self, port: u16) {
         self.execute_js(&get_ipc_script(port));
     }
+    #[inline]
     pub fn set_state(&self, state: OyasumiSidecarState) {
         let state = unsafe { String::from_utf8_unchecked(state.encode_to_vec()) };
         let state = BASE64_STANDARD.encode(state);
         self.execute_js(&format!("window.OyasumiIPCIn.setState(\"{}\");", state));
     }
 }
+#[inline]
 pub async fn start_websocket_server() -> u16 {
     let addr = "127.0.0.1:0";
     let listener = TcpListener::bind(addr).await.expect("Failed to bind");
@@ -95,6 +103,7 @@ pub async fn start_websocket_server() -> u16 {
     });
     port
 }
+#[inline]
 async fn handle_connection(ws_stream: tokio_tungstenite::WebSocketStream<tokio::net::TcpStream>) {
     log::info!("[websocket] New client connected");
     let (mut sender, mut receiver) = ws_stream.split();

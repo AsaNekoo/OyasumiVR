@@ -166,10 +166,10 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             }
             let mut guard = app.write().unwrap();
             match guard.run(false) {
-                xr_overlay::runner::PollResult::Success(v) => {
+                xr_overlay::runner::PollResult::Success(_) => {
                     //it already waits for next frame
                     drop(guard);
-                    std::thread::sleep(v.saturating_sub(Duration::from_micros(700)));
+                    // std::thread::sleep(v.saturating_sub(Duration::fr(700)));
                     // std::thread::sleep(Duration::from_millis(frame_time))
                 }
                 xr_overlay::runner::PollResult::SuccessNoRender => {

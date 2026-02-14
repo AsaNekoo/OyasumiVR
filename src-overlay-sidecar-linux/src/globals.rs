@@ -22,6 +22,7 @@ pub mod textures {
     // #[allow(dead_code)]
     // pub static TEST: LazyLock<RgbaTexture> =
     //     LazyLock::new(|| decode_texture(include_bytes!("Resources/test.png")));
+    #[inline(never)]
     fn decode_texture(bytes: &[u8]) -> RgbaTexture {
         let image = image::ImageReader::new(Cursor::new(bytes))
             .with_guessed_format()

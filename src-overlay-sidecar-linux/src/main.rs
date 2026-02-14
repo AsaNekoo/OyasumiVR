@@ -75,14 +75,18 @@ fn main() {
         );
         hook(e);
     }));
-    env_logger::Builder::new()
-        .filter_level(log::LevelFilter::Trace)
-        .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
-        .filter_module("xr_overlay", log::LevelFilter::Debug)
-        .filter_module("tokio_tungstenite", log::LevelFilter::Warn)
-        .filter_module("tungstenite", log::LevelFilter::Warn)
-        .parse_default_env()
-        .init();
+    let mut binding = env_logger::Builder::new();
+    let mut logger = binding.filter_level(log::LevelFilter::Trace);
+    #[cfg(not(debug_assertions))]
+    {
+        logger = logger
+            .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
+            .filter_module("xr_overlay", log::LevelFilter::Debug)
+            .filter_module("tokio_tungstenite", log::LevelFilter::Warn)
+            .filter_module("tungstenite", log::LevelFilter::Warn);
+    }
+    logger.parse_default_env().init();
+
     if !OVERLAY_CONFIG_PATH.exists() {
         fs::write(&*OVERLAY_CONFIG_PATH, DEFAULT_OVERLAY_CONFIG).unwrap();
     }
@@ -167,7 +171,7 @@ async fn tokio_main() {
             if killed() {
                 break;
             }
-            tokio::time::sleep(Duration::from_secs(1)).await;
+            tokio::time::sleep(Duration::from_secs(10)).await;
         }
     });
     let mut core_client = OyasumiCoreClient::connect(format!(
@@ -186,10 +190,10 @@ async fn tokio_main() {
     info!("got http port:{:?}", http_port);
     let ui_port = match ARGS.get().as_ref().unwrap().core_grpc_port == 0 {
         true => {
-            if TcpStream::connect("127.0.0.1:5177").is_ok() {
+            if cfg!(debug_assertions) && TcpStream::connect("127.0.0.1:5177").is_ok() {
                 log::debug!("using: 127.0.0.1:5177 for ui");
                 5176
-            }else {
+            } else {
                 log::debug!("serving ui");
                 serve_ui().await
             }
@@ -246,12 +250,14 @@ async fn tokio_main() {
 }
 static mut KILL: bool = false;
 // #[allow(dead_code)]
+#[inline]
 pub fn kill() {
     if !killed() {
         trace!("killing overlay");
     }
     unsafe { KILL = true };
 }
+#[inline]
 pub fn killed() -> bool {
     let pid = ARGS.get().as_ref().unwrap().core_pid as u32;
     if pid != 0 && !PathBuf::from(format!("/proc/{}", pid)).exists() {

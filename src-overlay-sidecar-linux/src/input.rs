@@ -7,7 +7,7 @@ use crate::{
     ARGS,
     vr::{DEFAULT_BINDINGS_CONFIG},
 };
-
+#[inline]
 pub fn get_controller_create_info() -> ControllersCreateInfo {
     let bindings = ControllersCreateInfo::default();
     let bindings_ = bindings.clone();

@@ -1,5 +1,5 @@
-use std::fmt::Debug;
 
+use std::fmt::Debug;
 use xr_overlay::{
     openxr::Vector3f,
     runner::{DeviceRole, ShowMode},
@@ -301,6 +301,7 @@ pub struct MiscSettings {
     // pub app_name: Box<str>,
     // pub xr_sort_order: u32,
 }
+#[inline(never)]
 pub fn parse_reference_space(str: &str) -> Result<ReferenceSpaceT, ConfigParseError> {
     Ok(match str {
         "stage" => ReferenceSpaceT::STAGE,
@@ -311,6 +312,7 @@ pub fn parse_reference_space(str: &str) -> Result<ReferenceSpaceT, ConfigParseEr
         }
     })
 }
+#[inline(never)]
 pub fn parse_show_mode(str: &str, pos: Vector3f) -> Result<ShowMode, ConfigParseError> {
     Ok(match str {
         "last_controller" => ShowMode::DeviceCallback {
@@ -339,6 +341,7 @@ pub fn parse_show_mode(str: &str, pos: Vector3f) -> Result<ShowMode, ConfigParse
         }
     })
 }
+#[inline(never)]
 pub fn parse_fps(current: u8, str: &str) -> Result<u8, ConfigParseError> {
     let (operator, value) = str.split_at(1);
     let value = value
