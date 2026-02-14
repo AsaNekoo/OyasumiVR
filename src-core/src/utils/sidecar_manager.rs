@@ -1,9 +1,10 @@
 use log::{error, info, warn};
 use oyasumi_shared::RESOURCES_PATH;
-use std::{path::PathBuf, sync::Arc};
+use std::cell::UnsafeCell;
+use std::sync::Arc;
 use std::time::Duration;
 // use sysinfo::{Pid, ProcessRefreshKind, System};
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{Mutex, mpsc};
 const LAUNCH_RETRY_INTERVALS: [Duration; 9] = [
     Duration::from_millis(100),
     Duration::from_secs(1),
@@ -16,7 +17,6 @@ const LAUNCH_RETRY_INTERVALS: [Duration; 9] = [
     Duration::from_secs(300),
 ];
 
-#[derive(Clone)]
 #[readonly::make]
 pub struct SidecarManager {
     pub sidecar_id: String,
@@ -24,15 +24,15 @@ pub struct SidecarManager {
     pub exe_dir: String,
     pub grpc_port: Arc<Mutex<Option<u32>>>,
     pub grpc_web_port: Arc<Mutex<Option<u32>>>,
-    pub active: Arc<Mutex<bool>>,
+    pub active: UnsafeCell<bool>,
     pub started: Arc<Mutex<bool>>,
-    pub sidecar_pid: Arc<Mutex<Option<u32>>>,
     pub sidecar_child: Arc<Mutex<Option<std::process::Child>>>,
     pub on_stop_tx: mpsc::Sender<()>,
     pub auto_restart: bool,
     pub args: Arc<Mutex<Vec<String>>>,
 }
-
+unsafe impl Send for SidecarManager{}
+unsafe impl Sync for SidecarManager{}
 impl SidecarManager {
     pub fn new(
         sidecar_id: String,
@@ -48,9 +48,8 @@ impl SidecarManager {
             exe_dir,
             grpc_port: Arc::new(Mutex::new(None)),
             grpc_web_port: Arc::new(Mutex::new(None)),
-            active: Arc::new(Mutex::new(false)),
+            active: UnsafeCell::new(false),
             started: Arc::new(Mutex::new(false)),
-            sidecar_pid: Arc::new(Mutex::new(None)),
             sidecar_child: Arc::new(Mutex::new(None)),
             on_stop_tx,
             auto_restart,
@@ -76,9 +75,8 @@ impl SidecarManager {
     }
 
     pub async fn start_or_restart(&mut self) {
-        let active = *self.active.lock().await;
         // Kill process if it is already active
-        if active {
+        if *self.active.get_mut() {
             info!(
                 "[Core] Killing running {} sidecar to prepare for restart...",
                 self.sidecar_id
@@ -91,7 +89,7 @@ impl SidecarManager {
             }
         }
         // Start the process if it was not already running, or if auto_restart is not set
-        if !active || !self.auto_restart {
+        if !*self.active.get_mut() || !self.auto_restart {
             self._start_internal(false).await;
         }
     }
@@ -106,10 +104,10 @@ impl SidecarManager {
             Some(port) => *port,
             None => return 0,
         };
-        if !relaunch && *self.active.lock().await {
+        if !relaunch && *self.active.get_mut() {
             return 0;
         }
-        *self.active.lock().await = true;
+        *self.active.get_mut() = true;
         info!(
             "[Core] {} {} sidecar...",
             match relaunch {
@@ -139,8 +137,8 @@ impl SidecarManager {
             }
         }
         let child = {
-            let cef_path=RESOURCES_PATH.join("sidecars/cef");
-            if !cef_path.exists(){
+            let cef_path = RESOURCES_PATH.join("sidecars/cef");
+            if !cef_path.exists() {
                 error!("cef path doesn't exist");
                 return 0;
             }
@@ -163,15 +161,19 @@ impl SidecarManager {
                 })
         };
         let child_pid = child.id();
-        *self.sidecar_pid.lock().await = Some(child_pid);
         *self.sidecar_child.lock().await = Some(child);
-        let self_ = self.clone();
+        let self_ = unsafe { &mut *(&raw mut *self) };
         tokio::task::spawn(async move {
             loop {
                 tokio::time::sleep(Duration::from_secs(1)).await;
                 if let Some(child) = &mut *self_.sidecar_child.lock().await {
                     //process exit code should be collected
-                    let _ = child.try_wait();
+                    if let Some(exit_code) = child.try_wait().unwrap() {
+                        log::info!("overlay sidecar exited with: {:?}", exit_code);
+                        unsafe {
+                            *self_.active.get() = false;
+                        }
+                    }
                 }
             }
         });
@@ -184,7 +186,7 @@ impl SidecarManager {
     // The sidecar process is running
     #[allow(dead_code)]
     pub async fn is_active(&self) -> bool {
-        *self.active.lock().await
+        unsafe { *self.active.get() }
     }
     #[allow(dead_code)]
     // The sidecar process is running, and the sidecar has signalled it has started
@@ -202,8 +204,7 @@ impl SidecarManager {
         // pid == 0 means that we are assuming the sidecar is running in development mode.
         if pid != 0 {
             // If the sidecar is not active, ignore this signal
-            let active_guard = self.active.lock().await;
-            if !*active_guard {
+            if !unsafe { *self.active.get() } {
                 warn!(
                     "Ignoring start signal for {} sidecar with pid {} because it is not active",
                     self.sidecar_id, pid
@@ -211,22 +212,30 @@ impl SidecarManager {
                 return false;
             }
             // If another sidecar is already running that does not have the old pid, ignore this signal
-            let current_pid = self.sidecar_pid.lock().await;
+            let bind = self.sidecar_child.lock().await;
+            let current_pid = bind.as_ref();
+            // let current_pid = self.sidecar_pid.lock().await;?
             if current_pid.is_some()
-                && (current_pid.unwrap() != pid
-                    && (old_pid.is_some() && current_pid.unwrap() != old_pid.unwrap()))
+                && (current_pid.unwrap().id() != pid
+                    && (old_pid.is_some() && current_pid.unwrap().id() != old_pid.unwrap()))
             {
-                warn!("Ignoring start signal for {} sidecar with pid {} because another {} sidecar is already running with pid {}", self.sidecar_id, pid, self.sidecar_id, current_pid.unwrap());
+                warn!(
+                    "Ignoring start signal for {} sidecar with pid {} because another {} sidecar is already running with pid {}",
+                    self.sidecar_id,
+                    pid,
+                    self.sidecar_id,
+                    current_pid.unwrap().id()
+                );
                 return false;
             }
         } else {
             // We already expect it to run in development mode
-            *self.active.lock().await = true;
+            unsafe {
+                *self.active.get() = true;
+            }
         }
         // Store started state
         *self.started.lock().await = true;
-        // Update the known pid
-        *self.sidecar_pid.lock().await = Some(pid);
         // Store the GRPC ports
         *self.grpc_port.lock().await = grpc_port;
         *self.grpc_web_port.lock().await = grpc_web_port;
@@ -239,72 +248,33 @@ impl SidecarManager {
 
     fn watch_process(&mut self) {
         // let mut s = System::new();
-        let self_arc = Arc::new(Mutex::new(self.clone()));
-
+        let self_ = unsafe { &mut *(&raw mut *self) };
         tokio::spawn(async move {
             let mut retries = 0;
-            let mut pid = {
-                let self_guard = self_arc.lock().await;
-                let value = match self_guard.sidecar_pid.lock().await.as_ref() {
-                    Some(pid) => *pid,
-                    None => {
-                        error!("[Core] Tried watching non-existant sidecar process");
-                        return;
-                    }
-                };
-                value
-            };
             loop {
                 loop {
                     tokio::time::sleep(Duration::from_secs(5)).await;
-                    let self_guard = self_arc.lock().await;
-                    let current_sidecar_pid =
-                        { self_guard.sidecar_pid.lock().await.as_ref().map(|pid| *pid) };
-                    // s.refresh_processes_specifics(
-                    //     sysinfo::ProcessesToUpdate::Some(&[Pid::from_u32(
-                    //         current_sidecar_pid.unwrap_or_default(),
-                    //     )]),
-                    //     true,
-                    //     ProcessRefreshKind::nothing().without_tasks(),
-                    // );
-                    // Check if the child process is no longer found
-                    if !PathBuf::from(format!("/proc/{}",pid)).exists() {
-                        // Check if the sidecar pid is still the same.
-                        // if s.process(Pid::from(pid as usize)).is_none() {
-                        // If it is, then we can assume the sidecar stopped.
-                        // If not, it likely got replaced by another instance of the sidecar.
-                        if match current_sidecar_pid {
-                            Some(current_sidecar_pid) => current_sidecar_pid == pid,
-                            None => true,
-                        } {
-                            let sidecar_pid = &self_guard.sidecar_pid;
-                            *sidecar_pid.lock().await = None;
-                            let sidecar_child = &self_guard.sidecar_child;
-                            *sidecar_child.lock().await = None;
-                            let grpc_port = &self_guard.grpc_port;
-                            *grpc_port.lock().await = None;
-                            let grpc_web_port = &self_guard.grpc_web_port;
-                            *grpc_web_port.lock().await = None;
-                            let active = &self_guard.active;
-                            *active.lock().await = false;
-                            let started = &self_guard.started;
-                            *started.lock().await = false;
-                        }
+                    if !*self_.active.get_mut() {
+                        let sidecar_child = &self_.sidecar_child;
+                        *sidecar_child.lock().await = None;
+                        let grpc_port = &self_.grpc_port;
+                        *grpc_port.lock().await = None;
+                        let grpc_web_port = &self_.grpc_web_port;
+                        *grpc_web_port.lock().await = None;
+                        *self_.active.get_mut() = false;
+                        let started = &self_.started;
+                        *started.lock().await = false;
+                        // }
                         // Send signal that the sidecar has stopped
-                        let _ = &self_guard.on_stop_tx.send(());
-                        info!(
-                            "[Core] {} sidecar has stopped (pid={})",
-                            &self_guard.sidecar_id, pid
-                        );
+                        let _ = &self_.on_stop_tx.send(());
+                        info!("[Core] {} sidecar has stopped", &self_.sidecar_id);
                         break;
                     } else {
                         retries = 0;
                     }
-                    // Drop the lock here before the next iteration
-                    drop(self_guard);
                 }
                 // Automatically try restarting the sidecar if desired
-                if self_arc.lock().await.auto_restart {
+                if self_.auto_restart {
                     let retry_interval = LAUNCH_RETRY_INTERVALS[retries];
                     tokio::time::sleep(retry_interval).await;
                     retries += 1;
@@ -312,7 +282,6 @@ impl SidecarManager {
                         retries = LAUNCH_RETRY_INTERVALS.len() - 1;
                     }
                     // KICKSTART THE SIDECAR
-                    pid = self_arc.lock().await._start_internal(true).await;
                     continue;
                 }
                 break;
