@@ -3739,6 +3739,7 @@ dependencies = [
 [[package]]
 name = "lact-client"
 version = "0.8.5"
+source = "git+https://github.com/sofoxe1/LACT?rev=ea44ef45f183da45bd690317e99369714631f692#ea44ef45f183da45bd690317e99369714631f692"
 dependencies = [
  "amdgpu-sysfs",
  "anyhow",
@@ -3755,6 +3756,7 @@ dependencies = [
 [[package]]
 name = "lact-schema"
 version = "0.8.5"
+source = "git+https://github.com/sofoxe1/LACT?rev=ea44ef45f183da45bd690317e99369714631f692#ea44ef45f183da45bd690317e99369714631f692"
 dependencies = [
  "amdgpu-sysfs",
  "anyhow",

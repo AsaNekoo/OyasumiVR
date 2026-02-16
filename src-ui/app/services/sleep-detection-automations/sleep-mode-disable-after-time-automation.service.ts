@@ -24,17 +24,23 @@ export class SleepModeDisableAfterTimeAutomationService {
     private automationConfig: AutomationConfigService,
     private sleep: SleepService
   ) {}
-
+  log(params:string) {
+    console.log("SleepModeDisableAfterTimeAutomationService: "+params);
+    
+  }
   async init() {
     this.automationConfig.configs
       .pipe(map((configs) => configs.SLEEP_MODE_DISABLE_AFTER_TIME))
       .subscribe((config) => {
         this.config = config;
         if (!this.config.enabled) {
+          this.log("config, clearing (1)");
           if (this.ClearTimeout) {
+            this.log("config, clearing (2)");
             clearTimeout(this.ClearTimeout);
           }
           if (this.timeout) {
+            this.log("config, clearing (3)");
             clearTimeout(this.timeout);
           }
         }
@@ -42,6 +48,7 @@ export class SleepModeDisableAfterTimeAutomationService {
 
     this.sleep.mode.pipe(distinctUntilChanged()).subscribe((mode) => {
       if (!this.config.enabled) {
+        this.log("sleep mode !enabled");
         return;
       }
       if (!this.config.duration) {
@@ -50,16 +57,20 @@ export class SleepModeDisableAfterTimeAutomationService {
       }
       if (mode) {
         if (this.SleepEnableTimeout) {
+          this.log("clearTimeout(this.SleepEnableTimeout);");
           clearTimeout(this.SleepEnableTimeout);
         }
         this.SleepEnableTimeout = setTimeout(() => {
+          this.log("SleepEnableTimeout");
           if (!this.config.duration) {
             console.error(
               'SleepModeDisableAfterTimeAutomationService this.config.duration is null! (2)'
             );
+            this.log("SleepEnableTimeout exit");
             return;
           }
           if (this.ClearTimeout) {
+            this.log("SleepEnableTimeout clear");
             clearTimeout(this.ClearTimeout);
           }
           if (!this.timeout) {
@@ -68,17 +79,22 @@ export class SleepModeDisableAfterTimeAutomationService {
         }, time_to_ms(this.config.sleep));
       } else {
         if (this.SleepEnableTimeout){
+          this.log("else (1)");
           clearTimeout(this.SleepEnableTimeout);
         }
         if (this.ClearTimeout) {
+          this.log("else (2)");
           clearTimeout(this.ClearTimeout);
         }
         if (this.config.awake) {
+          this.log("else (3)");
           this.ClearTimeout = setTimeout(() => {
             if (!this.timeout) {
+              this.log("else (4)");
               console.warn('SleepModeDisableAfterTimeAutomationService upsie');
               return;
             }
+            this.log("else (5)");
             clearTimeout(this.timeout);
           }, time_to_ms(this.config.awake));
         }
@@ -88,6 +104,7 @@ export class SleepModeDisableAfterTimeAutomationService {
 
   async disable() {
     if (!this.config.enabled) {
+      this.log("disable canceled");
       return;
     }
     await this.sleep.disableSleepMode({
