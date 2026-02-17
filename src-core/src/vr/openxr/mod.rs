@@ -4,26 +4,27 @@ use std::{
 };
 mod input;
 use log::{debug, info};
-use tokio::{spawn, sync::Mutex, task::spawn_blocking};
+use tauri::async_runtime::spawn_blocking;
+use tokio::{spawn, sync::Mutex};
 use xr_overlay::{
+    RgbaTexture,
     error::LocateError,
     model::AppContext,
     openxr::{Posef, Vector3f},
-    runner::{events::AppEvent, AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle},
+    runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent},
     utils::VecFExt,
     xr::ReferenceSpaceT,
-    RgbaTexture,
 };
 
 use crate::{
     utils::send_event,
     vr::{
+        SLEEP_DETECTION_ENABLED,
         commands::SLEEP_STATE,
         gesture_detector::GestureDetector,
         model::{SleepState, VRDevicePose, VRStatus},
-        openxr::input::{check_user_activity, INPUT_CONTEXT},
-        sleep_detector::{SleepDetector, SLEEP_DETECTOR_PERIOD},
-        SLEEP_DETECTION_ENABLED,
+        openxr::input::{INPUT_CONTEXT, check_user_activity},
+        sleep_detector::{SLEEP_DETECTOR_PERIOD, SleepDetector},
     },
 };
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
@@ -210,13 +211,13 @@ async fn session_restart() {
 //no need for atomic since vr is running on single thread
 static mut RESTARTING: bool = false;
 fn openxr_callback(event: AppEvent) {
-    spawn_blocking(move || match event {
+    match event {
         AppEvent::SessionEnded | AppEvent::Killed => {
             if !unsafe { RESTARTING } {
                 unsafe { RESTARTING = true };
 
                 log::debug!("[core] openxr disconnected");
-                spawn(async {
+                spawn_blocking(move || async {
                     INPUT_CONTEXT.lock().await.take();
                     update_status(VRStatus::Inactive).await;
                     unsafe { OXR_HANDLE.get().as_ref().unwrap().lock().await.drop_ctx() };
@@ -230,7 +231,28 @@ fn openxr_callback(event: AppEvent) {
             spawn(update_status(VRStatus::Initialized));
         }
         _ => (),
-    });
+    }
+    // spawn_blocking(move || match event {
+    //     AppEvent::SessionEnded | AppEvent::Killed => {
+    //         if !unsafe { RESTARTING } {
+    //             unsafe { RESTARTING = true };
+
+    //             log::debug!("[core] openxr disconnected");
+    //             spawn(async {
+    //                 INPUT_CONTEXT.lock().await.take();
+    //                 update_status(VRStatus::Inactive).await;
+    //                 unsafe { OXR_HANDLE.get().as_ref().unwrap().lock().await.drop_ctx() };
+    //                 OXR_BRIGHTNES_OVERLAY_HANDLE.lock().await.take();
+    //                 tokio::task::spawn(session_restart());
+    //             });
+    //         }
+    //     }
+    //     AppEvent::Started => {
+    //         log::debug!("[core] openxr ready");
+    //         spawn(update_status(VRStatus::Initialized));
+    //     }
+    //     _ => (),
+    // });
 }
 async fn update_status(new_status: VRStatus) {
     info!("[core] updating openxr status:{:?}", new_status);

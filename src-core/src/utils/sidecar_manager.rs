@@ -5,6 +5,8 @@ use std::sync::Arc;
 use std::time::Duration;
 // use sysinfo::{Pid, ProcessRefreshKind, System};
 use tokio::sync::{Mutex, mpsc};
+
+use crate::vr::openxr::OXR_HANDLE;
 const LAUNCH_RETRY_INTERVALS: [Duration; 9] = [
     Duration::from_millis(100),
     Duration::from_secs(1),
@@ -31,8 +33,8 @@ pub struct SidecarManager {
     pub auto_restart: bool,
     pub args: Arc<Mutex<Vec<String>>>,
 }
-unsafe impl Send for SidecarManager{}
-unsafe impl Sync for SidecarManager{}
+unsafe impl Send for SidecarManager {}
+unsafe impl Sync for SidecarManager {}
 impl SidecarManager {
     pub fn new(
         sidecar_id: String,
@@ -75,7 +77,6 @@ impl SidecarManager {
     }
 
     pub async fn start_or_restart(&mut self) {
-       
         // Kill process if it is already active
         if *self.active.get_mut() {
             info!(
@@ -167,13 +168,16 @@ impl SidecarManager {
         tokio::task::spawn(async move {
             loop {
                 tokio::time::sleep(Duration::from_secs(1)).await;
-                if let Some(child) = &mut *self_.sidecar_child.lock().await {
+                let mut guard=self_.sidecar_child.lock().await;
+                if let Some(child) = &mut *guard {
                     //process exit code should be collected
                     if let Some(exit_code) = child.try_wait().unwrap() {
                         log::info!("overlay sidecar exited with: {:?}", exit_code);
                         unsafe {
                             *self_.active.get() = false;
                         }
+                        drop(guard);
+                        OXR_HANDLE.get().unwrap().lock().await.run();
                         break;
                     }
                 }
@@ -285,9 +289,7 @@ impl SidecarManager {
                     }
                     // KICKSTART THE SIDECAR
                     self_._start_internal(true).await;
-                    continue;
                 }
-                break;
             }
         });
     }
