@@ -75,6 +75,7 @@ impl SidecarManager {
     }
 
     pub async fn start_or_restart(&mut self) {
+       
         // Kill process if it is already active
         if *self.active.get_mut() {
             info!(
@@ -173,6 +174,7 @@ impl SidecarManager {
                         unsafe {
                             *self_.active.get() = false;
                         }
+                        break;
                     }
                 }
             }
@@ -282,6 +284,7 @@ impl SidecarManager {
                         retries = LAUNCH_RETRY_INTERVALS.len() - 1;
                     }
                     // KICKSTART THE SIDECAR
+                    self_._start_internal(true).await;
                     continue;
                 }
                 break;
