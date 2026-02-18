@@ -32,7 +32,7 @@ pub async fn play_sound(name: String, volume: f32) {
             return;
         }
     };
-    let _ = tx.send((name, volume));
+    let _ = tx.send((name, volume)).await.unwrap();
 }
 
 #[tauri::command]
