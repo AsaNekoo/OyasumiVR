@@ -14,7 +14,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::sync::LazyLock;
 use tokio::sync::Mutex;
-use tokio::sync::mpsc::Sender;
+use std::sync::mpsc::Sender;
 type PlaySoundSender = LazyLock<Mutex<Option<Sender<(String, f32)>>>>;
 pub static DBUS_CONNECTION: Mutex<Option<Connection>> = Mutex::const_new(None);
 pub async fn connect_dbus() -> bool {
@@ -40,21 +40,12 @@ pub async fn init_audio_device_manager() {}
 
 pub async fn init_sound_playback() {
     // Create channels
-    let (tokio_tx, mut tokio_rx) = tokio::sync::mpsc::channel::<(String, f32)>(32);
+    // let (tokio_tx, mut tokio_rx) = tokio::sync::mpsc::channel::<(String, f32)>(32);
     let (std_tx, std_rx) = std::sync::mpsc::channel::<(String, f32)>();
 
     // Store the tokio sender
-    *PLAY_SOUND_TX.lock().await = Some(tokio_tx);
+    *PLAY_SOUND_TX.lock().await = Some(std_tx);
 
-    // Forward messages from tokio channel to std channel
-    std::thread::spawn(move || {
-        let rt = tokio::runtime::Runtime::new().unwrap();
-        rt.block_on(async {
-            while let Some(msg) = tokio_rx.recv().await {
-                let _ = std_tx.send(msg);
-            }
-        });
-    });
 
     // Spawn standard thread to play sounds
     std::thread::spawn(move || {
