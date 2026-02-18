@@ -13,8 +13,8 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 use std::sync::LazyLock;
-use tokio::sync::Mutex;
 use std::sync::mpsc::Sender;
+use tokio::sync::Mutex;
 type PlaySoundSender = LazyLock<Mutex<Option<Sender<(String, f32)>>>>;
 pub static DBUS_CONNECTION: Mutex<Option<Connection>> = Mutex::const_new(None);
 pub async fn connect_dbus() -> bool {
@@ -45,7 +45,6 @@ pub async fn init_sound_playback() {
 
     // Store the tokio sender
     *PLAY_SOUND_TX.lock().await = Some(std_tx);
-
 
     // Spawn standard thread to play sounds
     std::thread::spawn(move || {
@@ -80,17 +79,17 @@ pub async fn init_sound_playback() {
         });
 
         // Initialize output stream
-        let (_stream, stream_handle) = match OutputStream::try_default() {
-            Ok((stream, handle)) => (stream, handle),
-            Err(e) => {
-                error!("[Core] Failed to initialize audio output stream: {}", e);
-                return;
-            }
-        };
 
         // Play sounds when requested
         while let Ok((sound, volume)) = std_rx.recv() {
             if let Some(source) = sounds.get(&sound) {
+                let (_stream, stream_handle) = match OutputStream::try_default() {
+                    Ok((stream, handle)) => (stream, handle),
+                    Err(e) => {
+                        error!("[Core] Failed to initialize audio output stream: {}", e);
+                        return;
+                    }
+                };
                 // Play sound
                 let source = source.clone();
                 let sink = match Sink::try_new(&stream_handle) {
@@ -102,6 +101,7 @@ pub async fn init_sound_playback() {
                 };
                 sink.set_volume(volume);
                 sink.append(source.clone());
+                sink.sleep_until_end();
                 sink.detach();
             } else {
                 error!("[Core] Sound not found: {}", sound);
