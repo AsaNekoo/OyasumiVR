@@ -47,11 +47,16 @@ export class StatusChangeGeneralEventsAutomationService {
   }
 
   private handleSleepMode() {
+    let currentState: {
+      status: UserStatus | null;
+      statusMessage: string | null;
+      sleepMode: boolean;
+    } | null = null;
     this.sleep.mode
       .pipe(
         skip(1),
         distinctUntilChanged(),
-        debounceTime(3000),
+        debounceTime(15000),
         filter(() => this.config.enabled),
         filter(() => Boolean(this.vrcUser && this.vrcUser.status !== UserStatus.Offline)),
         map((sleepMode) => {
@@ -71,9 +76,11 @@ export class StatusChangeGeneralEventsAutomationService {
           return { status, statusMessage, sleepMode };
         }),
         filter((data) => Boolean(data.status !== null || data.statusMessage !== null)),
-        debounceTime(500)
+        debounceTime(500),
+        filter((state) => currentState != state)
       )
       .subscribe(async ({ status, statusMessage, sleepMode }) => {
+        currentState = { status, statusMessage, sleepMode };
         const oldStatus = this.vrcUser?.status;
         const oldStatusMessage = this.vrcUser?.statusDescription;
         const success = await this.vrchat.setStatus(status, statusMessage).catch(() => false);
@@ -103,6 +110,7 @@ export class StatusChangeGeneralEventsAutomationService {
   }
 
   private handleSleepPreparation() {
+    
     this.sleepPreparation.onSleepPreparation
       .pipe(
         filter(() => this.config.enabled),
@@ -117,7 +125,7 @@ export class StatusChangeGeneralEventsAutomationService {
           return { status, statusMessage };
         }),
         filter((data) => Boolean(data.status || data.statusMessage)),
-        debounceTime(500)
+        debounceTime(500),
       )
       .subscribe(async ({ status, statusMessage }) => {
         const oldStatus = this.vrcUser?.status;
