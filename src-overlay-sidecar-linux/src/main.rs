@@ -15,12 +15,7 @@ use xr_overlay_cef::{
 };
 
 use crate::{
-    config::{DEFAULT_OVERLAY_CONFIG, OverlayConfig},
-    core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
-    grpc::{start_grpc_server, start_grpc_web_server},
-    overlay_ipc::start_websocket_server,
-    ui::serve_ui,
-    vr::{DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard, start_vr},
+    config::{DEFAULT_OVERLAY_CONFIG, OverlayConfig}, core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient}, globals::CORE_GRPC_DEV_PORT, grpc::{start_grpc_server, start_grpc_web_server}, overlay_ipc::start_websocket_server, ui::serve_ui, vr::{DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard, start_vr}
 };
 
 pub mod config;
@@ -188,11 +183,11 @@ async fn tokio_main() {
         .into_inner()
         .port;
     info!("got http port:{:?}", http_port);
-    let ui_port = match ARGS.get().as_ref().unwrap().core_grpc_port == 0 {
+    let ui_port = match ARGS.get().as_ref().unwrap().core_grpc_port == CORE_GRPC_DEV_PORT {
         true => {
-            if cfg!(debug_assertions) && TcpStream::connect("127.0.0.1:5177").is_ok() {
-                log::debug!("using: 127.0.0.1:5177 for ui");
-                5176
+            if cfg!(debug_assertions) && TcpStream::connect("localhost:5173").is_ok() {
+                log::debug!("using: 127.0.0.1:5173 for ui");
+                5173
             } else {
                 log::debug!("serving ui");
                 serve_ui().await

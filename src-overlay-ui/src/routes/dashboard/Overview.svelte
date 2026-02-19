@@ -22,7 +22,17 @@
 	let staggerOffset = 50;
 	let flyYTransform = 30;
 
-	$: time = new Date();
+	let time = new Date();
+	function update_time() {
+		// console.debug('time update');
+		window.current_time = new Date();
+		time = window.current_time;
+		let left = 60000 - (time.getTime() % 60000);
+		setTimeout(() => update_time(), left + 10);
+	}
+	if (!window.current_time) {
+		update_time();
+	}
 	$: timeHours = time.getHours().toString().padStart(2, '0');
 	$: timeMinutes = time.getMinutes().toString().padStart(2, '0');
 
