@@ -77,7 +77,7 @@ fn main() {
     }));
     let mut binding = env_logger::Builder::new();
     let mut logger = binding.filter_level(log::LevelFilter::Trace);
-    #[cfg(not(debug_assertions))]
+    #[cfg(debug_assertions)]
     {
         logger = logger
             .filter_module("xr_overlay_cef", log::LevelFilter::Debug)
@@ -247,6 +247,11 @@ async fn tokio_main() {
         .load_url(Some(&(url_noti.as_str()).into()));
     NOTIFICATION_OVERLAY.wait().inject_ipc(ws_port);
     tokio::time::sleep(Duration::from_secs(2)).await;
+    if let Some(no_vr) = NO_VR.get()
+        && *no_vr
+    {
+        show_dashboard();
+    }
 }
 static mut KILL: bool = false;
 // #[allow(dead_code)]
