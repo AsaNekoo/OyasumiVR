@@ -95,10 +95,9 @@ export interface AutomationConfigs {
   VRCHAT_GROUP_AUTOMATIONS: VRChatGroupAutomationsConfig;
 
   // SYSTEM CONTROL
-  WINDOWS_POWER_POLICY_ON_SLEEP_MODE_ENABLE: WindowsPowerPolicyOnSleepModeAutomationConfig;
-  WINDOWS_POWER_POLICY_ON_SLEEP_PREPARATION: WindowsPowerPolicyOnSleepModeAutomationConfig;
-  WINDOWS_POWER_POLICY_ON_SLEEP_MODE_DISABLE: WindowsPowerPolicyOnSleepModeAutomationConfig;
-  LINUX_POWER_POLICY_PROVIDER: LinuxPowerPolicyProvider;
+  SYSTEM_POWER_POLICY_ON_SLEEP_MODE_ENABLE: SystemPowerPolicyOnSleepModeAutomationConfig;
+  SYSTEM_POWER_POLICY_ON_SLEEP_PREPARATION: SystemPowerPolicyOnSleepModeAutomationConfig;
+  SYSTEM_POWER_POLICY_ON_SLEEP_MODE_DISABLE: SystemPowerPolicyOnSleepModeAutomationConfig;
   FRAME_LIMIT_AUTOMATIONS: FrameLimitAutomationsConfig;
   SHUTDOWN_AUTOMATIONS: ShutdownAutomationsConfig;
   RUN_AUTOMATIONS: RunAutomationsConfig;
@@ -333,11 +332,8 @@ export interface ChangeStatusGeneralEventsAutomationConfig extends AutomationCon
 }
 
 // WINDOWS POWER POLICY AUTOMATIONS
-export interface WindowsPowerPolicyOnSleepModeAutomationConfig extends AutomationConfig {
+export interface SystemPowerPolicyOnSleepModeAutomationConfig extends AutomationConfig {
   powerPolicy?: string;
-}
-export interface LinuxPowerPolicyProvider extends AutomationConfig {
-  provider: string;
 }
 
 // MISCELLANEOUS AUTOMATIONS
@@ -915,13 +911,13 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
   },
 
   // SYSTEM CONTROL
-  WINDOWS_POWER_POLICY_ON_SLEEP_MODE_ENABLE: {
+  SYSTEM_POWER_POLICY_ON_SLEEP_MODE_ENABLE: {
     enabled: false,
   },
-  WINDOWS_POWER_POLICY_ON_SLEEP_PREPARATION: {
+  SYSTEM_POWER_POLICY_ON_SLEEP_PREPARATION: {
     enabled: false,
   },
-  WINDOWS_POWER_POLICY_ON_SLEEP_MODE_DISABLE: {
+  SYSTEM_POWER_POLICY_ON_SLEEP_MODE_DISABLE: {
     enabled: false,
   },
   FRAME_LIMIT_AUTOMATIONS: {
@@ -1005,10 +1001,6 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
     onSleepDisableRgb: [0, 255, 0],
     onSleepPreparation: false,
     onSleepPreparationRgb: [128, 0, 0],
-  },
-  LINUX_POWER_POLICY_PROVIDER: {
-    enabled: true,
-    provider: 'powerprofilesctl',
   },
   PLAYBACK_AUTOMATIONS: {
     pause_on_sleep_enable: false,

@@ -73,7 +73,7 @@ function from4to5(data: any): any {
 function from3to4(data: any): any {
   data.version = 4;
   data.logs = data.logs.map((log: any) => {
-    if (log.type === 'windowsPowerPolicySet') {
+    if (log.type === 'SystemPowerPolicySet') {
       switch (log.policy) {
         case 'HIGH_PERFORMANCE':
           log.policyName = 'High Performance';

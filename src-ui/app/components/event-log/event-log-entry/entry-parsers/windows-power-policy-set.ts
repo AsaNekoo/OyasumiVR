@@ -1,22 +1,22 @@
 import { EventLogEntryParser } from '../event-log-entry-parser';
-import { EventLogType, EventLogWindowsPowerPolicySet } from '../../../../models/event-log-entry';
+import { EventLogType, EventLogSystemPowerPolicySet } from '../../../../models/event-log-entry';
 
-export class EventLogWindowsPowerPolicySetEntryParser extends EventLogEntryParser<EventLogWindowsPowerPolicySet> {
+export class EventLogSystemPowerPolicySetEntryParser extends EventLogEntryParser<EventLogSystemPowerPolicySet> {
   entryType(): EventLogType {
-    return 'windowsPowerPolicySet';
+    return 'SystemPowerPolicySet';
   }
 
   override headerInfoTitle(): string {
-    return 'comp.event-log-entry.type.windowsPowerPolicySet.title';
+    return 'comp.event-log-entry.type.SystemPowerPolicySet.title';
   }
 
-  override headerInfoTitleParams(entry: EventLogWindowsPowerPolicySet): { [s: string]: string } {
+  override headerInfoTitleParams(entry: EventLogSystemPowerPolicySet): { [s: string]: string } {
     return {
       policy: entry.policyName,
     };
   }
 
-  override headerInfoSubTitle(entry: EventLogWindowsPowerPolicySet): string {
-    return 'comp.event-log-entry.type.windowsPowerPolicySet.reason.' + entry.reason;
+  override headerInfoSubTitle(entry: EventLogSystemPowerPolicySet): string {
+    return 'comp.event-log-entry.type.SystemPowerPolicySet.reason.' + entry.reason;
   }
 }

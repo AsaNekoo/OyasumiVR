@@ -283,7 +283,7 @@
             "VARIOUS": "Mematikan beberapa perangkat"
           }
         },
-        "windowsPowerPolicySet": {
+        "SystemPowerPolicySet": {
           "reason": {
             "SLEEP_MODE_DISABLED": "Saat mode tidur dimatikan",
             "SLEEP_MODE_ENABLED": "Saat mode tidur dinyalakan"

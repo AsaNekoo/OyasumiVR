@@ -33,7 +33,7 @@ export type EventLogEntry =
   | EventLogChaperoneFadeDistanceChanged
   | EventLogShutdownSequenceStarted
   | EventLogShutdownSequenceCancelled
-  | EventLogWindowsPowerPolicySet
+  | EventLogSystemPowerPolicySet
   | EventLogChangedVRChatMicMuteState
   | EventLogChangedSystemMicMuteState
   | EventLogChangedSystemMicControllerButtonBehavior
@@ -70,7 +70,7 @@ export type EventLogType =
   | 'chaperoneFadeDistanceChanged'
   | 'shutdownSequenceStarted'
   | 'shutdownSequenceCancelled'
-  | 'windowsPowerPolicySet'
+  | 'SystemPowerPolicySet'
   | 'changedVRChatMicMuteState'
   | 'changedSystemMicMuteState'
   | 'changedSystemMicControllerButtonBehavior'
@@ -265,8 +265,8 @@ export interface EventLogChaperoneFadeDistanceChanged extends EventLogBase {
   fadeDistance: number;
 }
 
-export interface EventLogWindowsPowerPolicySet extends EventLogBase {
-  type: 'windowsPowerPolicySet';
+export interface EventLogSystemPowerPolicySet extends EventLogBase {
+  type: 'SystemPowerPolicySet';
   policyName: string;
   reason: 'SLEEP_MODE_ENABLED' | 'SLEEP_MODE_DISABLED'|'SLEEP_PREPARATION';
 }

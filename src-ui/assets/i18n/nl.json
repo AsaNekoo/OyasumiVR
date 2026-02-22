@@ -652,7 +652,7 @@
             "set": "Je VRChat groepsrepresentatie is veranderd naar \"{groupName}\""
           }
         },
-        "windowsPowerPolicySet": {
+        "SystemPowerPolicySet": {
           "reason": {
             "SLEEP_MODE_DISABLED": "Omdat de slaap modus is uitgeschakeld",
             "SLEEP_MODE_ENABLED": "Omdat de slaap modus is ingeschakeld"

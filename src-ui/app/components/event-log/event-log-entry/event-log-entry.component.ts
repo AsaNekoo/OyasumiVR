@@ -19,7 +19,7 @@ import { EventLogShutdownSequenceStartedEntryParser } from './entry-parsers/shut
 import { EventLogShutdownSequenceCancelledEntryParser } from './entry-parsers/shutdown-sequence-cancelled';
 import { EventLogHardwareBrightnessChangedEntryParser } from './entry-parsers/display-brightness-changed';
 import { EventLogSoftwareBrightnessChangedEntryParser } from './entry-parsers/image-brightness-changed';
-import { EventLogWindowsPowerPolicySetEntryParser } from './entry-parsers/windows-power-policy-set';
+import { EventLogSystemPowerPolicySetEntryParser } from './entry-parsers/windows-power-policy-set';
 import { EventLogMsiAfterburnerProfileSetEntryParser } from './entry-parsers/msi-afterburner-profile-set';
 import { EventLogSimpleBrightnessChangedEntryParser } from './entry-parsers/simple-brightness-changed';
 import { EventLogChangedVRChatMicMuteStateEntryParser } from './entry-parsers/changed-vrchat-mic-mute-state';
@@ -68,7 +68,7 @@ export class EventLogEntryComponent implements OnInit, OnChanges {
     new EventLogFadeDistanceChangedEntryParser(),
     new EventLogShutdownSequenceStartedEntryParser(),
     new EventLogShutdownSequenceCancelledEntryParser(),
-    new EventLogWindowsPowerPolicySetEntryParser(),
+    new EventLogSystemPowerPolicySetEntryParser(),
     new EventLogMsiAfterburnerProfileSetEntryParser(),
     new EventLogChangedVRChatMicMuteStateEntryParser(),
     new EventLogChangedSystemMicMuteStateEntryParser(),

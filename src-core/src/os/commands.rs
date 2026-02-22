@@ -1,10 +1,10 @@
 use super::models::Output;
-use super::models::WindowsPowerPolicy;
+use super::models::SystemPowerPolicy;
 use crate::os::linux::audio::LinuxAudioError;
 use crate::os::linux::audio::get_linux_audio_manager;
+use crate::os::linux::power::get_power_manager;
 use crate::os::models::AudioDeviceDto;
 use crate::os::notifications;
-use crate::os::notifications::os::IsInhibited;
 use crate::utils::VRCHAT_ACTIVE;
 use crate::warn_unimplemented;
 use log::error;
@@ -111,52 +111,54 @@ pub async fn show_in_folder(path: String) {
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn set_system_power_policy(guid: String) {
-    use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
-
-    LINUX_POWER_POLICY_MANAGER.lock().await.set_policy(guid);
+pub async fn set_system_power_policy(name: String) {
+    if let Some(manager) = get_power_manager().await {
+        manager.set_policy(name).await;
+    }
 }
 #[tauri::command]
 pub async fn set_power_policy_provider(name: String) {
-    use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
-
-    LINUX_POWER_POLICY_MANAGER.lock().await.set_provider(name);
+    //  if let Some(manager)=get_power_manager().await{
+    //     manager.set_policy(guid).await;
+    // }
+    // LINUX_POWER_POLICY_MANAGER.lock().await.set_provider(name);
 }
 #[tauri::command]
 pub async fn get_power_policy_providers() -> Vec<String> {
-    use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
+    // use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
 
-    LINUX_POWER_POLICY_MANAGER.lock().await.get_providers()
+    // LINUX_POWER_POLICY_MANAGER.lock().await.get_providers()
+    let mut a = Vec::new();
+    a.push("aa".to_string());
+    a
 }
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn active_system_power_policy() -> Option<WindowsPowerPolicy> {
-    use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
-    let current = LINUX_POWER_POLICY_MANAGER
-        .lock()
-        .await
-        .get_current_profile();
-    Some(WindowsPowerPolicy {
-        guid: current.clone(),
+pub async fn active_system_power_policy() -> Option<SystemPowerPolicy> {
+    let current = get_power_manager().await?.get_current_profile().await?;
+    Some(SystemPowerPolicy {
         name: current,
     })
 }
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn get_system_power_policies() -> Vec<WindowsPowerPolicy> {
-    use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
-
-    LINUX_POWER_POLICY_MANAGER
-        .lock()
-        .await
-        .get_avalible_profiles()
-        .into_iter()
-        .map(|p| WindowsPowerPolicy {
-            guid: p.clone(),
-            name: p,
-        })
-        .collect()
+pub async fn get_system_power_policies() -> Vec<SystemPowerPolicy> {
+    if let Some(manager) = get_power_manager().await {
+        let profiles = manager.get_avalible_profiles().await;
+        if profiles.is_none() {
+            return Vec::default();
+        }
+        return profiles
+            .unwrap()
+            .into_iter()
+            .map(|p| SystemPowerPolicy {
+                name: p,
+            })
+            .collect();
+    } else {
+        Vec::default()
+    }
 }
 
 #[tauri::command]

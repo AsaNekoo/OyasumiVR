@@ -588,7 +588,7 @@
           },
           "title": "VRChat Avatar wurde zu ''{avatarName}'' geändert"
         },
-        "windowsPowerPolicySet": {
+        "SystemPowerPolicySet": {
           "reason": {
             "SLEEP_MODE_DISABLED": "Da der Schlafmodus ausgeschaltet war",
             "SLEEP_MODE_ENABLED": "Da der Schlafmodus eingeschaltet war"

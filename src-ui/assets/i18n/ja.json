@@ -652,7 +652,7 @@
             "set": "バナー表示をグループ『''{groupName}''』へ変更"
           }
         },
-        "windowsPowerPolicySet": {
+        "SystemPowerPolicySet": {
           "reason": {
             "SLEEP_MODE_DISABLED": "睡眠モードが無効になった",
             "SLEEP_MODE_ENABLED": "睡眠モードが有効になった"

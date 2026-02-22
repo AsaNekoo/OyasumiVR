@@ -1,4 +1,4 @@
-pub mod power_managment;
+pub mod power;
 pub mod audio;
 pub mod lact;
 //fixme: use libmonado to limit fps https://gitlab.freedesktop.org/monado/monado/-/issues/488

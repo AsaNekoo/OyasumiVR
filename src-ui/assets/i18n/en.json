@@ -664,7 +664,7 @@
             "set": "Changed the VRChat group you represent to ''{groupName}''"
           }
         },
-        "windowsPowerPolicySet": {
+        "SystemPowerPolicySet": {
           "reason": {
             "SLEEP_MODE_DISABLED": "As sleep mode was disabled",
             "SLEEP_PREPARATION": "As you prepared to go to sleep",

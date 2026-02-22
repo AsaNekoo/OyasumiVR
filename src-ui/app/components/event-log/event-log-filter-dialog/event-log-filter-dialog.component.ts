@@ -55,7 +55,7 @@ export class EventLogFilterDialogComponent
     },
     {
       id: 'WINDOWS_POWER_POLICY',
-      eventLogTypes: ['windowsPowerPolicySet'],
+      eventLogTypes: ['SystemPowerPolicySet'],
     },
     {
       id: 'BRIGHTNESS_CCT',

@@ -225,8 +225,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     image_cache::init(cache_dir).await;
     // Init sound playback
     os::init_sound_playback().await;
-    // Initialize audio device manager
-    os::init_audio_device_manager().await;
+
     // Initialize Lighthouse Bluetooth
     lighthouse::init().await;
     // Initialize log commands

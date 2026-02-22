@@ -7,8 +7,7 @@ pub struct Output {
     pub status: i32,
 }
 #[derive(Clone, Serialize, Deserialize)]
-pub struct WindowsPowerPolicy {
-    pub guid: String,
+pub struct SystemPowerPolicy {
     pub name: String,
 }
 #[derive(PartialEq, Eq, Clone, Copy, Serialize)]

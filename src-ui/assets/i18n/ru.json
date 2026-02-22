@@ -653,7 +653,7 @@
             "set": "Представляемая Вами VRChat группа изменена на ''{groupName}''"
           }
         },
-        "windowsPowerPolicySet": {
+        "SystemPowerPolicySet": {
           "reason": {
             "SLEEP_MODE_DISABLED": "Так как режим сна был отключен",
             "SLEEP_MODE_ENABLED": "Так как режим сна был включен"

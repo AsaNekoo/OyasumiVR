@@ -271,7 +271,7 @@
             "SLEEP_MODE_ENABLED": "Car le mode sommeil a été activé"
           }
         },
-        "windowsPowerPolicySet": {
+        "SystemPowerPolicySet": {
           "reason": {
             "SLEEP_MODE_DISABLED": "Car le mode sommeil a été désactivé",
             "SLEEP_MODE_ENABLED": "Car le mode sommeil a été activé"

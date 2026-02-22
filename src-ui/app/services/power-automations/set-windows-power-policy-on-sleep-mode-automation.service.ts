@@ -4,7 +4,7 @@ import { AutomationConfigService } from '../automation-config.service';
 import { skip } from 'rxjs';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
-  WindowsPowerPolicyOnSleepModeAutomationConfig,
+  SystemPowerPolicyOnSleepModeAutomationConfig,
 } from '../../models/automations';
 import { SleepService } from '../sleep.service';
 import { WindowsService } from '../windows.service';
@@ -14,14 +14,14 @@ import { SleepPreparationService } from '../sleep-preparation.service';
   providedIn: 'root',
 })
 export class SetWindowsPowerPolicyOnSleepModeAutomationService {
-  onSleepModeEnableConfig: WindowsPowerPolicyOnSleepModeAutomationConfig = structuredClone(
-    AUTOMATION_CONFIGS_DEFAULT.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_ENABLE
+  onSleepModeEnableConfig: SystemPowerPolicyOnSleepModeAutomationConfig = structuredClone(
+    AUTOMATION_CONFIGS_DEFAULT.SYSTEM_POWER_POLICY_ON_SLEEP_MODE_ENABLE
   );
-  onSleepModePrepareConfig: WindowsPowerPolicyOnSleepModeAutomationConfig = structuredClone(
-    AUTOMATION_CONFIGS_DEFAULT.WINDOWS_POWER_POLICY_ON_SLEEP_PREPARATION
+  onSleepModePrepareConfig: SystemPowerPolicyOnSleepModeAutomationConfig = structuredClone(
+    AUTOMATION_CONFIGS_DEFAULT.SYSTEM_POWER_POLICY_ON_SLEEP_PREPARATION
   );
-  onSleepModeDisableConfig: WindowsPowerPolicyOnSleepModeAutomationConfig = structuredClone(
-    AUTOMATION_CONFIGS_DEFAULT.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_DISABLE
+  onSleepModeDisableConfig: SystemPowerPolicyOnSleepModeAutomationConfig = structuredClone(
+    AUTOMATION_CONFIGS_DEFAULT.SYSTEM_POWER_POLICY_ON_SLEEP_MODE_DISABLE
   );
 
   constructor(
@@ -33,13 +33,13 @@ export class SetWindowsPowerPolicyOnSleepModeAutomationService {
 
   async init() {
     this.automationConfig.configs.subscribe((configs) => {
-      this.onSleepModeEnableConfig = configs.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_ENABLE;
-      this.onSleepModePrepareConfig = configs.WINDOWS_POWER_POLICY_ON_SLEEP_PREPARATION;
-      this.onSleepModeDisableConfig = configs.WINDOWS_POWER_POLICY_ON_SLEEP_MODE_DISABLE;
+      this.onSleepModeEnableConfig = configs.SYSTEM_POWER_POLICY_ON_SLEEP_MODE_ENABLE;
+      this.onSleepModePrepareConfig = configs.SYSTEM_POWER_POLICY_ON_SLEEP_PREPARATION;
+      this.onSleepModeDisableConfig = configs.SYSTEM_POWER_POLICY_ON_SLEEP_MODE_DISABLE;
     });
     this.sleepPrepare.onSleepPreparation.subscribe(async (_) => {
       if (this.onSleepModePrepareConfig && this.onSleepModePrepareConfig.powerPolicy) {
-        await this.windows.setWindowsPowerPolicy(
+        await this.windows.setPowerPolicy(
           this.onSleepModePrepareConfig.powerPolicy,
           'SLEEP_PREPARATION'
         );
@@ -55,7 +55,7 @@ export class SetWindowsPowerPolicyOnSleepModeAutomationService {
           this.onSleepModeEnableConfig.enabled &&
           this.onSleepModeEnableConfig.powerPolicy
         ) {
-          await this.windows.setWindowsPowerPolicy(
+          await this.windows.setPowerPolicy(
             this.onSleepModeEnableConfig.powerPolicy,
             'SLEEP_MODE_ENABLED'
           );
@@ -64,7 +64,7 @@ export class SetWindowsPowerPolicyOnSleepModeAutomationService {
           this.onSleepModeDisableConfig.enabled &&
           this.onSleepModeDisableConfig.powerPolicy
         ) {
-          await this.windows.setWindowsPowerPolicy(
+          await this.windows.setPowerPolicy(
             this.onSleepModeDisableConfig.powerPolicy,
             'SLEEP_MODE_DISABLED'
           );

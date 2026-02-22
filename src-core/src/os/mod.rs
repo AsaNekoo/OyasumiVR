@@ -35,8 +35,6 @@ pub async fn connect_dbus() -> bool {
 }
 static PLAY_SOUND_TX: PlaySoundSender = LazyLock::new(Mutex::default);
 
-pub async fn init_audio_device_manager() {}
-
 pub async fn init_sound_playback() {
     // Create channels
     let (tokio_tx, mut tokio_rx) = tokio::sync::mpsc::channel::<(String, f32)>(32);
