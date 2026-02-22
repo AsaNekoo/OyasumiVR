@@ -24,9 +24,11 @@ pub async fn set_lact_profile(profile: String) -> Result<bool, GpuProfileError> 
                         .iter()
                         .find(|p|*p.0==profile)
                         .ok_or(GpuProfileError::InvalidProfileIndex)?;
-                    v.set_profile(Some(profile.0.to_string()), false)
-                        .await
-                        .unwrap();
+                    if let Err(err)=v.set_profile(Some(profile.0.to_string()), false)
+                        .await{
+                            log::error!("failed to set lact profile: {:?}",err);
+                            return Err(GpuProfileError::UnknownError);
+                        }
                     Ok(true)
                 }
                 Err(err) => {
@@ -37,7 +39,6 @@ pub async fn set_lact_profile(profile: String) -> Result<bool, GpuProfileError> 
         // })
     }
     inner(profile).await
-    // tokio::task::spawn_local(async move {inner(profile).await}).await.unwrap()
 }
 pub async fn get_lact_profiles() -> Result<Vec<String>, GpuProfileError> {
     async fn inner() -> Result<Vec<String>, GpuProfileError> {
