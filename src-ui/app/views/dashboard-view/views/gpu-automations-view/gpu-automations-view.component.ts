@@ -10,7 +10,6 @@ import { ConfirmModalComponent } from '../../../../components/confirm-modal/conf
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ExecutableReferenceStatus } from 'src-ui/app/models/settings';
 import { ActivatedRoute } from '@angular/router';
-import { check_windows, is_windows } from 'src-ui/app/app.module';
 
 export type GpuAutomationsTab = 'POWER_LIMITS' | 'MSI_AFTERBURNER';
 
@@ -89,7 +88,7 @@ export class GpuAutomationsViewComponent implements OnInit {
         if (!sidecarRunning) return true;
         // Afterburner
         if (
-          (msiAfterburnerConfig.onSleepDisableProfile||
+          (msiAfterburnerConfig.onSleepDisableProfile ||
             msiAfterburnerConfig.onSleepEnableProfile ||
             msiAfterburnerConfig.onSleepPreparation) &&
           (
@@ -111,14 +110,7 @@ export class GpuAutomationsViewComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.is_windows = is_windows;
-    await check_windows();
-    if (is_windows) {
-      const fragment = await firstValueFrom(this.activatedRoute.fragment);
-      if (fragment) this.activeTab = fragment as GpuAutomationsTab;
-    } else {
-      this.activeTab = 'MSI_AFTERBURNER';
-    }
+    this.activeTab = 'MSI_AFTERBURNER';
   }
 
   async startSidecar() {

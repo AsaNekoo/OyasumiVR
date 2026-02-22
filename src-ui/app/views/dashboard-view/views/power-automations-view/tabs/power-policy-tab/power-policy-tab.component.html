@@ -1,25 +1,17 @@
 <div class="setting-category">
   <div class="description">
     <p>
-      @if (is_windows) {
-        <span translate>power-automations.windowsPowerPolicy.description</span>
-      } @else {
-        <span translate>power-automations.linuxPowerPolicy.description</span>
-      }
+      <span translate>power-automations.linuxPowerPolicy.description</span>
     </p>
     <i class="material-icons-outlined description-icon">energy_savings_leaf</i>
   </div>
   <h3 translate>power-automations.windowsPowerPolicy.automations</h3>
   <div class="settings">
-
     <div class="setting-row">
       <div class="setting-row-label" translate>
         <span translate>power-automations.windowsPowerPolicy.sleepModeEnable.title</span>
-        @if (is_windows) {
-          <span translate>power-automations.windowsPowerPolicy.sleepModeEnable.description</span>
-        } @else {
-          <span translate>power-automations.linuxPowerPolicy.sleepModeEnable.description</span>
-        }
+
+        <span translate>power-automations.linuxPowerPolicy.sleepModeEnable.description</span>
       </div>
       <div class="setting-row-action">
         <app-select-box
@@ -33,11 +25,8 @@
     <div class="setting-row">
       <div class="setting-row-label" translate>
         <span translate>power-automations.windowsPowerPolicy.sleepPrepare.title</span>
-        @if (is_windows) {
-          <span translate>power-automations.windowsPowerPolicy.sleepPrepare.description</span>
-        } @else {
-          <span translate>power-automations.linuxPowerPolicy.sleepPrepare.description</span>
-        }
+
+        <span translate>power-automations.linuxPowerPolicy.sleepPrepare.description</span>
       </div>
       <div class="setting-row-action">
         <app-select-box
@@ -51,11 +40,8 @@
     <div class="setting-row">
       <div class="setting-row-label" translate>
         <span translate>power-automations.windowsPowerPolicy.sleepModeDisable.title</span>
-        @if (is_windows) {
-          <span translate>power-automations.windowsPowerPolicy.sleepModeEnable.description</span>
-        } @else {
-          <span translate>power-automations.linuxPowerPolicy.sleepModeEnable.description</span>
-        }
+
+        <span translate>power-automations.linuxPowerPolicy.sleepModeEnable.description</span>
       </div>
       <div class="setting-row-action">
         <app-select-box

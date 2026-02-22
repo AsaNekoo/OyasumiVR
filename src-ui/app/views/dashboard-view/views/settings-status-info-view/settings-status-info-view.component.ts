@@ -8,13 +8,11 @@ import { OscService } from '../../../../services/osc.service';
 import { ElevatedSidecarService } from '../../../../services/elevated-sidecar.service';
 import { OverlayService } from '../../../../services/overlay/overlay.service';
 import { OpenVRService } from '../../../../services/openvr.service';
-import { IPCService } from '../../../../services/ipc.service';
 import { FontLoaderService } from '../../../../services/font-loader.service';
 import { invoke } from '@tauri-apps/api/core';
 import { hshrink } from '../../../../utils/animations';
 import { TStringTranslatePipe } from '../../../../pipes/tstring-translate.pipe';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
-import { is_windows } from 'src-ui/app/app.module';
 
 @Component({
   selector: 'app-settings-status-info-view',
@@ -41,11 +39,9 @@ export class SettingsStatusInfoViewComponent {
     elevatedSidecar: ElevatedSidecarService,
     overlaySidecar: OverlayService,
     openvr: OpenVRService,
-    ipc: IPCService,
     fontLoader: FontLoaderService,
     private tsTranslate: TStringTranslatePipe
   ) {
-   this.is_windows=is_windows;
     this.categories = [
       {
         name: 'OyasumiVR Application',

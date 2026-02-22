@@ -8,7 +8,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SelectBoxItem } from '../../../../../../components/select-box/select-box.component';
 import { WindowsService } from '../../../../../../services/windows.service';
 import { combineLatest, tap } from 'rxjs';
-import { check_windows, is_windows } from 'src-ui/app/app.module';
 
 @Component({
   selector: 'app-power-policy-tab',
@@ -55,8 +54,6 @@ export class PowerPolicyTabComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    await check_windows;
-    this.is_windows = is_windows;
     combineLatest([
       this.automationConfigService.configs,
       // Update options when the windows power policies are updated
@@ -103,7 +100,7 @@ export class PowerPolicyTabComponent implements OnInit {
     switch (automation) {
       case 'ON_ENABLE':
         await this.automationConfigService.updateAutomationConfig<SystemPowerPolicyOnSleepModeAutomationConfig>(
-          'WINDOWS_POWER_POLICY_ON_SLEEP_MODE_ENABLE',
+          'SYSTEM_POWER_POLICY_ON_SLEEP_MODE_ENABLE',
           {
             enabled: selectBoxItem.id !== 'NONE',
             powerPolicy: selectBoxItem.id === 'NONE' ? undefined : selectBoxItem.id,
@@ -112,7 +109,7 @@ export class PowerPolicyTabComponent implements OnInit {
         break;
       case 'ON_PREPARE':
         await this.automationConfigService.updateAutomationConfig<SystemPowerPolicyOnSleepModeAutomationConfig>(
-          'WINDOWS_POWER_POLICY_ON_SLEEP_PREPARATION',
+          'SYSTEM_POWER_POLICY_ON_SLEEP_PREPARATION',
           {
             enabled: selectBoxItem.id !== 'NONE',
             powerPolicy: selectBoxItem.id === 'NONE' ? undefined : selectBoxItem.id,
@@ -121,7 +118,7 @@ export class PowerPolicyTabComponent implements OnInit {
         break;
       case 'ON_DISABLE':
         await this.automationConfigService.updateAutomationConfig<SystemPowerPolicyOnSleepModeAutomationConfig>(
-          'WINDOWS_POWER_POLICY_ON_SLEEP_MODE_DISABLE',
+          'SYSTEM_POWER_POLICY_ON_SLEEP_MODE_DISABLE',
           {
             enabled: selectBoxItem.id !== 'NONE',
             powerPolicy: selectBoxItem.id === 'NONE' ? undefined : selectBoxItem.id,

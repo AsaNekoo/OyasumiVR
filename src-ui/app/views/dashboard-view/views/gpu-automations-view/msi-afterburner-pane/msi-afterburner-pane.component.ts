@@ -14,7 +14,6 @@ import {
 import { vshrink } from '../../../../../utils/animations';
 import { SelectBoxItem } from '../../../../../components/select-box/select-box.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { is_windows } from 'src-ui/app/app.module';
 import { invoke } from '@tauri-apps/api/core';
 
 @Component({
@@ -96,7 +95,6 @@ export class MsiAfterburnerPaneComponent implements OnInit {
     this.gpuAutomations.msiAfterburnerStatus
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((status) => this.processMSIAfterburnerStatus(status));
-    this.is_windows = is_windows;
   }
 
   processMSIAfterburnerStatus(status: ExecutableReferenceStatus) {

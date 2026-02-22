@@ -1,7 +1,6 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
 import { AutomationConfigService } from '../../../../../../services/automation-config.service';
 import { AppSettingsService } from '../../../../../../services/app-settings.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
   BigscreenBeyondFanControlAutomationsConfig,
@@ -12,7 +11,6 @@ import { APP_SETTINGS_DEFAULT, AppSettings } from '../../../../../../models/sett
 import { hshrink } from '../../../../../../utils/animations';
 import { SET_BRIGHTNESS_OR_CCT_OPTIONS_DEFAULTS } from '../../../../../../services/brightness-control/brightness-control-models';
 import { HardwareBrightnessControlService } from '../../../../../../services/brightness-control/hardware-brightness-control.service';
-import { is_windows } from 'src-ui/app/app.module';
 
 const MIN_SAFE_FAN_SPEED = 40;
 const AUTOMATION_ENABLE_KEYS = ['onSleepEnable', 'onSleepDisable', 'onSleepPreparation'];
@@ -47,19 +45,19 @@ export class HmdAutomationsBigscreenBeyondTabComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    if (is_windows){
-    this.automationConfigService.configs
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((configs) => {
-        this.rgbControlConfig = configs.BIGSCREEN_BEYOND_RGB_CONTROL;
-        this.fanControlConfig = configs.BIGSCREEN_BEYOND_FAN_CONTROL;
-      });
-    this.appSettingsService.settings
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((settings) => {
-        this.appSettings = settings;
-      });
-    }
+    // if (is_windows){
+    // this.automationConfigService.configs
+    //   .pipe(takeUntilDestroyed(this.destroyRef))
+    //   .subscribe((configs) => {
+    //     this.rgbControlConfig = configs.BIGSCREEN_BEYOND_RGB_CONTROL;
+    //     this.fanControlConfig = configs.BIGSCREEN_BEYOND_FAN_CONTROL;
+    //   });
+    // this.appSettingsService.settings
+    //   .pipe(takeUntilDestroyed(this.destroyRef))
+    //   .subscribe((settings) => {
+    //     this.appSettings = settings;
+    //   });
+    // }
   }
 
   async toggleFanAutomation(key: keyof BigscreenBeyondFanControlAutomationsConfig) {

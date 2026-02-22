@@ -23,24 +23,6 @@
               </label>
             </div>
           </div>
-          @if(is_windows){
-          <div class="setting-row">
-            <div class="setting-row-label" translate>
-              <span translate>settings.advanced.application.openVrInitDelayFix.title</span>
-              <span translate>settings.advanced.application.openVrInitDelayFix.description</span>
-            </div>
-            <div class="setting-row-action">
-              <label class="switch-toggle">
-                <input
-                  type="checkbox"
-                  [checked]="openVrInitDelayFix"
-                  (change)="setOpenVrInitDelayFix(!openVrInitDelayFix)"
-                />
-                <span class="switch-toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-        }
         </div>
       </div>
       <div class="setting-category">
@@ -166,25 +148,6 @@
         <h2 translate>settings.advanced.troubleshooting.title</h2>
         <p translate>settings.advanced.troubleshooting.description</p>
         <div class="settings">
-          @if(is_windows){
-          <div class="setting-row">
-            <div class="setting-row-label" translate>
-              <span translate>settings.advanced.troubleshooting.vrManifestReregister.title</span>
-              <span translate
-                >settings.advanced.troubleshooting.vrManifestReregister.description</span
-              >
-            </div>
-            <div class="setting-row-action">
-              <button
-                class="btn btn-primary"
-                (click)="reregisterVRManifest()"
-                [disabled]="(openvr.status | async) !== 'INITIALIZED'"
-              >
-                <span translate>settings.advanced.troubleshooting.vrManifestReregister.action</span>
-              </button>
-            </div>
-          </div>
-        }
           <div class="setting-row">
             <div class="setting-row-label" translate>
               <span translate>settings.advanced.troubleshooting.devTools.title</span>

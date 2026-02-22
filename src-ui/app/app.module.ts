@@ -274,10 +274,7 @@ import { DNDService } from './services/do_not_disturb_service';
   localeUK,
   localeDE,
 ].forEach((locale) => registerLocaleData(locale));
-export var is_windows: boolean = true;
-export async function check_windows() {
-  is_windows = await invoke('is_windows');
-}
+
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
@@ -577,7 +574,6 @@ export class AppModule {
   }
 
   async init() {
-    await check_windows();
     try {
       await pMinDelay(
         (async () => {
@@ -655,7 +651,7 @@ export class AppModule {
             }),
             // Initialize Brightness Control
             await Promise.all([
-              this.logInit('Initializing CCT control', this.cctControlService.init()),
+              // this.logInit('Initializing CCT control', this.cctControlService.init()),
               this.logInit(
                 'Initializing hardware brightness control',
                 this.hardwareBrightnessControlService.init()

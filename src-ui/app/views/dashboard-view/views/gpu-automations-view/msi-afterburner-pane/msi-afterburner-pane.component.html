@@ -1,23 +1,15 @@
 <div class="pane-content">
   <div class="setting-view-container">
     <div class="description-row">
-      @if (is_windows) {
-        <p [innerHtml]="'gpu-automations.msiAfterburner.description' | translate"></p>
-        <img draggable="false" src="/assets/img/afterburner_icon.png" />
-      } @else {
-        <p [innerHtml]="'gpu-automations.lact.description' | translate"></p>
-      }
+      <p [innerHtml]="'gpu-automations.lact.description' | translate"></p>
     </div>
     <h3>Automations</h3>
     <div class="settings">
       <div class="setting-row">
         <div class="setting-row-label" translate>
           <span translate>gpu-automations.lact.sleepModeEnable.title</span>
-          @if (is_windows) {
-            <span translate>gpu-automations.msiAfterburner.sleepModeEnable.description</span>
-          } @else {
-            <span translate>gpu-automations.lact.sleepModeEnable.description</span>
-          }
+
+          <span translate>gpu-automations.lact.sleepModeEnable.description</span>
         </div>
         <div class="setting-row-action">
           <app-select-box
@@ -31,11 +23,8 @@
       <div class="setting-row">
         <div class="setting-row-label" translate>
           <span translate>gpu-automations.lact.sleepPreparation.title</span>
-          @if (is_windows) {
-            <span translate>gpu-automations.msiAfterburner.sleepPreparation.description</span>
-          } @else {
-            <span translate>gpu-automations.lact.sleepPreparation.description</span>
-          }
+
+          <span translate>gpu-automations.lact.sleepPreparation.description</span>
         </div>
         <div class="setting-row-action">
           <app-select-box
@@ -49,11 +38,8 @@
       <div class="setting-row">
         <div class="setting-row-label" translate>
           <span translate>gpu-automations.msiAfterburner.sleepModeDisable.title</span>
-          @if (is_windows) {
-            <span translate>gpu-automations.msiAfterburner.sleepModeEnable.description</span>
-          } @else {
-            <span translate>gpu-automations.lact.sleepModeEnable.description</span>
-          }
+
+          <span translate>gpu-automations.lact.sleepModeEnable.description</span>
         </div>
         <div class="setting-row-action">
           <app-select-box
@@ -71,16 +57,7 @@
         <i class="material-icons">warning</i>
       </div>
       <div class="alert-content flex-row">
-        @if (is_windows) {
-          <div translate>gpu-automations.msiAfterburner.enabledWarning</div>
-        } @else {
-          <div translate>gpu-automations.lact.enabledWarning</div>
-        }
-        @if (is_windows) {
-          <button class="btn btn-secondary" (click)="gpuAutomations.disable()" translate>
-            gpu-automations.disable
-          </button>
-        }
+        <div translate>gpu-automations.lact.enabledWarning</div>
       </div>
     </div>
   </div>

@@ -26,54 +26,28 @@
       <div class="menu-item-icon-prefix"> <i class="material-icons-round">bedtime</i> </div>
       <div class="menu-item-label" translate>comp.dashboard-navbar.sleepDetection</div>
     </div>
-    @if (is_windows) {
-      <div
-        class="menu-item"
-        (click)="openSubMenu('HARDWARE')"
-        [class.active]="
-          pathIsActive([
-            'brightnessAutomations',
-            'powerAutomations',
-            'gpuAutomations',
-            'resolutionAutomations',
-            'audioVolumeAutomations',
-            'systemMicMuteAutomations',
 
-            'hmdAutomations',
-          ])
-        "
-      >
-        <div class="menu-item-icon-prefix">
-          <i class="material-symbols-outlined">head_mounted_device</i>
-        </div>
-        <div class="menu-item-label" translate>comp.dashboard-navbar.hardwareAutomations</div>
-        <div class="menu-item-submenu-icon"
-          ><i class="material-icons-round">arrow_forward_ios</i></div
-        >
+    <div
+      class="menu-item"
+      (click)="openSubMenu('HARDWARE')"
+      [class.active]="
+        pathIsActive([
+          'brightnessAutomations',
+          'powerAutomations',
+          'gpuAutomations',
+          'audioVolumeAutomations',
+          'systemMicMuteAutomations',
+        ])
+      "
+    >
+      <div class="menu-item-icon-prefix">
+        <i class="material-symbols-outlined">head_mounted_device</i>
       </div>
-    } @else {
-      <div
-        class="menu-item"
-        (click)="openSubMenu('HARDWARE')"
-        [class.active]="
-          pathIsActive([
-            'brightnessAutomations',
-            'powerAutomations',
-            'gpuAutomations',
-            'audioVolumeAutomations',
-            'systemMicMuteAutomations',
-          ])
-        "
+      <div class="menu-item-label" translate>comp.dashboard-navbar.hardwareAutomations</div>
+      <div class="menu-item-submenu-icon"
+        ><i class="material-icons-round">arrow_forward_ios</i></div
       >
-        <div class="menu-item-icon-prefix">
-          <i class="material-symbols-outlined">head_mounted_device</i>
-        </div>
-        <div class="menu-item-label" translate>comp.dashboard-navbar.hardwareAutomations</div>
-        <div class="menu-item-submenu-icon"
-          ><i class="material-icons-round">arrow_forward_ios</i></div
-        >
-      </div>
-    }
+    </div>
 
     <div
       class="menu-item"
@@ -98,49 +72,27 @@
         ><i class="material-icons-round">arrow_forward_ios</i></div
       >
     </div>
-    @if (is_windows) {
-      <div
-        class="menu-item"
-        (click)="openSubMenu('MISCELLANEOUS')"
-        [class.active]="
-          pathIsActive([
-            'chaperoneAutomations',
-            'nightmareDetection',
-            'frameLimitAutomations',
-            'runAutomations',
-          ])
-        "
-      >
-        <div class="menu-item-icon-prefix">
-          <i class="material-icons-round">build</i>
-        </div>
-        <div class="menu-item-label" translate>comp.dashboard-navbar.miscAutomations</div>
-        <div class="menu-item-submenu-icon"
-          ><i class="material-icons-round">arrow_forward_ios</i></div
-        >
+
+    <div
+      class="menu-item"
+      (click)="openSubMenu('MISCELLANEOUS')"
+      [class.active]="
+        pathIsActive([
+          'nightmareDetection',
+          'frameLimitAutomations',
+          'runAutomations',
+          'playbackAutomations',
+        ])
+      "
+    >
+      <div class="menu-item-icon-prefix">
+        <i class="material-icons-round">build</i>
       </div>
-    } @else {
-      <div
-        class="menu-item"
-        (click)="openSubMenu('MISCELLANEOUS')"
-        [class.active]="
-          pathIsActive([
-            'nightmareDetection',
-            'frameLimitAutomations',
-            'runAutomations',
-            'playbackAutomations',
-          ])
-        "
+      <div class="menu-item-label" translate>comp.dashboard-navbar.miscAutomations</div>
+      <div class="menu-item-submenu-icon"
+        ><i class="material-icons-round">arrow_forward_ios</i></div
       >
-        <div class="menu-item-icon-prefix">
-          <i class="material-icons-round">build</i>
-        </div>
-        <div class="menu-item-label" translate>comp.dashboard-navbar.miscAutomations</div>
-        <div class="menu-item-submenu-icon"
-          ><i class="material-icons-round">arrow_forward_ios</i></div
-        >
-      </div>
-    }
+    </div>
 
     <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'shutdownAutomations'">
       <div class="menu-item-icon-prefix">
@@ -287,25 +239,12 @@
           <div class="active-effect" @fade></div>
         }
       </div>
-      @if (is_windows) {
-        <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'hmdAutomations'">
-          <div class="menu-item-icon-prefix">
-            <i class="material-symbols-outlined">head_mounted_device</i>
-          </div>
-          <div class="menu-item-label" translate>comp.dashboard-navbar.hmdAutomations</div>
+      <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'audioVolumeAutomations'">
+        <div class="menu-item-icon-prefix">
+          <i class="material-icons-round">volume_up</i>
         </div>
-      }
-        <div
-          class="menu-item"
-          [routerLinkActive]="'active'"
-          [routerLink]="'audioVolumeAutomations'"
-        >
-          <div class="menu-item-icon-prefix">
-            <i class="material-icons-round">volume_up</i>
-          </div>
-          <div class="menu-item-label" translate>comp.dashboard-navbar.audioVolumeAutomations</div>
-        </div>
-      
+        <div class="menu-item-label" translate>comp.dashboard-navbar.audioVolumeAutomations</div>
+      </div>
 
       <div
         class="menu-item"
@@ -317,14 +256,6 @@
         </div>
         <div class="menu-item-label" translate>comp.dashboard-navbar.systemMicMuteAutomations</div>
       </div>
-      @if (is_windows) {
-        <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'resolutionAutomations'">
-          <div class="menu-item-icon-prefix">
-            <i class="material-icons-round">blur_on</i>
-          </div>
-          <div class="menu-item-label" translate>comp.dashboard-navbar.resolutionAutomations</div>
-        </div>
-      }
     </div>
   }
 
@@ -337,14 +268,6 @@
           <div class="menu-header-label" translate>comp.dashboard-navbar.miscAutomations</div>
         </button>
       </div>
-      @if (is_windows) {
-        <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'chaperoneAutomations'">
-          <div class="menu-item-icon-prefix">
-            <i class="material-symbols-outlined">guardian</i>
-          </div>
-          <div class="menu-item-label" translate>comp.dashboard-navbar.chaperoneAutomations</div>
-        </div>
-      }
       <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'nightmareDetection'">
         <div class="menu-item-icon-prefix">
           <i class="material-icons-round">notification_important</i>
@@ -361,15 +284,17 @@
         </div>
         <div class="menu-item-label" translate>comp.dashboard-navbar.runAutomations</div>
       </div>
-      @if (!is_windows) {
-        <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'playbackAutomations'">
-          <div class="menu-item-icon-prefix">
-            <i class="material-icons-round">play_circle</i>
-          </div>
-          <div class="menu-item-label" translate>comp.dashboard-navbar.playbackAutomations</div>
+      <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'playbackAutomations'">
+        <div class="menu-item-icon-prefix">
+          <i class="material-icons-round">play_circle</i>
         </div>
-      }
-      <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="'notificationsAutomations'">
+        <div class="menu-item-label" translate>comp.dashboard-navbar.playbackAutomations</div>
+      </div>
+      <div
+        class="menu-item"
+        [routerLinkActive]="'active'"
+        [routerLink]="'notificationsAutomations'"
+      >
         <div class="menu-item-icon-prefix">
           <i class="material-icons-round">notifications</i>
         </div>
@@ -403,18 +328,6 @@
         </div>
         <div class="menu-item-label" translate>comp.dashboard-navbar.settings.notifications</div>
       </div>
-      @if (is_windows){
-      <div
-        class="menu-item"
-        [routerLinkActive]="'active'"
-        [routerLink]="['settings', 'brightnessCct']"
-      >
-        <div class="menu-item-icon-prefix">
-          <i class="material-icons-round">brightness_6</i>
-        </div>
-        <div class="menu-item-label" translate>comp.dashboard-navbar.settings.brightnessCct</div>
-      </div>
-    }
       <div class="menu-item" [routerLinkActive]="'active'" [routerLink]="['settings', 'hotkeys']">
         <div class="menu-item-icon-prefix">
           <i class="material-icons-round">keyboard</i>

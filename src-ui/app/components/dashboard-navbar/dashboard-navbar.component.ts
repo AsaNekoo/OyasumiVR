@@ -8,7 +8,6 @@ import { BrightnessCctAutomationService } from '../../services/brightness-cct-au
 import { ModalService } from 'src-ui/app/services/modal.service';
 import { DeveloperDebugModalComponent } from '../developer-debug-modal/developer-debug-modal.component';
 import { UpdateService } from 'src-ui/app/services/update.service';
-import { check_windows, is_windows } from 'src-ui/app/app.module';
 
 function slideMenu(name = 'slideMenu', length = '.2s ease', root = true) {
   return trigger(name, [
@@ -124,29 +123,23 @@ type SubMenu = 'GENERAL' | 'VRCHAT' | 'HARDWARE' | 'MISCELLANEOUS' | 'SETTINGS';
     slideMenu('subMenu', '.2s ease', false),
   ],
   standalone: false,
- 
 })
 export class DashboardNavbarComponent implements OnInit {
   subMenu: SubMenu = 'GENERAL';
   updateAvailable: Observable<boolean>;
-  is_windows:boolean=true;
   constructor(
     private updateService: UpdateService,
     protected router: Router,
     protected background: BackgroundService,
     protected brightnessAutomation: BrightnessCctAutomationService,
     private modalService: ModalService,
-    
+
     private destroyRef: DestroyRef
   ) {
     this.updateAvailable = this.updateService.updateAvailable.pipe(map((a) => !!a.update));
   }
 
-  async ngOnInit(): Promise<void> {
-    await check_windows();
-    this.is_windows=is_windows;
-
-  }
+  async ngOnInit(): Promise<void> {}
 
   logoClicked = 0;
 

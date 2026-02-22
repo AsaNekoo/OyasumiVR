@@ -18,7 +18,6 @@ import { ModalService } from 'src-ui/app/services/modal.service';
 import { LANGUAGES } from '../../../../globals';
 import { vshrink } from '../../../../utils/animations';
 import { OVRInputEventAction } from 'src-ui/app/models/ovr-input-event';
-import { is_windows } from 'src-ui/app/app.module';
 
 @Component({
   selector: 'app-settings-general-view',
@@ -93,7 +92,6 @@ export class SettingsGeneralViewComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.is_windows = is_windows;
     this.settingsService.settings
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((settings) => (this.appSettings = settings));
