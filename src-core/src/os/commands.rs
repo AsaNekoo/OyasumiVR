@@ -117,22 +117,6 @@ pub async fn set_system_power_policy(name: String) {
     }
 }
 #[tauri::command]
-pub async fn set_power_policy_provider(name: String) {
-    //  if let Some(manager)=get_power_manager().await{
-    //     manager.set_policy(guid).await;
-    // }
-    // LINUX_POWER_POLICY_MANAGER.lock().await.set_provider(name);
-}
-#[tauri::command]
-pub async fn get_power_policy_providers() -> Vec<String> {
-    // use crate::os::linux::power_managment::LINUX_POWER_POLICY_MANAGER;
-
-    // LINUX_POWER_POLICY_MANAGER.lock().await.get_providers()
-    let mut a = Vec::new();
-    a.push("aa".to_string());
-    a
-}
-#[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn active_system_power_policy() -> Option<SystemPowerPolicy> {
     let current = get_power_manager().await?.get_current_profile().await?;

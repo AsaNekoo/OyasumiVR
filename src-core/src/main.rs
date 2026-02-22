@@ -353,9 +353,6 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         grpc::commands::get_core_grpc_port,
         grpc::commands::get_core_grpc_web_port,
         vrcx::commands::vrcx_log,
-        os::commands::set_power_policy_provider,
-        os::commands::get_power_policy_providers,
-        // os::commands::n_os_is_inhibited,
         os::commands::n_os_inhibit,
         os::commands::n_os_un_inhibit,
     ]
