@@ -1,8 +1,8 @@
 use crate::{
     vr::{
+        SLEEP_DETECTION_ENABLED,
         model::{OVRDevice, OVRFrameLimits, SleepState},
         openxr::SLEEP_DETECTOR,
-        SLEEP_DETECTION_ENABLED,
     },
     warn_unimplemented,
 };
@@ -16,12 +16,10 @@ pub async fn set_sleep_state(state: SleepState) {
 }
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
-pub async fn vr_set_app_framelimit(
-    app_id: u32,
-    limits: Option<OVRFrameLimits>,
-) -> Result<(), String> {
-    crate::os::linux::mangohud::limit_frame_rate(app_id, limits).await;
-    Ok(())
+pub async fn vr_set_app_framelimit(app_id: u32, limits: Option<OVRFrameLimits>) {
+    if let Err(err) = crate::os::linux::mangohud::limit_frame_rate(app_id, limits).await {
+        log::error!("failed to set frame limit with: {:?}", err);
+    }
 }
 
 #[tauri::command]
@@ -97,7 +95,6 @@ pub async fn vr_set_image_brightness(
 ) {
     super::openxr::set_brightness(brightness, perceived_brightness_adjustment_gamma).await;
 }
-
 
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
