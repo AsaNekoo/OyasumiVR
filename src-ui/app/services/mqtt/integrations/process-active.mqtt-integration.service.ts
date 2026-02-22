@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MqttDiscoveryService } from '../mqtt-discovery.service';
 import { VRChatService } from '../../vrchat-api/vrchat.service';
-import { OpenVRService } from '../../openvr.service';
+import { VRService } from '../../openvr.service';
 import { distinctUntilChanged } from 'rxjs';
 
 @Injectable({
@@ -11,7 +11,7 @@ export class ProcessActiveMqttIntegrationService {
   constructor(
     private mqtt: MqttDiscoveryService,
     private vrchat: VRChatService,
-    private openvr: OpenVRService
+    private openvr: VRService
   ) {}
 
   async init() {
@@ -26,7 +26,7 @@ export class ProcessActiveMqttIntegrationService {
       type: 'SENSOR',
       id: 'steamvrActive',
       topicPath: 'steamvrActive',
-      displayName: 'SteamVR Running',
+      displayName: 'VR Running',
       value: 'off',
     });
     this.vrchat.vrchatProcessActive.pipe(distinctUntilChanged()).subscribe((active) => {

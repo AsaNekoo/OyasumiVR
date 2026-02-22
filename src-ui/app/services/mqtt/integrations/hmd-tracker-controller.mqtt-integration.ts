@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MqttDiscoveryService } from '../mqtt-discovery.service';
-import { OpenVRService } from '../../openvr.service';
+import { VRService } from '../../openvr.service';
 import { LighthouseConsoleService } from '../../lighthouse-console.service';
 import {
   asyncScheduler,
@@ -28,7 +28,7 @@ export class HmdTrackerControllerMqttIntegrationService {
 
   constructor(
     private mqtt: MqttDiscoveryService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private lighthouseConsole: LighthouseConsoleService
   ) {}
 

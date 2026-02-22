@@ -50,17 +50,17 @@ OyasumiVR可以根据你的动作自动检测你何时入睡！只需一次校�
   <li>在特定时间自动启用/禁用睡眠模式</li>
   <li>根据控制器和追踪器的电量启用/禁用睡眠模式</li>
   <li>根据控制器和追踪器的开关状态来启用/禁用睡眠模式</li>
-  <li>根据SteamVR的状态来进行模式切换</li>
+  <li>根据VR的状态来进行模式切换</li>
   <li>Heart Rate</li>
   <li>Sitting Upright</li>
   <li>VRChat players joining or leaving</li>
 </ul>
 
 {{STEAMVR_OVERLAY_HEADER}}
-📲 SteamVR叠加层
+📲 VR叠加层
 
 {{STEAMVR_OVERLAY_BODY}}
-OyasumiVR拥有自己的SteamVR叠加层界面，可以让你在VR里玩游戏时控制一些功能！
+OyasumiVR拥有自己的VR叠加层界面，可以让你在VR里玩游戏时控制一些功能！
 <br><br>
 默认情况下，双击你右手控制器上的A按钮，它就会在你面前出现。
 
@@ -76,14 +76,14 @@ OyasumiVR拥有自己的SteamVR叠加层界面，可以让你在VR里玩游戏�
 此外，你可以在控制器或追踪器的电量降低到一定程度时，或者当你把它们放在充电座上时，让它们自动关闭。这对于支持热插拔的控制器来说是非常好的方式
 
 {{POWER_AUTOMATIONS_BODY_WINDOWS_POWER_POLICY}}
-<b>Windows电源策略</b>
+<b>System电源策略</b>
 <br>
-通过在你睡觉（和醒来时）自动设置Windows的电源策略，节省一些电量！只需在你睡觉时设置一个更保守的策略（如"省电模式"），然后在你醒来时恢复更高性能的策略。
+通过在你睡觉（和醒来时）自动设置System的电源策略，节省一些电量！只需在你睡觉时设置一个更保守的策略（如"省电模式"），然后在你醒来时恢复更高性能的策略。
 
 {{POWER_AUTOMATIONS_BODY_BASE_STATIONS}}
 <b>基站</b>
 <br>
-让OyasumiVR与SteamVR一起打开和关闭你的基站。有点像SteamVR自己的基站电源管理，但是<b>它与任何HMD兼容！</b>只要你的PC支持蓝牙并且在基站的信号范围内，这个功能就可以正常使用。
+让OyasumiVR与VR一起打开和关闭你的基站。有点像VR自己的基站电源管理，但是<b>它与任何HMD兼容！</b>只要你的PC支持蓝牙并且在基站的信号范围内，这个功能就可以正常使用。
 
 {{GPU_AUTOMATIONS_HEADER}}
 🔌 GPU自动化
@@ -161,13 +161,13 @@ OyasumiVR可以检测你的心率，如果你的心率持续升高，这可能�
 👓 分辨率自动化
 
 {{RESOLUTION_AUTOMATIONS_BODY}}
-让OyasumiVR在你睡觉（或者醒来时），自动调整你的SteamVR渲染分辨率！这可以帮助你在不需要的时候减少对硬件的负载。
+让OyasumiVR在你睡觉（或者醒来时），自动调整你的VR渲染分辨率！这可以帮助你在不需要的时候减少对硬件的负载。
 
 {{CHAPERONE_AUTOMATIONS_HEADER}}
 🔳 保护墙自动化
 
 {{CHAPERONE_AUTOMATIONS_BODY}}
-当你睡觉时，自动调整SteamVR保护墙的淡出距离。如果你的游戏区域很小，你可以使用这个功能。然后在睡着时隐藏保护墙。等你醒来的时候再重新显示出来。
+当你睡觉时，自动调整VR保护墙的淡出距离。如果你的游戏区域很小，你可以使用这个功能。然后在睡着时隐藏保护墙。等你醒来的时候再重新显示出来。
 
 {{TRANSLATION_AND_LOCALIZATION_HEADER}}
 翻译和本地化翻译与本地化
@@ -194,7 +194,7 @@ OyasumiVR目前支持以下语言：OyasumiVR 目前支持以下语言：
 电池自动化
 
 {{SUPPORTED_HARDWARE_BATTERY_AUTOMATIONS_BODY}}
-目前，OyasumiVR支持所有通过SteamVR报告电池电量、充电状态，以及支持通过SteamVR关闭的设备的电池自动化功能。这包括但不限于以下设备：
+目前，OyasumiVR支持所有通过VR报告电池电量、充电状态，以及支持通过VR关闭的设备的电池自动化功能。这包括但不限于以下设备：
 
 - HTC Vive控制器
 - Index控制器/ Knuckles
@@ -290,7 +290,7 @@ Oyasumi VR 完全且永久免费。不过，如果你愿意支持我继续开发
 🎮 设备控制
 
 {{DEVICE_CONTROL_BODY}}
-Oyasumi VR 可以让你轻松控制许多 SteamVR 设备，例如控制器、追踪器和基站。
+Oyasumi VR 可以让你轻松控制许多 VR 设备，例如控制器、追踪器和基站。
 <br><br>
 只需点击一次，你就可以轻松确认电池电量、充电状态，或者开关你的基站。
 
@@ -326,8 +326,8 @@ Oyasumi VR 支持在你准备睡觉时，或者检测到你睡着、睡醒时自
 <ul>
   <li>关闭控制器 / 追踪器</li>
   <li>关闭基站</li>
-  <li>关闭SteamVR <i>(以及SteamVR游戏和覆盖层)</i></li>
-  <li>关闭Windows</li>
+  <li>关闭VR <i>(以及VR游戏和覆盖层)</i></li>
+  <li>关闭System</li>
 </ul>
 <br>
 当设置好关机序列后，你就可以在VR里安心睡着而不需要担心你的电费了！
@@ -372,7 +372,7 @@ OyasumiVR 支持控制多种头显的功能，目前包括：
 头显亮度控制功能目前只支持 Valve Index 和 Bigscreen Beyond。
 
 {{MQTT_CONTROL_BODY}}
-OyasumiVR 可以通过 MQTT 向 Home Assistant 联动自身的许多功能，也可以联动 SteamVR 的功能！
+OyasumiVR 可以通过 MQTT 向 Home Assistant 联动自身的许多功能，也可以联动 VR 的功能！
 这让你可以将 OyasumiVR 与家中各种智能设备联动，还可以在 Home Assistant 中构建出强大的自动化流程。
 例如，当你入睡时自动关闭智能灯，或在需要时重新开启它们！
 
@@ -420,10 +420,10 @@ OyasumiVR 可以通过 MQTT 向 Home Assistant 联动自身的许多功能，也
 </tr>
 <tr>
   <td>
-    <b>SteamVR 功能</b>
+    <b>VR 功能</b>
     <ul>
       <li>VR 头显型号（传感器）</li>
-      <li>SteamVR 是否运行中（传感器）</li>
+      <li>VR 是否运行中（传感器）</li>
       <li>
         控制器和追踪器
         <ul>
@@ -450,7 +450,7 @@ OyasumiVR 可以通过 MQTT 向 Home Assistant 联动自身的许多功能，也
 色温自动化
 
 {{SUPPORTED_HARDWARE_CCT_BODY}}
-控制 VR 头显屏幕的色温功能，目前仅支持部分原生 SteamVR 头显，例如 Valve Index、Bigscreen Beyond 以及 HTC Vive（Pro）。
+控制 VR 头显屏幕的色温功能，目前仅支持部分原生 VR 头显，例如 Valve Index、Bigscreen Beyond 以及 HTC Vive（Pro）。
 在其他头显上可能也能使用，但效果无法保证。
 
 {{TELEMETRY_HEADER}}

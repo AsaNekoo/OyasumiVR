@@ -13,7 +13,7 @@ import {
 } from 'rxjs';
 import { isEqual, omit } from 'lodash';
 import { invoke } from '@tauri-apps/api/core';
-import { OpenVRService } from './openvr.service';
+import { VRService } from './openvr.service';
 
 export interface FrameLimiterAppPreset {
   appLabel: string;
@@ -50,7 +50,7 @@ export class FrameLimiterService {
 
   constructor(
     private automationConfig: AutomationConfigService,
-    private openvr: OpenVRService
+    private openvr: VRService
   ) {}
 
   public async init() {

@@ -75,7 +75,7 @@
       "title": "日没"
     },
     "HMD_CONNECT": {
-      "title": "SteamVR接続時"
+      "title": "VR接続時"
     },
     "SLEEP_MODE_DISABLE": {
       "title": "起床時"
@@ -121,8 +121,8 @@
       "description": "ディスプレイの輝度を調整します",
       "title": "ハードウェアの輝度を調整する"
     },
-    "hmdConnectEventTooltip": "適用中\nHMDがSteamVRに接続されたときに適用されます",
-    "hmdConnectPotentialEventTooltip": "未適用\nHMDがSteamVRに接続されたときに適用されます",
+    "hmdConnectEventTooltip": "適用中\nHMDがVRに接続されたときに適用されます",
+    "hmdConnectPotentialEventTooltip": "未適用\nHMDがVRに接続されたときに適用されます",
     "miscConfig": "その他の設定",
     "mode": {
       "advanced": "高度",
@@ -154,7 +154,7 @@
     }
   },
   "chaperone-automations": {
-    "description": "SteamVRのガーディアンのフェード距離を自動的に調整します。",
+    "description": "VRのガーディアンのフェード距離を自動的に調整します。",
     "fadeDistance": {
       "title": "ガーディアンのフェード距離"
     },
@@ -190,19 +190,19 @@
       "dropdown": {
         "description": "バインドの設定を開く",
         "desktop": "デスクトップモード",
-        "vr": "SteamVRモード"
+        "vr": "VRモード"
       },
       "errors": {
         "DASHBOARD_OPEN": {
-          "message": "SteamVR\nダッシュボードが開いています",
-          "tooltip": "バインドを表示するにはSteamVRダッシュボードを閉じてください"
+          "message": "VR\nダッシュボードが開いています",
+          "tooltip": "バインドを表示するにはVRダッシュボードを閉じてください"
         },
         "MISSING_CONTROLLER": {
           "tooltip": "左右のコントローラーが接続されていることを確認してください"
         },
         "STEAMVR_INACTIVE": {
-          "message": "SteamVRがオフラインです",
-          "tooltip": "コントローラーバインドを表示または変更するには\nSteamVRが実行中である必要があります"
+          "message": "VRがオフラインです",
+          "tooltip": "コントローラーバインドを表示または変更するには\nVRが実行中である必要があります"
         },
         "UNKNOWN": {
           "message": "バインディングを設定"
@@ -470,8 +470,8 @@
             "MANUAL": "手動でオンにした",
             "OYASUMI_START": "OyasumiVRの起動に合わせて",
             "SLEEP_MODE_DISABLED": "睡眠モードが無効になった",
-            "STEAMVR_START": "SteamVRの起動に合わせて",
-            "STEAMVR_STOP": "SteamVRが停止した"
+            "STEAMVR_START": "VRの起動に合わせて",
+            "STEAMVR_STOP": "VRが停止した"
           }
         },
         "msiAfterburnerProfileSet": {
@@ -495,8 +495,8 @@
             "SLEEP_MODE_ENABLED": "睡眠モードが有効になった"
           },
           "title": {
-            "auto": "SteamVRのレンダリング解像度を「自動」に設定",
-            "custom": "SteamVRのレンダリング解像度を{value}に設定"
+            "auto": "VRのレンダリング解像度を「自動」に設定",
+            "custom": "VRのレンダリング解像度を{value}に設定"
           }
         },
         "runAutomationExecuted": {
@@ -505,7 +505,7 @@
             "SLEEP_MODE_ENABLED": "睡眠モードが有効になった",
             "SLEEP_PREPARATION": "就寝準備をした"
           },
-          "title": "ユーザー定義コマンドをWindowsコマンドプロンプトで実行"
+          "title": "ユーザー定義コマンドをSystemコマンドプロンプトで実行"
         },
         "shutdownSequenceCancelled": {
           "reason": {
@@ -542,7 +542,7 @@
           "reason": {
             "automation": {
               "NIGHTMARE_DETECTION": "悪夢を見ていると判断された",
-              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "SteamVRの終了による",
+              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "VRの終了による",
               "SLEEP_MODE_DISABLE_AFTER_TIME": "時間経過による",
               "SLEEP_MODE_DISABLE_AT_TIME": "予定時刻による",
               "SLEEP_MODE_DISABLE_ON_DEVICE_POWER_ON": "デバイスの電源が入った",
@@ -605,7 +605,7 @@
           },
           "title": "VRChatステータスを{oldStatus}から{newStatus}に変更"
         },
-        "turnedOffOpenVRDevices": {
+        "turnedOffVRDevices": {
           "reason": {
             "BATTERY_LEVEL": "バッテリー残量が{threshold}%未満に低下したため",
             "CHARGING": "充電器に接続された",
@@ -657,7 +657,7 @@
             "SLEEP_MODE_DISABLED": "睡眠モードが無効になった",
             "SLEEP_MODE_ENABLED": "睡眠モードが有効になった"
           },
-          "title": "Windowsの電源プランを{policy}に設定"
+          "title": "Systemの電源プランを{policy}に設定"
         }
       }
     },
@@ -688,7 +688,7 @@
           "title": "GPU制御"
         },
         "RUN_AUTOMATIONS": {
-          "description": "Windowsコマンドプロンプトに関連するログ",
+          "description": "Systemコマンドプロンプトに関連するログ",
           "title": "コマンドプロンプト"
         },
         "SHUTDOWN_SEQUENCE": {
@@ -700,8 +700,8 @@
           "title": "睡眠モード"
         },
         "STEAMVR_SETTINGS": {
-          "description": "SteamVR設定の変更（レンダリング解像度やフェード距離など）に関連するログ",
-          "title": "SteamVR設定"
+          "description": "VR設定の変更（レンダリング解像度やフェード距離など）に関連するログ",
+          "title": "VR設定"
         },
         "VRCHAT_AVATAR": {
           "description": "VRChatアバターの変更に関連するログ",
@@ -720,8 +720,8 @@
           "title": "VRChatステータス"
         },
         "WINDOWS_POWER_POLICY": {
-          "description": "Windowsの電源プラン変更に関連するログ",
-          "title": "Windows電源プラン"
+          "description": "Systemの電源プラン変更に関連するログ",
+          "title": "System電源プラン"
         }
       },
       "selectAll": "すべて選択",
@@ -768,8 +768,8 @@
           "detectBasestationDesc": "HMD, コントローラーまたはトラッカーがベースステーションを認識できることを確認してください",
           "deviceDetected": "デバイスが検出されました",
           "running": "実行中",
-          "startSteamVR": "SteamVRを起動",
-          "waitingForSteamVR": "SteamVRの起動を待機中……"
+          "startVR": "VRを起動",
+          "waitingForVR": "VRの起動を待機中……"
         }
       },
       "detectAutomatically": "自動検出",
@@ -958,8 +958,8 @@
       "defaultPlaceholder": "選択する"
     },
     "start-with-steamvr-how-to-modal": {
-      "description": "SteamVR -> 設定 -> スタートアップ/シャットダウン -> スタートアップオーバーレイアプリを選択",
-      "title": "SteamVRと一緒にOyasumiVRを起動"
+      "description": "VR -> 設定 -> スタートアップ/シャットダウン -> スタートアップオーバーレイアプリを選択",
+      "title": "VRと一緒にOyasumiVRを起動"
     },
     "update-modal": {
       "message": "OyasumiVRの新しいアップデートが見つかりました: v{newVersion}\n\n現在、v{currentVersion}を利用しています。\n\n今すぐアップデートしますか、それとも後ほどアップデートしますか？",
@@ -1127,7 +1127,7 @@
     },
     "addLimiter": "アプリの追加",
     "description": "フレーム制限を自動的に変更します。就寝中などにフレームレートを下げ、省電力化できます。",
-    "directControlRequiresSteamVR": "フレーム制限を制御するにはSteamVRを起動してください。",
+    "directControlRequiresVR": "フレーム制限を制御するにはVRを起動してください。",
     "frameLimits": "フレーム制限",
     "noLimits": "設定されたアプリはありません",
     "onSleepDisable": "起床時",
@@ -1136,11 +1136,11 @@
     "removeLimiter": "削除",
     "selector": {
       "auto": "自動",
-      "autoDescription": "SteamVRが最適なフレームレートを判断します。",
+      "autoDescription": "VRが最適なフレームレートを判断します。",
       "disabled": "変更しない",
       "noLimit": "無制限"
     },
-    "steamvrRequired": "SteamVRが起動しているとき、HMDに応じた正確なフレーム制限を表示できます。SteamVRを起動してください。",
+    "steamvrRequired": "VRが起動しているとき、HMDに応じた正確なフレーム制限を表示できます。VRを起動してください。",
     "supportedHardwareWarning": "サポートされているHMD(Valve Index, Bigscreen Beyond)でのみ利用可能です。",
     "title": "フレーム制御の自動化"
   },
@@ -1777,7 +1777,7 @@
           "onSleepModeDisable": "起床時",
           "onSleepModeEnable": "睡眠時",
           "onSleepPreparation": "就寝準備時",
-          "onSteamVRStop": "SteamVRを停止したとき",
+          "onVRStop": "VRを停止したとき",
           "onlyWhileSleepModeEnabled": "睡眠モード有効時"
         }
       },
@@ -1788,7 +1788,7 @@
         "triggers": {
           "onOyasumiStart": "OyasumiVRを起動したとき",
           "onSleepModeDisable": "起床時",
-          "onSteamVRStart": "SteamVRを起動したとき"
+          "onVRStart": "VRを起動したとき"
         }
       }
     },
@@ -1796,15 +1796,15 @@
       "adapterError": "Bluetoothアダプターとの通信を試みている間にエラーが発生しました。Bluetoothアダプターが有効になっていることを確認し、再度お試しください。",
       "noAdapter": "お使いのシステムでBluetoothアダプターが見つかりませんでした。システムにBluetoothアダプターが搭載され、有効になっているかを確認してください。"
     },
-    "powerManagementWarning": "OyasumiVRでベースステーションの電源を自動化する場合、SteamVRの設定でベースステーションの電源管理を無効にすることを推奨します。",
+    "powerManagementWarning": "OyasumiVRでベースステーションの電源を自動化する場合、VRの設定でベースステーションの電源管理を無効にすることを推奨します。",
     "tabs": {
       "devices": "デバイス",
       "windowsPowerPolicy": "電源オプション"
     },
     "title": "電源の自動化",
     "windowsPowerPolicy": {
-      "automations": "Windows電源プランの自動化",
-      "description": "Windowsの電源プランを自動的に変更する設定です。睡眠時の消費電力を削減し、起床時に元のプランへ復元するのに使用します。",
+      "automations": "System電源プランの自動化",
+      "description": "Systemの電源プランを自動的に変更する設定です。睡眠時の消費電力を削減し、起床時に元のプランへ復元するのに使用します。",
       "sleepModeDisable": {
         "description": "次の電源プランを適用します",
         "title": "睡眠モード無効時"
@@ -1824,7 +1824,7 @@
     }
   },
   "resolution-automations": {
-    "description": "SteamVRのレンダリング解像度を自動的に調整します。",
+    "description": "VRのレンダリング解像度を自動的に調整します。",
     "onSleepDisable": {
       "description": "レンダリング解像度を調整する",
       "title": "起床時"
@@ -1842,7 +1842,7 @@
   },
   "runAutomations": {
     "commandsToRun": "コマンド",
-    "description": "Windowsコマンドプロンプト経由でコマンドを自動実行できます。\n\nコマンドはcmd.exeを通じて実行されます。",
+    "description": "Systemコマンドプロンプト経由でコマンドを自動実行できます。\n\nコマンドはcmd.exeを通じて実行されます。",
     "onSleepDisable": {
       "description": "コマンドを実行します",
       "title": "起床時"
@@ -1862,8 +1862,8 @@
     "advanced": {
       "application": {
         "openVrInitDelayFix": {
-          "description": "SteamVRが検出された後、OyasumiVRは少し待ってから処理を開始します。",
-          "title": "OpenVR初期化の遅延"
+          "description": "VRが検出された後、OyasumiVRは少し待ってから処理を開始します。",
+          "title": "VR初期化の遅延"
         },
         "overlayGpuAcceleration": {
           "description": "オーバーレイが正しく描画されない場合、この設定を無効にすると一部の環境（例：ハイブリッドGPU）で問題が解決することがあります。",
@@ -1965,7 +1965,7 @@
         "title": "トラブルシューティング",
         "vrManifestReregister": {
           "action": "マニフェストの再登録",
-          "description": "OyasumiVRのアプリケーションマニフェストをSteamVRに再登録します",
+          "description": "OyasumiVRのアプリケーションマニフェストをVRに再登録します",
           "modal": {
             "FLAVOUR_NOT_ELIGIBLE": {
               "message": "OyasumiVRの非対応ビルド（たとえば、Steam版）を使用しているため、アプリケーションマニフェストは登録解除されましたが、再登録されませんでした。これはエラーではありません。OyasumiVRを再起動してください。",
@@ -1992,11 +1992,11 @@
               "title": "VRアプリケーションマニフェストの再登録失敗"
             },
             "success": {
-              "message": "OyasumiVRのマニフェストはSteamVRに正常に再登録されました。",
+              "message": "OyasumiVRのマニフェストはVRに正常に再登録されました。",
               "title": "VRアプリケーションマニフェストの再登録成功"
             }
           },
-          "title": "SteamVRアプリケーションマニフェストの再登録"
+          "title": "VRアプリケーションマニフェストの再登録"
         }
       }
     },
@@ -2046,7 +2046,7 @@
         "title": "言語"
       },
       "lighthouseConsole": {
-        "description": "SteamVRの<strong>lighthouse_console.exe</strong>が格納されているフォルダを指定する必要があります。\nデフォルトのフォルダにない場合は手動で指定してください。",
+        "description": "VRの<strong>lighthouse_console.exe</strong>が格納されているフォルダを指定する必要があります。\nデフォルトのフォルダにない場合は手動で指定してください。",
         "status": {
           "CHECKING": "有効な<strong>lighthouse_console.exe</strong>であるかどうか確認中です。",
           "INVALID_EXECUTABLE": "この場所にある<strong>lighthouse_console.exe</strong>が機能していることを確認できませんでした。",
@@ -2075,11 +2075,11 @@
           },
           "title": "優先する電源オフ状態"
         },
-        "title": "SteamVRベースステーションの電源制御"
+        "title": "VRベースステーションの電源制御"
       },
       "overlay": {
         "binding": {
-          "description": "オーバーレイメニューを表示させるボタンはSteamVRのバインディングメニューで設定できます",
+          "description": "オーバーレイメニューを表示させるボタンはVRのバインディングメニューで設定できます",
           "title": "コントローラーバインディング"
         },
         "onlyOpenMenuWhenVRChatRunning": {
@@ -2116,14 +2116,14 @@
       "startStop": {
         "title": "起動と終了"
       },
-      "startWithSteamVR": {
-        "description": "SteamVRが起動したときにOyasumiVRを起動します",
+      "startWithVR": {
+        "description": "VRが起動したときにOyasumiVRを起動します",
         "howTo": "詳細",
-        "label": "SteamVRと起動"
+        "label": "VRと起動"
       },
-      "stopWithSteamVR": {
-        "description": "SteamVRが一定の時間停止したときにOyasumiVRを終了します",
-        "label": "SteamVRと終了",
+      "stopWithVR": {
+        "description": "VRが一定の時間停止したときにOyasumiVRを終了します",
+        "label": "VRと終了",
         "options": {
           "AFTERDELAY": "2分後",
           "DISABLED": "無効",
@@ -2302,14 +2302,14 @@
     "overlay": {
       "cancel": "キャンセル",
       "stage": {
-        "POWERING_DOWN": "Windowsをシャットダウン中……",
-        "QUITTING_STEAMVR": "SteamVRを終了……",
+        "POWERING_DOWN": "Systemをシャットダウン中……",
+        "QUITTING_STEAMVR": "VRを終了……",
         "TURNING_OFF_DEVICES": "デバイスをオフ……"
       },
       "title": "シャットダウン"
     },
     "sequence": {
-      "powerDownWindows": {
+      "powerDownSystem": {
         "description": "コンピューターの電源をオフにします",
         "options": {
           "HIBERNATE": "休止状態",
@@ -2320,16 +2320,16 @@
         },
         "rebootMessage": "OyasumiVRがPCを再起動しています",
         "shutdownMessage": "OyasumiVRがPCをシャットダウンしています",
-        "title": "Windowsをシャットダウンする"
+        "title": "Systemをシャットダウンする"
       },
-      "quitSteamVR": {
+      "quitVR": {
         "conflict": {
-          "description": "SteamVRが停止されたときにOyasumiVRがすぐに終了するように設定されています。そのため、その後の自動化が実行されない可能性があります。これを修正するには、このタスクを無効にするか、一般設定でSteamVRが停止されたときにOyasumiVRをすぐに終了しないように設定してください。",
+          "description": "VRが停止されたときにOyasumiVRがすぐに終了するように設定されています。そのため、その後の自動化が実行されない可能性があります。これを修正するには、このタスクを無効にするか、一般設定でVRが停止されたときにOyasumiVRをすぐに終了しないように設定してください。",
           "goToSettings": "一般設定へ",
           "title": "警告：このタスクを実行するとOyasumiVRがすぐに終了します"
         },
         "description": "実行中のゲームやオーバーレイも終了します",
-        "title": "SteamVRを終了する"
+        "title": "VRを終了する"
       },
       "run": "シャットダウン実行",
       "title": "シャットダウン実行のアクション",
@@ -2404,7 +2404,7 @@
       "description": "任意の設定に基づいて睡眠モードを無効にします。",
       "onDevicePowerOn": "デバイスの電源がオンになったとき",
       "onPlayerJoinOrLeave": "他のプレイヤーがJoin、退出したとき",
-      "onSteamVRStop": "SteamVRを終了したとき",
+      "onVRStop": "VRを終了したとき",
       "onUprightPose": "睡眠後、起き上がっているとき"
     },
     "enableAutomations": {
@@ -2582,7 +2582,7 @@
           "stepPrefix": "キャリブレーション手順は以下の通りです。",
           "stepSuffix": "完了すると寝落ち検知機能が使用できるようになります。"
         },
-        "noSteamVR": "HMDを装着した状態でSteamVRを起動している必要があります。",
+        "noVR": "HMDを装着した状態でVRを起動している必要があります。",
         "prepare": {
           "instruction": "HMDを装着して、寝る姿勢になりましょう。",
           "note": "準備が整えば、オーバーレイなどで開始ボタンを押してください。"

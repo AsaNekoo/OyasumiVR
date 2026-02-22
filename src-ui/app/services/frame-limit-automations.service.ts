@@ -12,7 +12,7 @@ import {
   pairwise,
   skip,
 } from 'rxjs';
-import { OpenVRService } from './openvr.service';
+import { VRService } from './openvr.service';
 import { FrameLimitConfigOption } from '../models/automations';
 import { SleepPreparationService } from './sleep-preparation.service';
 import { EventLogFrameLimitChanged } from '../models/event-log-entry';
@@ -24,7 +24,7 @@ export class FrameLimitAutomationsService {
   constructor(
     private automationConfigService: AutomationConfigService,
     private sleepService: SleepService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private sleepPreparationService: SleepPreparationService,
     private eventLog: EventLogService,
     private frameLimiterService: FrameLimiterService

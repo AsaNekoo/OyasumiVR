@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { QuitWithSteamVRMode } from '../models/settings';
+import { QuitWithVRMode } from '../models/settings';
 import { AppSettingsService } from './app-settings.service';
-import { OpenVRService } from './openvr.service';
+import { VRService } from './openvr.service';
 import { debounceTime, EMPTY, filter, firstValueFrom, of, pairwise, switchMap } from 'rxjs';
 import { exit } from '@tauri-apps/plugin-process';
 import { info } from '@tauri-apps/plugin-log';
@@ -9,17 +9,17 @@ import { info } from '@tauri-apps/plugin-log';
 @Injectable({
   providedIn: 'root',
 })
-export class QuitWithSteamVRService {
-  private mode: QuitWithSteamVRMode = 'DISABLED';
+export class QuitWithVRService {
+  private mode: QuitWithVRMode = 'DISABLED';
 
   constructor(
     private appSettings: AppSettingsService,
-    private openvr: OpenVRService
+    private openvr: VRService
   ) {}
 
   async init() {
     this.appSettings.settings.subscribe((settings) => {
-      this.mode = settings.quitWithSteamVR;
+      this.mode = settings.quitWithVR;
     });
     this.openvr.status
       .pipe(
@@ -29,7 +29,7 @@ export class QuitWithSteamVRService {
         switchMap(async () => {
           if (this.mode === 'AFTERDELAY') return of(void 0);
           if (this.mode === 'IMMEDIATELY') {
-            info('[QuitWithSteamVR] SteamVR has stopped: quitting OyasumiVR immediately.');
+            info('[QuitWithVR] VR has stopped: quitting OyasumiVR immediately.');
             await exit(0);
           }
           return EMPTY;
@@ -40,7 +40,7 @@ export class QuitWithSteamVRService {
             this.mode === 'AFTERDELAY' &&
             (await firstValueFrom(this.openvr.status)) === 'INACTIVE'
           ) {
-            info('[QuitWithSteamVR] SteamVR has stopped for 2 minutes: quitting OyasumiVR.');
+            info('[QuitWithVR] VR has stopped for 2 minutes: quitting OyasumiVR.');
             await exit(0);
           }
           return EMPTY;

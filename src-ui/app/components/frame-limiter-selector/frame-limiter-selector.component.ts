@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged, map } from 'rxjs';
 import { FrameLimitConfigOption, FrameLimitConfigOptions } from 'src-ui/app/models/automations';
 import { TString } from 'src-ui/app/models/translatable-string';
-import { OpenVRService } from 'src-ui/app/services/openvr.service';
+import { VRService } from 'src-ui/app/services/openvr.service';
 import { vshrink } from 'src-ui/app/utils/animations';
 
 @Component({
@@ -22,7 +22,7 @@ export class FrameLimiterSelectorComponent implements OnInit {
   frameLimitConfigOptions = FrameLimitConfigOptions.filter((o) => o !== 'DISABLED');
 
   constructor(
-    private readonly openvr: OpenVRService,
+    private readonly openvr: VRService,
     private destroyRef: DestroyRef
   ) {}
 

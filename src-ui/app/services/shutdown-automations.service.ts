@@ -23,7 +23,7 @@ import {
 import { AUTOMATION_CONFIGS_DEFAULT, ShutdownAutomationsConfig } from '../models/automations';
 import { isEqual } from 'lodash';
 import { AppSettingsService } from './app-settings.service';
-import { OpenVRService } from './openvr.service';
+import { VRService } from './openvr.service';
 import { LighthouseConsoleService } from './lighthouse-console.service';
 import { LighthouseService } from './lighthouse.service';
 import { invoke } from '@tauri-apps/api/core';
@@ -74,7 +74,7 @@ export class ShutdownAutomationsService {
     private sleepService: SleepService,
     private automationConfigService: AutomationConfigService,
     private appSettings: AppSettingsService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private lighthouseConsole: LighthouseConsoleService,
     private lighthouse: LighthouseService,
     private eventLog: EventLogService,
@@ -172,8 +172,8 @@ export class ShutdownAutomationsService {
   getApplicableStages(): ShutdownSequenceStage[] {
     const stages: ShutdownSequenceStage[] = [];
     if (this.turnOffKnownDevices.length) stages.push('TURNING_OFF_DEVICES');
-    if (this.config.quitSteamVR) stages.push('QUITTING_STEAMVR');
-    if (this.config.powerDownWindows) stages.push('POWERING_DOWN');
+    if (this.config.quitVR) stages.push('QUITTING_STEAMVR');
+    if (this.config.powerDownSystem) stages.push('POWERING_DOWN');
     return stages;
   }
 
@@ -201,8 +201,8 @@ export class ShutdownAutomationsService {
       stages,
     } as EventLogShutdownSequenceStarted);
     if (!(await this.turnOffDevices())) return;
-    if (!(await this.quitSteamVR())) return;
-    if (!(await this.powerDownWindows())) return;
+    if (!(await this.quitVR())) return;
+    if (!(await this.powerDownSystem())) return;
     this._stage.next('IDLE');
     this.cancelFlag = false;
   }
@@ -276,13 +276,13 @@ export class ShutdownAutomationsService {
     return nowMinutes <= endMinutes || nowMinutes >= startMinutes;
   }
 
-  private async quitSteamVR() {
+  private async quitVR() {
     if (this.cancelFlag) {
       this.cancelFlag = false;
       this._stage.next('IDLE');
       return false;
     }
-    if (!this.config.quitSteamVR) return true;
+    if (!this.config.quitVR) return true;
     this._stage.next('QUITTING_STEAMVR');
     // Quit steam
     await invoke('quit_steamvr', { kill: false });
@@ -373,20 +373,20 @@ export class ShutdownAutomationsService {
     return true;
   }
 
-  private async powerDownWindows(): Promise<boolean> {
+  private async powerDownSystem(): Promise<boolean> {
     if (this.cancelFlag) {
       this.cancelFlag = false;
       this._stage.next('IDLE');
       return false;
     }
-    if (!this.config.powerDownWindows) return true;
+    if (!this.config.powerDownSystem) return true;
     this._stage.next('POWERING_DOWN');
     // Power down windows
-    switch (this.config.powerDownWindowsMode) {
+    switch (this.config.powerDownSystemMode) {
       case 'SHUTDOWN':
         await invoke('system_shutdown', {
           message: this.translate.instant(
-            'shutdown-automations.sequence.powerDownWindows.shutdownMessage'
+            'shutdown-automations.sequence.powerDownSystem.shutdownMessage'
           ),
           timeout: 20,
           forceCloseApps: true,
@@ -396,7 +396,7 @@ export class ShutdownAutomationsService {
       case 'REBOOT':
         await invoke('system_reboot', {
           message: this.translate.instant(
-            'shutdown-automations.sequence.powerDownWindows.rebootMessage'
+            'shutdown-automations.sequence.powerDownSystem.rebootMessage'
           ),
           timeout: 20,
           forceCloseApps: true,

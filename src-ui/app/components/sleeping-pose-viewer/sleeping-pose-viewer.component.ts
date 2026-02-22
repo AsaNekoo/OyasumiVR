@@ -12,7 +12,7 @@ import * as THREE from 'three';
 import { Object3D, PerspectiveCamera, Vector3, WebGLRenderer } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { OpenVRService } from '../../services/openvr.service';
+import { VRService } from '../../services/openvr.service';
 import { combineLatest, filter, map } from 'rxjs';
 import { SleepService } from '../../services/sleep.service';
 import { VRDevicePose } from '../../models/ovr-device';
@@ -34,7 +34,7 @@ export class SleepingPoseViewerComponent implements AfterViewInit {
   protected sleepingPose: SleepingPose = 'UNKNOWN';
 
   constructor(
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private sleep: SleepService,
     private cdr: ChangeDetectorRef,
     private elementRef: ElementRef,

@@ -1,20 +1,10 @@
 use lact_client::DaemonClient;
 use log::warn;
-use tokio::task::LocalSet;
 
 use crate::{utils::send_event, Models::elevated_sidecar::GpuProfileError};
-unsafe impl<T> Send for SendWapper<T> {}
-pub struct SendWapper<T> {
-    inner: T,
-}
 
 pub async fn init() {
     send_event("ELEVATED_SIDECAR_STARTED", 0).await;
-    // let h=tokio::runtime::Handle::current();
-    // h.spa
-
-    // tokio::task::spawn( tokio::task::LocalSet::new().run_until(spawn_local(inner())));
-    // let local = tokio::task::LocalSet::new()
 }
 //fixme: fix this attrocity
 pub async fn set_lact_profile(profile: String) -> Result<bool, GpuProfileError> {

@@ -68,7 +68,7 @@ export class EventLogFilterDialogComponent
     },
     {
       id: 'DEVICE_POWER',
-      eventLogTypes: ['turnedOffOpenVRDevices', 'lighthouseSetPowerState'],
+      eventLogTypes: ['turnedOffVRDevices', 'lighthouseSetPowerState'],
     },
     {
       id: 'GPU_CONTROL',

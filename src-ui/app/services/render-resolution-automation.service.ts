@@ -12,7 +12,7 @@ import {
   skip,
 } from 'rxjs';
 import { EventLogRenderResolutionChanged } from '../models/event-log-entry';
-import { OpenVRService } from './openvr.service';
+import { VRService } from './openvr.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +21,7 @@ export class RenderResolutionAutomationService {
   constructor(
     private automationConfigService: AutomationConfigService,
     private sleepService: SleepService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private eventLog: EventLogService
   ) {}
   //not called

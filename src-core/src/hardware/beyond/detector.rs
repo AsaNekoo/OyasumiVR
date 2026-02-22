@@ -106,7 +106,7 @@ impl PnPDetector {
         }
     }
 
-    /// Detect USB events: just run a Windows event loop
+    /// Detect USB events: just run a System event loop
     fn detect(&self) {
         unsafe {
             let mut msg: MSG = std::mem::MaybeUninit::zeroed().assume_init();
@@ -131,7 +131,7 @@ impl PnPDetector {
     ) -> LRESULT {
         match msg {
             WM_CREATE => {
-                use windows::Win32::UI::WindowsAndMessaging::CREATESTRUCTW;
+                use windows::Win32::UI::SystemAndMessaging::CREATESTRUCTW;
                 let create_struct = lparam.0 as *mut CREATESTRUCTW;
                 let window_state_ptr = create_struct.as_ref().unwrap().lpCreateParams;
                 SetWindowLongPtrW(hwnd, GWLP_USERDATA, window_state_ptr as isize);

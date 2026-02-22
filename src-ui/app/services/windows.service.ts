@@ -12,7 +12,7 @@ interface SystemPowerPolicy {
 @Injectable({
   providedIn: 'root',
 })
-export class WindowsService {
+export class SystemService {
   private _policies = new BehaviorSubject<SystemPowerPolicy[]>([]);
   public readonly policies = this._policies.asObservable();
 
@@ -35,7 +35,7 @@ export class WindowsService {
     const currentPolicy = await this.getPowerPolicy();
     if (currentPolicy?.name !== name) {
       error(
-        `[Windows] Likely failed to set windows power policy: The newly fetched policy does not match the policy that was just set. (Set Policy = ${name}, Actual Policy = ${currentPolicy?.name})`
+        `[System] Likely failed to set windows power policy: The newly fetched policy does not match the policy that was just set. (Set Policy = ${name}, Actual Policy = ${currentPolicy?.name})`
       );
     } else if (currentPolicy) {
       this.eventLog.logEvent({

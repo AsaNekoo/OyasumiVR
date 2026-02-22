@@ -74,7 +74,7 @@
       "title": "Bei Sonnenuntergang"
     },
     "HMD_CONNECT": {
-      "title": "Wenn das Headset mit SteamVR verbunden wird"
+      "title": "Wenn das Headset mit VR verbunden wird"
     },
     "SLEEP_MODE_DISABLE": {
       "title": "Wenn ich aufwache"
@@ -150,7 +150,7 @@
     }
   },
   "chaperone-automations": {
-    "description": "OyasumiVR kann die Aktivationsdistanz von SteamVRs Chaperone automatisch anpassen währed der Schlafmodus aktiv oder inaktiv ist",
+    "description": "OyasumiVR kann die Aktivationsdistanz von VRs Chaperone automatisch anpassen währed der Schlafmodus aktiv oder inaktiv ist",
     "fadeDistance": {
       "title": "Setze die Chaperone-Aktivationsdistanz auf"
     },
@@ -186,19 +186,19 @@
       "dropdown": {
         "description": "Tastenzuweisungseinstellungen öffnen",
         "desktop": "Desktop-Modus",
-        "vr": "SteamVR-Modus"
+        "vr": "VR-Modus"
       },
       "errors": {
         "DASHBOARD_OPEN": {
-          "message": "SteamVR Dashboard öffnen",
-          "tooltip": "Schließe das SteamVR Dashboard um Tastenbelegungen zu sehen"
+          "message": "VR Dashboard öffnen",
+          "tooltip": "Schließe das VR Dashboard um Tastenbelegungen zu sehen"
         },
         "MISSING_CONTROLLER": {
           "tooltip": "Stelle sicher, dass sowohl der rechte als auch der linke Controller verbunden ist"
         },
         "STEAMVR_INACTIVE": {
-          "message": "SteamVR Inaktiv",
-          "tooltip": "Um Tastenbelgungen zu sehen oder zu ändern muss SteamVR laufen"
+          "message": "VR Inaktiv",
+          "tooltip": "Um Tastenbelgungen zu sehen oder zu ändern muss VR laufen"
         },
         "UNKNOWN": {
           "message": "Tastenbelgungen ändern"
@@ -427,8 +427,8 @@
             "MANUAL": "Manuell eingeschaltet",
             "OYASUMI_START": "Da OyasumiVR gestartet ist",
             "SLEEP_MODE_DISABLED": "Da der Schlafmodus ausgeschaltet war",
-            "STEAMVR_START": "Da SteamVR gestartet ist",
-            "STEAMVR_STOP": "Da SteamVR gestoppt ist"
+            "STEAMVR_START": "Da VR gestartet ist",
+            "STEAMVR_STOP": "Da VR gestoppt ist"
           }
         },
         "msiAfterburnerProfileSet": {
@@ -452,8 +452,8 @@
             "SLEEP_MODE_ENABLED": "Da der Schlafmodus eingeschaltet war"
           },
           "title": {
-            "auto": "SteamVR-Renderauflösung auf \"auto\" gesetzt",
-            "custom": "SteamVR-Renderauflösung auf {value} gesetzt"
+            "auto": "VR-Renderauflösung auf \"auto\" gesetzt",
+            "custom": "VR-Renderauflösung auf {value} gesetzt"
           }
         },
         "shutdownSequenceCancelled": {
@@ -491,7 +491,7 @@
           "reason": {
             "automation": {
               "NIGHTMARE_DETECTION": "Da erkannt wurde, dass du einen Albtraum haben könntest",
-              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "Da SteamVR geschlossen wurde",
+              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "Da VR geschlossen wurde",
               "SLEEP_MODE_DISABLE_AFTER_TIME": "Da der Schlafmodus lang genug eingeschaltet war",
               "SLEEP_MODE_DISABLE_AT_TIME": "Bei der festgelegten Zeit",
               "SLEEP_MODE_DISABLE_ON_DEVICE_POWER_ON": "Da ein Gerät eingeschaltet war",
@@ -552,7 +552,7 @@
           },
           "title": "Dein VRChat Status wurde von {oldStatus} zu {newStatus} geändert"
         },
-        "turnedOffOpenVRDevices": {
+        "turnedOffVRDevices": {
           "reason": {
             "BATTERY_LEVEL": "Weil deine Battery unter {threshold}% gefallen ist",
             "CHARGING": "Da das Gerät auflädt",
@@ -593,7 +593,7 @@
             "SLEEP_MODE_DISABLED": "Da der Schlafmodus ausgeschaltet war",
             "SLEEP_MODE_ENABLED": "Da der Schlafmodus eingeschaltet war"
           },
-          "title": "Windows Energieplan wurde zu ''{policy} geändert"
+          "title": "System Energieplan wurde zu ''{policy} geändert"
         }
       }
     },
@@ -628,8 +628,8 @@
           "title": "Schlafmodus"
         },
         "STEAMVR_SETTINGS": {
-          "description": "Events mit Bezug zu Änderungen der SteamVR Einstellungen, wie zum Beispiel Auflösung und Fade Distanz",
-          "title": "SteamVR Einstellungen"
+          "description": "Events mit Bezug zu Änderungen der VR Einstellungen, wie zum Beispiel Auflösung und Fade Distanz",
+          "title": "VR Einstellungen"
         },
         "VRCHAT_AVATAR": {
           "description": "Events mit Bezug zu OyasumiVRs Änderungen zu deinem VRChat Avatar",
@@ -644,8 +644,8 @@
           "title": "VRChat Status"
         },
         "WINDOWS_POWER_POLICY": {
-          "description": "Events mit Bezug zu Änderungen im Windows Energieplan",
-          "title": "Windows Energieplan"
+          "description": "Events mit Bezug zu Änderungen im System Energieplan",
+          "title": "System Energieplan"
         }
       },
       "selectAll": "Alles Auswählen",
@@ -692,8 +692,8 @@
           "detectBasestationDesc": "Stelle sicher, dass du Headset, Kontroller oder Tracker die Basisstationen sehen können",
           "deviceDetected": "Geräte erkannt",
           "running": "Läuft",
-          "startSteamVR": "Starte SteamVR",
-          "waitingForSteamVR": "Warte auf den Start von SteamVr..."
+          "startVR": "Starte VR",
+          "waitingForVR": "Warte auf den Start von SteamVr..."
         }
       },
       "detectAutomatically": "Automatisch Feststellen",
@@ -881,8 +881,8 @@
       "defaultPlaceholder": "Auswählen..."
     },
     "start-with-steamvr-how-to-modal": {
-      "description": "Du kannst OyasumiVR so einstellen, dass es zusammen mit SteamVR startet innerhalb der SteamVR inernen Einstellungen. Du kannst diese hier finden:\n\nEnglish\nSteamVR -> Settings -> Startup / Shutdown -> Choose startup overlay apps\n\nDeutsch\nSteamVR-> Einstellungen -> Start / Beenden ->\nStartanwendung für Overlay auswählen",
-      "title": "OyasumiVR mit SteamVR starten"
+      "description": "Du kannst OyasumiVR so einstellen, dass es zusammen mit VR startet innerhalb der VR inernen Einstellungen. Du kannst diese hier finden:\n\nEnglish\nVR -> Settings -> Startup / Shutdown -> Choose startup overlay apps\n\nDeutsch\nVR-> Einstellungen -> Start / Beenden ->\nStartanwendung für Overlay auswählen",
+      "title": "OyasumiVR mit VR starten"
     },
     "update-modal": {
       "message": "Ein neues Update für OyasumiVR wurde gefunden:\nv{newVersion}.\n\nDu hast immernoch Version v{currentVersion}.\n\nMöchstest du jetzt oder später updaten?",
@@ -1197,7 +1197,7 @@
     "GORONE_LEGACY_PRESET_WARNING": "Version v4.0 und höher dieser Voreinstellung beinhalten bereits Drehfunktionen und sind nicht kompatibel mit dieser Voreinstellung. Die Voreinstellung ist immernoch verfühbar wenn dein Avatar eine ältere Version dieser Voreinstellung verwendet",
     "oneTimeFlagDialogs": {
       "CCT_CONTROL_WARNING_DIALOG": {
-        "message": "Bitte beachten , dass die Steuerung der Farbtemperatur der Anzeige nur mit bestimmten nativen SteamVR-Headsets verfügbar ist, z. B. dem Valve Index, Bigscreen Beyond oder HTC Vive (Pro).\n\nWenn keines dieser Headsets verwenden, wird diese Funktion wahrscheinlich keine Auswirkungen für Sie haben.\n\nSie können die Steuerung der Farbtemperatur in den Einstellungen deaktivieren, wenn Sie dies wünschen.",
+        "message": "Bitte beachten , dass die Steuerung der Farbtemperatur der Anzeige nur mit bestimmten nativen VR-Headsets verfügbar ist, z. B. dem Valve Index, Bigscreen Beyond oder HTC Vive (Pro).\n\nWenn keines dieser Headsets verwenden, wird diese Funktion wahrscheinlich keine Auswirkungen für Sie haben.\n\nSie können die Steuerung der Farbtemperatur in den Einstellungen deaktivieren, wenn Sie dies wünschen.",
         "title": "Feature Verfügbarkeit"
       },
       "acknowledge": "Ich verstehe"
@@ -1434,20 +1434,20 @@
       "adapterError": "Ein Fehler ist bei der Kommunikation mit deinem Bluetoothadapter eingetreten. Bitte stelle sicher, dass dieser funktioniert.",
       "noAdapter": "Kein Bluetoothadapter konnte gefunden werden. Bitte stelle sicher, dass einer in deinem System integriert, angeschlossen und aktiviert ist."
     },
-    "powerManagementWarning": "Für die Verwendung der OyasumiVR Automationen um deine Basisstationen aus oder an zu schalten wird empfohlen, dass du dein Energiemangement in den SteamVR Basistationseinstellungen deaktivierst.",
+    "powerManagementWarning": "Für die Verwendung der OyasumiVR Automationen um deine Basisstationen aus oder an zu schalten wird empfohlen, dass du dein Energiemangement in den VR Basistationseinstellungen deaktivierst.",
     "tabs": {
       "windowsPowerPolicy": "Energieeinstellungen"
     },
     "title": "Energie-Automatisierungen",
     "windowsPowerPolicy": {
       "automations": "Automatisierungen",
-      "description": "OyasumiVR kann automatisch deine Windows Energieeinstellungen ändern wenn du einschläfst oder aufwachst. Dies spart Strom und kann beim Aufwachen die leistungsstärken Einstellungen auswählen.",
+      "description": "OyasumiVR kann automatisch deine System Energieeinstellungen ändern wenn du einschläfst oder aufwachst. Dies spart Strom und kann beim Aufwachen die leistungsstärken Einstellungen auswählen.",
       "sleepModeDisable": {
-        "description": "Folgende Windows Energieeinstellungen festlegen",
+        "description": "Folgende System Energieeinstellungen festlegen",
         "title": "Wenn Schlafmodus deaktiviert ist"
       },
       "sleepModeEnable": {
-        "description": "Folgende Windows Energieeinstellungen festlegen",
+        "description": "Folgende System Energieeinstellungen festlegen",
         "title": "Wenn der Schlafmodus eingeschaltet ist"
       }
     }
@@ -1461,7 +1461,7 @@
     }
   },
   "resolution-automations": {
-    "description": "OyasumiVR kann automatisch deine render Auflösung von SteamVR anpassen, wenn der Schlafmodus de- oder aktiviert wird.",
+    "description": "OyasumiVR kann automatisch deine render Auflösung von VR anpassen, wenn der Schlafmodus de- oder aktiviert wird.",
     "onSleepDisable": {
       "description": "Render Auflösung anpassen",
       "title": "Wenn ich aufwache"
@@ -1571,7 +1571,7 @@
         },
         "vrManifestReregister": {
           "action": "Neuangelegtes Manifest",
-          "description": "Neuangelegte OyasumiVR Anwendungs Manifest mit SteamVR",
+          "description": "Neuangelegte OyasumiVR Anwendungs Manifest mit VR",
           "modal": {
             "FLAVOUR_NOT_ELIGIBLE": {
               "message": "Da du eine nicht berechtigte Version von OyasumiVR verwendest (Zum Beispiel die Steam Version) konnte das Anwendungsmanifest zwar unregistriert, aber nicht neu registriert werden. Dies ist ein Fehler! Bitte starte OyasumiVR neu.",
@@ -1582,11 +1582,11 @@
               "title": "Neuanlegung des VR Anwendungsmanifestes fehlgeschlagen"
             },
             "MANIFEST_CHECK_FAILED": {
-              "message": "Es konnte nicht geprüft werden, ob das OyasumiVR Manifst bereits mit SteamVR registriert wurde. Bitte starte OyasumiVR neu und prüfe den Verlauf.",
+              "message": "Es konnte nicht geprüft werden, ob das OyasumiVR Manifst bereits mit VR registriert wurde. Bitte starte OyasumiVR neu und prüfe den Verlauf.",
               "title": "Neuanlegung des VR Anwendungsmanifestes fehlgeschlagen"
             },
             "MANIFEST_NOT_REGISTERED": {
-              "message": "OyasumiVR hat kein registriertes Manifest mit SteamVR. Es wurde nich neuregistriert. Bitte starte OyasumiVR neu.",
+              "message": "OyasumiVR hat kein registriertes Manifest mit VR. Es wurde nich neuregistriert. Bitte starte OyasumiVR neu.",
               "title": "Neuanlegung des VR Anwendungsmanifestes fehlgeschlagen"
             },
             "MANIFEST_REMOVE_FAILED": {
@@ -1598,11 +1598,11 @@
               "title": "Neuanlegung des VR Anwendungsmanifestes fehlgeschlagen"
             },
             "success": {
-              "message": "OyasumiVRs Manifest wurde erfolgreich neuregistriert mit SteamVR.",
+              "message": "OyasumiVRs Manifest wurde erfolgreich neuregistriert mit VR.",
               "title": "Neuanlegung des VR Anwendungsmanifestes durchgeführt"
             }
           },
-          "title": "Neuregistrierung des SteamVR Anwendungsmanifest"
+          "title": "Neuregistrierung des VR Anwendungsmanifest"
         }
       }
     },
@@ -1652,7 +1652,7 @@
         "title": "Sprache"
       },
       "lighthouseConsole": {
-        "description": "OyasumiVR muss wissen wo genau SteamVR installiert ist <strong>lighthouse_console.exe</strong>.\nWenn OyasumiVR dern Ort nicht anhand des standardmäßigen Ortes bestimmen kann, muss du diesen selbst angeben.",
+        "description": "OyasumiVR muss wissen wo genau VR installiert ist <strong>lighthouse_console.exe</strong>.\nWenn OyasumiVR dern Ort nicht anhand des standardmäßigen Ortes bestimmen kann, muss du diesen selbst angeben.",
         "status": {
           "CHECKING": "Prüfe gültige <strong>lighthouse_console.exe</strong>",
           "INVALID_EXECUTABLE": "Die <strong>lighthouse_console.exe</strong> an diesen Speicherort konnte nicht als funktionierend verifiziert werden",
@@ -1681,11 +1681,11 @@
           },
           "title": "Bevorzugter Status (An/Aus)"
         },
-        "title": "SteamVR Basisstationenkontrolle"
+        "title": "VR Basisstationenkontrolle"
       },
       "overlay": {
         "binding": {
-          "description": "Der Knopf, der das Overlay Menu öffnet kann im SteamVR Tastenbelegungsmenu angepasst werden.",
+          "description": "Der Knopf, der das Overlay Menu öffnet kann im VR Tastenbelegungsmenu angepasst werden.",
           "title": "Kontrollertastenzuweisung"
         },
         "onlyOpenMenuWhenVRChatRunning": {
@@ -1722,14 +1722,14 @@
       "startStop": {
         "title": "Start und Stop"
       },
-      "startWithSteamVR": {
-        "description": "Starte OyasumiVR, wenn SteamVR startet",
+      "startWithVR": {
+        "description": "Starte OyasumiVR, wenn VR startet",
         "howTo": "Wie macht man",
-        "label": "Starte mit SteamVR"
+        "label": "Starte mit VR"
       },
-      "stopWithSteamVR": {
-        "description": "OyasumiVR mit SteamVR schließen",
-        "label": "Mit SteamVR schließen",
+      "stopWithVR": {
+        "description": "OyasumiVR mit VR schließen",
+        "label": "Mit VR schließen",
         "options": {
           "AFTERDELAY": "Nach 2 Minuten",
           "DISABLED": "Deaktiviert",
@@ -1900,13 +1900,13 @@
     "overlay": {
       "cancel": "Jetzt Abbrechen",
       "stage": {
-        "POWERING_DOWN": "Fahre Windows herunter...",
-        "QUITTING_STEAMVR": "Schließe SteamVR..."
+        "POWERING_DOWN": "Fahre System herunter...",
+        "QUITTING_STEAMVR": "Schließe VR..."
       },
       "title": "Herunterfahren"
     },
     "sequence": {
-      "powerDownWindows": {
+      "powerDownSystem": {
         "description": "Versuche den PC herunterzufahren",
         "options": {
           "HIBERNATE": "Einfrieren",
@@ -1917,16 +1917,16 @@
         },
         "rebootMessage": "OyasumiVR startet deinen PC neu",
         "shutdownMessage": "OyasumiVR fährt deinen PC herunter",
-        "title": "Windows herunterfahren"
+        "title": "System herunterfahren"
       },
-      "quitSteamVR": {
+      "quitVR": {
         "conflict": {
-          "description": "Du hast OyasumiVR so eingestellt, dass es sich gemeinsam mit SteamVR schließt. Deswegen können legliche folgenden Automationen nicht ausgeführt werden. Um dies zu behebn musst du entweder diese Funktion deaktivieren oder das gemeinsame Schließen deaktivieren.",
+          "description": "Du hast OyasumiVR so eingestellt, dass es sich gemeinsam mit VR schließt. Deswegen können legliche folgenden Automationen nicht ausgeführt werden. Um dies zu behebn musst du entweder diese Funktion deaktivieren oder das gemeinsame Schließen deaktivieren.",
           "goToSettings": "Generelle Einstellungen",
           "title": "Warnung: Wenn du diese Aktion startest wird OyasumiVR sofort beendet"
         },
         "description": "Dies sollte jedes aktive Overlay oder Spiel schließen",
-        "title": "SteamVR schließen"
+        "title": "VR schließen"
       },
       "run": "Sequenz srarten",
       "title": "Herunterfahrsequenzaktionen",
@@ -2001,7 +2001,7 @@
       "description": "Schalte den Schlafmodus basierend auf verschiedenen anderen Trigger aus",
       "onDevicePowerOn": "Wenn ein Gerät angeschaltet wird",
       "onPlayerJoinOrLeave": "Wenn ein VRChat Spieler meiner Welt beitritt / diese verlässt",
-      "onSteamVRStop": "Wenn SteamVR ausgeschaltet wird",
+      "onVRStop": "Wenn VR ausgeschaltet wird",
       "onUprightPose": "Wenn ich aufstehe nachdem ich geliegen habe"
     },
     "enableAutomations": {
@@ -2179,7 +2179,7 @@
           "stepPrefix": "Die Kalibrierung funktioniert folgend:",
           "stepSuffix": "Super! Nach der Kalibrierung sollte OyasumiVR anhand der Bewegungen deines VR-Headsets erkennen können, ob du eingeschlafen bist."
         },
-        "noSteamVR": "Du kannst die Kalibrierung nur starten, wenn SteamVR aktiv ist und dein VR-Headset verbunden ist.",
+        "noVR": "Du kannst die Kalibrierung nur starten, wenn VR aktiv ist und dein VR-Headset verbunden ist.",
         "prepare": {
           "instruction": "Zieh dein VR-Headset an und lege dich hin.",
           "note": "Sobald du bereit bist kannst du ein Fenster in deinem Overlay sehen, dass 'Starte Kalibrierung' sagt um anzufangen."

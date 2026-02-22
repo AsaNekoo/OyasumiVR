@@ -219,7 +219,7 @@ async fn app_setup(app_handle: tauri::AppHandle) {
     grpc::init_server().await;
     grpc::init_web_server().await;
 
-    // Initialize OpenVR Manager
+    // Initialize VR Manager
     vr::init().await;
     // Initialize Image Cache
     image_cache::init(cache_dir).await;

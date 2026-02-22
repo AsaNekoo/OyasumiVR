@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, Observable, pairwise, startWith } from 'rxjs';
-import { OpenVRService } from './openvr.service';
+import { VRService } from './openvr.service';
 import { AppSettingsService } from './app-settings.service';
 import { invoke } from '@tauri-apps/api/core';
 import { OVRDevice } from '../models/ovr-device';
@@ -18,7 +18,7 @@ export class LighthouseConsoleService {
 
   constructor(
     private appSettings: AppSettingsService,
-    private openvr: OpenVRService
+    private openvr: VRService
   ) {
     this.init();
   }

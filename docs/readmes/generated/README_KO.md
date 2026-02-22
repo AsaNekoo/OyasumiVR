@@ -167,9 +167,9 @@ OyasumiVR에는 자체 SteamVR 오버레이가 제공되어 VR 내에서 일부 
   </tr>
   <tr>
     <td>
-<b>Windows 전력 정책</b>
+<b>System 전력 정책</b>
 <br>
-잠을 자거나 깨어날 때 Windows의 전원 정책을 자동으로 설정하여 전기를 절약하세요! 잠을 잘 때는 더 엄격한 정책(예: "절전")을 설정했다가 다시 깨어나면 더 높은 성능의 정책으로 복원하기만 하면 됩니다. 
+잠을 자거나 깨어날 때 System의 전원 정책을 자동으로 설정하여 전기를 절약하세요! 잠을 잘 때는 더 엄격한 정책(예: "절전")을 설정했다가 다시 깨어나면 더 높은 성능의 정책으로 복원하기만 하면 됩니다. 
     </td>
     <td width="380"><img src="https://github.com/Raphiiko/OyasumiVR/assets/111654848/05398894-a058-4715-b66a-067857b90e43"></td>
   </tr>
@@ -327,7 +327,7 @@ Depending on which actions you configure, it will do any of the following:
   <li>Turn off your controllers and/or Trackers</li>
   <li>Turn off your Base Stations</li>
   <li>Quit SteamVR <i>(And any running game or overlay along with it)</i></li>
-  <li>Shut down Windows</li>
+  <li>Shut down System</li>
 </ul>
 <br>
 With the shutdown sequence configured, you can fall asleep soundly in VR, knowing that everything will shut down when you don't need to be in VR anymore!

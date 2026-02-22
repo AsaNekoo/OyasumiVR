@@ -4,7 +4,7 @@ import {
   OscGeneralAutomationConfig,
 } from '../../../../models/automations';
 
-import { OpenVRService } from '../../../../services/openvr.service';
+import { VRService } from '../../../../services/openvr.service';
 import { AutomationConfigService } from '../../../../services/automation-config.service';
 import { OscScript } from '../../../../models/osc-script';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -21,7 +21,7 @@ export class OscAutomationsViewComponent implements OnInit {
   );
 
   constructor(
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private automationConfigService: AutomationConfigService,
     private destroyRef: DestroyRef
   ) {}

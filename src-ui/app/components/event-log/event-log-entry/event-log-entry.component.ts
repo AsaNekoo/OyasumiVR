@@ -2,7 +2,7 @@ import { Component, DestroyRef, Input, OnChanges, OnInit } from '@angular/core';
 import { EventLogEntryParser } from './event-log-entry-parser';
 import { EventLogSleepModeEnabledEntryParser } from './entry-parsers/sleep-mode-enabled';
 import { EventLogSleepModeDisabledEntryParser } from './entry-parsers/sleep-mode-disabled';
-import { EventLogTurnedOffOpenVRDevicesEntryParser } from './entry-parsers/openvr-device-turned-off';
+import { EventLogTurnedOffVRDevicesEntryParser } from './entry-parsers/openvr-device-turned-off';
 import { EventLogGpuPowerLimitChangedEntryParser } from './entry-parsers/gpu-power-limit-changed';
 import { EventLogAcceptedInviteRequestEntryParser } from './entry-parsers/accepted-invite-request';
 import { EventLogDeclinedInviteRequestEntryParser } from './entry-parsers/declined-invite-request';
@@ -52,7 +52,7 @@ export class EventLogEntryComponent implements OnInit, OnChanges {
   private readonly parsers: EventLogEntryParser<EventLogEntry>[] = [
     new EventLogSleepModeEnabledEntryParser(),
     new EventLogSleepModeDisabledEntryParser(),
-    new EventLogTurnedOffOpenVRDevicesEntryParser(),
+    new EventLogTurnedOffVRDevicesEntryParser(),
     new EventLogLighthouseSetPowerStateEntryParser(),
     new EventLogGpuPowerLimitChangedEntryParser(),
     new EventLogSimpleBrightnessChangedEntryParser(),

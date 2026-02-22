@@ -6,7 +6,7 @@ import {
 } from '../../../../../../models/automations';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SelectBoxItem } from '../../../../../../components/select-box/select-box.component';
-import { WindowsService } from '../../../../../../services/windows.service';
+import { SystemService } from '../../../../../../services/windows.service';
 import { combineLatest, tap } from 'rxjs';
 
 @Component({
@@ -50,7 +50,7 @@ export class PowerPolicyTabComponent implements OnInit {
   constructor(
     private automationConfigService: AutomationConfigService,
     private destroyRef: DestroyRef,
-    private windowsService: WindowsService
+    private windowsService: SystemService
   ) {}
 
   async ngOnInit() {

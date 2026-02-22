@@ -9,7 +9,7 @@ import {
   DMDeviceTypes,
 } from 'src-ui/app/models/device-manager';
 import { DeviceManagerService } from 'src-ui/app/services/device-manager.service';
-import { OpenVRService } from 'src-ui/app/services/openvr.service';
+import { VRService } from 'src-ui/app/services/openvr.service';
 import { LighthouseService } from 'src-ui/app/services/lighthouse.service';
 import { OVRDevice } from 'src-ui/app/models/ovr-device';
 import { LighthouseDevice } from 'src-ui/app/models/lighthouse-device';
@@ -58,7 +58,7 @@ export class DeviceSelectorModalComponent
 
   constructor(
     private deviceManager: DeviceManagerService,
-    private openVRService: OpenVRService,
+    private openVRService: VRService,
     private lighthouseService: LighthouseService,
     private destroyRef: DestroyRef
   ) {
@@ -275,7 +275,7 @@ export class DeviceSelectorModalComponent
 
   getDeviceOVR(device: DMKnownDevice): OVRDevice | undefined {
     if (!device.id.startsWith('OVR_')) return undefined;
-    return this.ovrDevices.find((d) => this.deviceManager['getIdForOpenVRDevice'](d) === device.id);
+    return this.ovrDevices.find((d) => this.deviceManager['getIdForVRDevice'](d) === device.id);
   }
 
   getDeviceLighthouse(device: DMKnownDevice): LighthouseDevice | undefined {

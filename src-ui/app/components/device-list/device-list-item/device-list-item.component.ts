@@ -5,7 +5,7 @@ import { LighthouseConsoleService } from '../../../services/lighthouse-console.s
 import { error } from '@tauri-apps/plugin-log';
 import {
   EventLogLighthouseSetPowerState,
-  EventLogTurnedOffOpenVRDevices,
+  EventLogTurnedOffVRDevices,
 } from '../../../models/event-log-entry';
 import { EventLogService } from '../../../services/event-log.service';
 import { LighthouseDevice, LighthouseDevicePowerState } from 'src-ui/app/models/lighthouse-device';
@@ -13,7 +13,7 @@ import { LighthouseService } from 'src-ui/app/services/lighthouse.service';
 import { AppSettingsService } from 'src-ui/app/services/app-settings.service';
 import { distinctUntilChanged, firstValueFrom, map, skip } from 'rxjs';
 import { ModalService } from 'src-ui/app/services/modal.service';
-import { OpenVRService } from '../../../services/openvr.service';
+import { VRService } from '../../../services/openvr.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ConfirmModalComponent,
@@ -47,7 +47,7 @@ export class DeviceListItemComponent implements OnInit {
     this._lighthouseDevice = undefined;
     this._ovrDevice = device;
     const knownDevice = this.deviceManager.getKnownDeviceById(
-      this.deviceManager.getIdForOpenVRDevice(device)
+      this.deviceManager.getIdForVRDevice(device)
     );
     if (!knownDevice) return;
 
@@ -155,7 +155,7 @@ export class DeviceListItemComponent implements OnInit {
   constructor(
     private lighthouseConsole: LighthouseConsoleService,
     private lighthouse: LighthouseService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private eventLog: EventLogService,
     private appSettings: AppSettingsService,
     private destroyRef: DestroyRef,
@@ -221,7 +221,7 @@ export class DeviceListItemComponent implements OnInit {
     if (this.mode === 'openvr') {
       await this.lighthouseConsole.turnOffDevices([this._ovrDevice!]);
       this.eventLog.logEvent({
-        type: 'turnedOffOpenVRDevices',
+        type: 'turnedOffVRDevices',
         reason: 'MANUAL',
         devices: (() => {
           switch (this._ovrDevice!.class) {
@@ -238,7 +238,7 @@ export class DeviceListItemComponent implements OnInit {
               return 'VARIOUS';
           }
         })(),
-      } as EventLogTurnedOffOpenVRDevices);
+      } as EventLogTurnedOffVRDevices);
     }
     if (this.mode === 'lighthouse') {
       if (this.lighthouse.deviceNeedsIdentifier(this._lighthouseDevice!)) {

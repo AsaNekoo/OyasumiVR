@@ -4,7 +4,7 @@ import { fade, fadeUp, vshrink } from 'src-ui/app/utils/animations';
 import { LighthouseDevice } from '../../models/lighthouse-device';
 import { LighthouseService } from '../../services/lighthouse.service';
 import { animate, style, transition, trigger } from '@angular/animations';
-import { OpenVRService } from '../../services/openvr.service';
+import { VRService } from '../../services/openvr.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { combineLatest, debounceTime, delay, filter, firstValueFrom, interval } from 'rxjs';
 import { AppSettingsService } from '../../services/app-settings.service';
@@ -81,7 +81,7 @@ export class LighthouseV1IdWizardModalComponent
 
   constructor(
     private lighthouseService: LighthouseService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private destroyRef: DestroyRef,
     private appSettings: AppSettingsService
   ) {
@@ -110,8 +110,8 @@ export class LighthouseV1IdWizardModalComponent
         );
         this.automaticDetectionSteps.splice(0, this.automaticDetectionSteps.length);
         const stepSteam = {
-          title: 'comp.lv1-id-wizard-modal.automaticDetection.steps.startSteamVR',
-          subtitle: 'comp.lv1-id-wizard-modal.automaticDetection.steps.waitingForSteamVR',
+          title: 'comp.lv1-id-wizard-modal.automaticDetection.steps.startVR',
+          subtitle: 'comp.lv1-id-wizard-modal.automaticDetection.steps.waitingForVR',
           icon: '',
           loader: true,
         };

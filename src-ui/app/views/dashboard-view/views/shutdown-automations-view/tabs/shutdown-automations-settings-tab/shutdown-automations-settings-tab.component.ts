@@ -9,14 +9,14 @@ import { ShutdownAutomationsService } from '../../../../../../services/shutdown-
 import { ModalService } from '../../../../../../services/modal.service';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
-  PowerDownWindowsMode,
+  PowerDownSystemMode,
   ShutdownAutomationsConfig,
 } from '../../../../../../models/automations';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AutomationConfigService } from '../../../../../../services/automation-config.service';
 import { AppSettingsService } from '../../../../../../services/app-settings.service';
-import { QuitWithSteamVRMode } from '../../../../../../models/settings';
+import { QuitWithVRMode } from '../../../../../../models/settings';
 import { SelectBoxItem } from '../../../../../../components/select-box/select-box.component';
 import { Router } from '@angular/router';
 import { fade, vshrink } from '../../../../../../utils/animations';
@@ -33,28 +33,28 @@ export class ShutdownAutomationsSettingsTabComponent implements OnInit {
   protected config: ShutdownAutomationsConfig = structuredClone(
     AUTOMATION_CONFIGS_DEFAULT.SHUTDOWN_AUTOMATIONS
   );
-  protected quitWithSteamVRMode: QuitWithSteamVRMode = 'DISABLED';
+  protected quitWithVRMode: QuitWithVRMode = 'DISABLED';
   protected lighthouseControlDisabled = false;
   protected powerDownOptions: SelectBoxItem[] = [
     {
       id: 'SHUTDOWN',
-      label: 'shutdown-automations.sequence.powerDownWindows.options.SHUTDOWN',
+      label: 'shutdown-automations.sequence.powerDownSystem.options.SHUTDOWN',
     },
     {
       id: 'SLEEP',
-      label: 'shutdown-automations.sequence.powerDownWindows.options.SLEEP',
+      label: 'shutdown-automations.sequence.powerDownSystem.options.SLEEP',
     },
     {
       id: 'HIBERNATE',
-      label: 'shutdown-automations.sequence.powerDownWindows.options.HIBERNATE',
+      label: 'shutdown-automations.sequence.powerDownSystem.options.HIBERNATE',
     },
     {
       id: 'REBOOT',
-      label: 'shutdown-automations.sequence.powerDownWindows.options.REBOOT',
+      label: 'shutdown-automations.sequence.powerDownSystem.options.REBOOT',
     },
     {
       id: 'LOGOUT',
-      label: 'shutdown-automations.sequence.powerDownWindows.options.LOGOUT',
+      label: 'shutdown-automations.sequence.powerDownSystem.options.LOGOUT',
     },
   ];
   protected powerDownOption: SelectBoxItem | undefined;
@@ -74,14 +74,14 @@ export class ShutdownAutomationsSettingsTabComponent implements OnInit {
       .subscribe((configs) => {
         this.config = configs.SHUTDOWN_AUTOMATIONS;
         this.powerDownOption = this.powerDownOptions.find(
-          (o) => o.id === configs.SHUTDOWN_AUTOMATIONS.powerDownWindowsMode
+          (o) => o.id === configs.SHUTDOWN_AUTOMATIONS.powerDownSystemMode
         );
       });
     this.settingsService.settings
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((settings) => {
         this.lighthouseControlDisabled = !settings.lighthousePowerControl;
-        this.quitWithSteamVRMode = settings.quitWithSteamVR;
+        this.quitWithVRMode = settings.quitWithVR;
       });
   }
 
@@ -97,19 +97,19 @@ export class ShutdownAutomationsSettingsTabComponent implements OnInit {
 
   get noOptionsSelected() {
     return (
-      !this.config.quitSteamVR &&
+      !this.config.quitVR &&
       this.config.turnOffDevices.devices.length === 0 &&
       this.config.turnOffDevices.types.length === 0 &&
       this.config.turnOffDevices.tagIds.length === 0 &&
-      !this.config.powerDownWindows
+      !this.config.powerDownSystem
     );
   }
 
-  async toggleQuitSteamVR() {
+  async toggleQuitVR() {
     await this.automationConfigs.updateAutomationConfig<ShutdownAutomationsConfig>(
       'SHUTDOWN_AUTOMATIONS',
       {
-        quitSteamVR: !this.config.quitSteamVR,
+        quitVR: !this.config.quitVR,
       }
     );
   }
@@ -123,11 +123,11 @@ export class ShutdownAutomationsSettingsTabComponent implements OnInit {
     );
   }
 
-  async togglePowerDownWindows() {
+  async togglePowerDownSystem() {
     await this.automationConfigs.updateAutomationConfig<ShutdownAutomationsConfig>(
       'SHUTDOWN_AUTOMATIONS',
       {
-        powerDownWindows: !this.config.powerDownWindows,
+        powerDownSystem: !this.config.powerDownSystem,
       }
     );
   }
@@ -137,7 +137,7 @@ export class ShutdownAutomationsSettingsTabComponent implements OnInit {
     this.automationConfigs.updateAutomationConfig<ShutdownAutomationsConfig>(
       'SHUTDOWN_AUTOMATIONS',
       {
-        powerDownWindowsMode: option!.id as PowerDownWindowsMode,
+        powerDownSystemMode: option!.id as PowerDownSystemMode,
       }
     );
   }

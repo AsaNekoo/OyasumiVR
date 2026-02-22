@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { MqttDiscoveryService } from '../mqtt-discovery.service';
 import { SleepService } from '../../sleep.service';
 import { distinctUntilChanged } from 'rxjs';
-import { OpenVRService } from '../../openvr.service';
+import { VRService } from '../../openvr.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +11,7 @@ export class SleepingPositionMqttIntegrationService {
   constructor(
     private mqtt: MqttDiscoveryService,
     private sleepService: SleepService,
-    private openvr: OpenVRService
+    private openvr: VRService
   ) {}
 
   async init() {

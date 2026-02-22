@@ -30,7 +30,7 @@ OyasumiVR 可以**自動偵測你何時入睡**，並以多種方式協助你，
 - 📩 自動處理好友邀請
 - 🔵 Automating your VRChat status
 - 🎤 當你睡着時自動關閉麥克風
-- 🛠 自動化各種 SteamVR 設定
+- 🛠 自動化各種 VR 設定
 
 ...還有更多！請查看即將推出的「功能」部分，深入了解 OyasumiVR 所提供的功能。
 
@@ -49,17 +49,17 @@ OyasumiVR 可以根據你的動作自動偵測你何時入睡！只需進行一�
   <li>時間表</li>
   <li>控制器和定位器的電量</li>
   <li>控制器和定位器的電源狀態</li>
-  <li>SteamVR 狀態</li>
+  <li>VR 狀態</li>
   <li>Heart Rate</li>
   <li>Sitting Upright</li>
   <li>VRChat players joining or leaving</li>
 </ul>
 
 {{STEAMVR_OVERLAY_HEADER}}
-📲 SteamVR 疊層畫面
+📲 VR 疊層畫面
 
 {{STEAMVR_OVERLAY_BODY}}
-OyasumiVR 配備了自己的 SteamVR 疊層畫面，允許你在虛擬實境中控制部分功能！
+OyasumiVR 配備了自己的 VR 疊層畫面，允許你在虛擬實境中控制部分功能！
 <br><br>
 預設情況下，你只需在右手控制器上快速按下 A 鈕，它就會在你面前彈出。
 
@@ -75,14 +75,14 @@ OyasumiVR 配備了自己的 SteamVR 疊層畫面，允許你在虛擬實境中�
 此外，你還可以在將控制器和/或定位器放在充電器上時自動關閉它們。這對於熱插拔控制器非常有用！
 
 {{POWER_AUTOMATIONS_BODY_WINDOWS_POWER_POLICY}}
-<b>Windows 電源策略</b>
+<b>System 電源策略</b>
 <br>
-入睡時自動設定 Windows 的電源策略，並在醒來時恢復到更高性能的策略！
+入睡時自動設定 System 的電源策略，並在醒來時恢復到更高性能的策略！
 
 {{POWER_AUTOMATIONS_BODY_BASE_STATIONS}}
 <b>基地台</b>
 <br>
-讓 OyasumiVR 與 SteamVR 一起自動開關基地台。這有點像 SteamVR 自己的基地台電源管理，但**與任何 HMD 相容**！只要你的 PC 支援藍牙，並且處於基地台的範圍內，就可以使用。
+讓 OyasumiVR 與 VR 一起自動開關基地台。這有點像 VR 自己的基地台電源管理，但**與任何 HMD 相容**！只要你的 PC 支援藍牙，並且處於基地台的範圍內，就可以使用。
 
 {{GPU_AUTOMATIONS_HEADER}}
 🔌 GPU 自動化
@@ -160,13 +160,13 @@ OyasumiVR 可以檢測到你的心跳率持續異常升高，這可能表示你�
 👓 解析度自動化
 
 {{RESOLUTION_AUTOMATIONS_BODY}}
-在進入睡眠和醒來時，自動調整 SteamVR 渲染解析度！讓 OyasumiVR 在你不需要時降低渲染解析度，有助於減輕硬體負擔。
+在進入睡眠和醒來時，自動調整 VR 渲染解析度！讓 OyasumiVR 在你不需要時降低渲染解析度，有助於減輕硬體負擔。
 
 {{CHAPERONE_AUTOMATIONS_HEADER}}
 🔳 Chaperone 自動化
 
 {{CHAPERONE_AUTOMATIONS_BODY}}
-在進入睡眠時，自動調整 SteamVR Chaperone 的淡入淡出距離。如果你的遊玩區域較小，你可以使用此功能確保在入睡時 Chaperone 保持隱藏，在醒來時重新啟用！
+在進入睡眠時，自動調整 VR Chaperone 的淡入淡出距離。如果你的遊玩區域較小，你可以使用此功能確保在入睡時 Chaperone 保持隱藏，在醒來時重新啟用！
 
 {{TRANSLATION_AND_LOCALIZATION_HEADER}}
 翻譯與本地化
@@ -189,10 +189,10 @@ OyasumiVR 能夠支援這麼多語言，得益於我們出色的志願者。我�
 電池自動化
 
 {{SUPPORTED_HARDWARE_BATTERY_AUTOMATIONS_BODY}}
-目前，OyasumiVR 支援使用其電池自動化關閉以下所有支援的 SteamVR 設定：
+目前，OyasumiVR 支援使用其電池自動化關閉以下所有支援的 VR 設定：
 
 1. 支援回報電量和充電狀態
-2. 支援通過 SteamVR 關閉的設定。
+2. 支援通過 VR 關閉的設定。
 
 這包括但不限於以下設定：
 

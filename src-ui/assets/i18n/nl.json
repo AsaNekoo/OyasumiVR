@@ -75,7 +75,7 @@
       "title": "Bij zonsondergang"
     },
     "HMD_CONNECT": {
-      "title": "Wanneer mijn headset verbind met SteamVR"
+      "title": "Wanneer mijn headset verbind met VR"
     },
     "SLEEP_MODE_DISABLE": {
       "title": "Wanneer ik wakker word"
@@ -121,8 +121,8 @@
       "description": "Past de helderheid van het fysieke scherm aan",
       "title": "Zet de hardware helderheid naar"
     },
-    "hmdConnectEventTooltip": "Deze instellingen worden toegepast wanneer je headset verbinding maakt met SteamVR",
-    "hmdConnectPotentialEventTooltip": "Deze instellingen kunnen worden toegepast wanneer je headset verbinding maakt met SteamVR, als dit van toepassing is",
+    "hmdConnectEventTooltip": "Deze instellingen worden toegepast wanneer je headset verbinding maakt met VR",
+    "hmdConnectPotentialEventTooltip": "Deze instellingen kunnen worden toegepast wanneer je headset verbinding maakt met VR, als dit van toepassing is",
     "miscConfig": "Andere opties",
     "mode": {
       "advanced": "Geavanceerde Modus",
@@ -154,7 +154,7 @@
     }
   },
   "chaperone-automations": {
-    "description": "OyasumiVR kan automatisch de activatie afstand van SteamVR's chaperone aanpassen wanneer de slaap modus wordt ingeschakeld of uitgeschakeld.",
+    "description": "OyasumiVR kan automatisch de activatie afstand van VR's chaperone aanpassen wanneer de slaap modus wordt ingeschakeld of uitgeschakeld.",
     "fadeDistance": {
       "title": "Zet de chaperone's activatie afstand op"
     },
@@ -190,19 +190,19 @@
       "dropdown": {
         "description": "Open Binding Configuratie",
         "desktop": "Desktop Modus",
-        "vr": "SteamVR Modus"
+        "vr": "VR Modus"
       },
       "errors": {
         "DASHBOARD_OPEN": {
-          "message": "SteamVR Dashboard Open",
-          "tooltip": "Sluit het SteamVR dashboard om bindings te kunnen inzien"
+          "message": "VR Dashboard Open",
+          "tooltip": "Sluit het VR dashboard om bindings te kunnen inzien"
         },
         "MISSING_CONTROLLER": {
           "tooltip": "Beide de linker en rechter controllers moeten verbonden zijn"
         },
         "STEAMVR_INACTIVE": {
-          "message": "SteamVR Inactief",
-          "tooltip": "Om controller bindings te bekijken of aan te passen moet SteamVR actief zijn"
+          "message": "VR Inactief",
+          "tooltip": "Om controller bindings te bekijken of aan te passen moet VR actief zijn"
         },
         "UNKNOWN": {
           "message": "Configureer Binding"
@@ -470,8 +470,8 @@
             "MANUAL": "Handmatig aangezet",
             "OYASUMI_START": "Omdat OyasumiVR opstartte",
             "SLEEP_MODE_DISABLED": "Omdat de slaap modus is uitgeschakeld",
-            "STEAMVR_START": "Omdat SteamVR draait",
-            "STEAMVR_STOP": "Omdat SteamVR gestopt is"
+            "STEAMVR_START": "Omdat VR draait",
+            "STEAMVR_STOP": "Omdat VR gestopt is"
           }
         },
         "msiAfterburnerProfileSet": {
@@ -495,8 +495,8 @@
             "SLEEP_MODE_ENABLED": "Omdat de slaap modus is ingeschakeld"
           },
           "title": {
-            "auto": "SteamVR render resolutie ingesteld op 'auto'",
-            "custom": "SteamVR render resolutie ingesteld op {value}"
+            "auto": "VR render resolutie ingesteld op 'auto'",
+            "custom": "VR render resolutie ingesteld op {value}"
           }
         },
         "runAutomationExecuted": {
@@ -505,7 +505,7 @@
             "SLEEP_MODE_ENABLED": "Omdat de slaap modus is ingeschakeld",
             "SLEEP_PREPARATION": "Omdat je je voorbereidde om te gaan slapen"
           },
-          "title": "Gebruikergedefinieerde commando's uitgevoerd via de Windows opdrachtprompt"
+          "title": "Gebruikergedefinieerde commando's uitgevoerd via de System opdrachtprompt"
         },
         "shutdownSequenceCancelled": {
           "reason": {
@@ -542,7 +542,7 @@
           "reason": {
             "automation": {
               "NIGHTMARE_DETECTION": "Omdat er een mogelijke nachtmerrie werd gedetecteerd",
-              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "Omdat SteamVR is gestopt",
+              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "Omdat VR is gestopt",
               "SLEEP_MODE_DISABLE_AFTER_TIME": "Omdat de slapa modus lang genoeg actief was",
               "SLEEP_MODE_DISABLE_AT_TIME": "Op de ingestelde tijd",
               "SLEEP_MODE_DISABLE_ON_DEVICE_POWER_ON": "Omdat een controller of tracker is ingeschakeld",
@@ -605,7 +605,7 @@
           },
           "title": "Status gewijzigd van ''{oldStatus}'' naar ''{newStatus}''"
         },
-        "turnedOffOpenVRDevices": {
+        "turnedOffVRDevices": {
           "reason": {
             "BATTERY_LEVEL": "Omdat het batterijniveau onder {threshold}% kwam",
             "CHARGING": "Omdat het apparaat aan het opladen is",
@@ -657,7 +657,7 @@
             "SLEEP_MODE_DISABLED": "Omdat de slaap modus is uitgeschakeld",
             "SLEEP_MODE_ENABLED": "Omdat de slaap modus is ingeschakeld"
           },
-          "title": "Het Windows energiebeheerschema is ingesteld op ''{policy}''"
+          "title": "Het System energiebeheerschema is ingesteld op ''{policy}''"
         }
       }
     },
@@ -688,7 +688,7 @@
           "title": "GPU Besturing"
         },
         "RUN_AUTOMATIONS": {
-          "description": "Gebeurtenissen gerelateerd aan automatiseringen die commando's uitvoeren via de Windows opdrachtprompt",
+          "description": "Gebeurtenissen gerelateerd aan automatiseringen die commando's uitvoeren via de System opdrachtprompt",
           "title": "Uitvoer Automatiseringen"
         },
         "SHUTDOWN_SEQUENCE": {
@@ -700,8 +700,8 @@
           "title": "Slaap Modus"
         },
         "STEAMVR_SETTINGS": {
-          "description": "Events gerelateerd aan veranderingen van SteamVR instellingen, zoals render resolutie en chaperone afstand.",
-          "title": "SteamVR Instellingen"
+          "description": "Events gerelateerd aan veranderingen van VR instellingen, zoals render resolutie en chaperone afstand.",
+          "title": "VR Instellingen"
         },
         "VRCHAT_AVATAR": {
           "description": "Events gerelateerd aan het instellen van je VRChat avatar",
@@ -720,8 +720,8 @@
           "title": "VRChat Status"
         },
         "WINDOWS_POWER_POLICY": {
-          "description": "Events gerelateerd aan veranderingen in de Windows power policy",
-          "title": "Windows Power Policy"
+          "description": "Events gerelateerd aan veranderingen in de System power policy",
+          "title": "System Power Policy"
         }
       },
       "selectAll": "Selecteer Alles",
@@ -768,8 +768,8 @@
           "detectBasestationDesc": "Zorg er voor dat een headset, controller, of tracker het base station kan zien",
           "deviceDetected": "Apparaat gedetecteerd",
           "running": "Draait",
-          "startSteamVR": "Start SteamVR",
-          "waitingForSteamVR": "Aan het wachten tot SteamVR start..."
+          "startVR": "Start VR",
+          "waitingForVR": "Aan het wachten tot VR start..."
         }
       },
       "detectAutomatically": "Detecteer Automatisch",
@@ -958,8 +958,8 @@
       "defaultPlaceholder": "Selecteer..."
     },
     "start-with-steamvr-how-to-modal": {
-      "description": "Je kan OyasumiVR automatisch laten starten wanneer SteamVR wordt gestart, met een configuratie optie binnen SteamVR's eigen instellingen. Je kunt de instelling vinden in:\n\nSteamVR -> Settings -> Startup / Shutdown -> Choose startup overlay apps",
-      "title": "OyasumiVR starten met SteamVR"
+      "description": "Je kan OyasumiVR automatisch laten starten wanneer VR wordt gestart, met een configuratie optie binnen VR's eigen instellingen. Je kunt de instelling vinden in:\n\nVR -> Settings -> Startup / Shutdown -> Choose startup overlay apps",
+      "title": "OyasumiVR starten met VR"
     },
     "update-modal": {
       "message": "Er is een nieuwe update beschikbaar voor OyasumiVR: v{newVersion}.\n\nJe draait op dit moment nog v{currentVersion}.\n\n.Wil je de update nu installeren?",
@@ -1127,7 +1127,7 @@
     },
     "addLimiter": "Voeg Applicatie Toe",
     "description": "OyasumiVR kan automatisch de framerate van verschillende games limiteren. Dit kun je doen om het stroomverbruik van je systeem te verlagen wanneer je geen hoge prestaties nodig hebt, zoals wanneer je slaapt.",
-    "directControlRequiresSteamVR": "Start SteamVR om direct framelimits te kunnen instellen",
+    "directControlRequiresVR": "Start VR om direct framelimits te kunnen instellen",
     "frameLimits": "Framelimits",
     "noLimits": "Je hebt nog geen applicaties geconfigureerd om te limiteren!",
     "onSleepDisable": "Wanneer ik wakker word",
@@ -1136,12 +1136,12 @@
     "removeLimiter": "Verwijder",
     "selector": {
       "auto": "Auto",
-      "autoDescription": "In auto modus zal SteamVR zelf de optimale frame limit bepalen.",
+      "autoDescription": "In auto modus zal VR zelf de optimale frame limit bepalen.",
       "disabled": "Niets veranderen",
       "noLimit": "Ongelimiteerd"
     },
-    "steamvrRequired": "OyasumiVR kan meer accurate frame limit targets tonen voor jouw specifieke VR headset, wanneer SteamVR actief is. Start SteamVR om meer informatie in te zien.",
-    "supportedHardwareWarning": "Let op dat SteamVR alleen framelimiting ondersteunt op native SteamVR headsets, als de Valve Index, Vive (Pro), of de Bigscreen Beyond. Niet-native headsets, zoals Quest headsets, worden niet ondersteund.",
+    "steamvrRequired": "OyasumiVR kan meer accurate frame limit targets tonen voor jouw specifieke VR headset, wanneer VR actief is. Start VR om meer informatie in te zien.",
+    "supportedHardwareWarning": "Let op dat VR alleen framelimiting ondersteunt op native VR headsets, als de Valve Index, Vive (Pro), of de Bigscreen Beyond. Niet-native headsets, zoals Quest headsets, worden niet ondersteund.",
     "title": "Framelimit Automatiseringen"
   },
   "gpu-automations": {
@@ -1525,7 +1525,7 @@
     "GORONE_LEGACY_PRESET_WARNING": "Versies v4.0 van deze prefab bevatten al functionaliteit om automatisch om te rollen, en zijn niet compatible met deze preset. Deze preset is alleen nog beschikbaar als je avatar oudere versies van deze prefab gebruikt.",
     "oneTimeFlagDialogs": {
       "CCT_CONTROL_WARNING_DIALOG": {
-        "message": "Let op dat het aanpassen van de kleur temperatuur alleen beschikbaar is op sommige native SteamVR headsets, zoals de Valve Index, Bigscreen Beyond, of HTC Vive (Pro).\n\nAls een andere headset gebruikt, is de kans groot dat deze feature geen effect zal hebben.\n\nJe kan kleur temperatuur besturing uitschakelen in de instellingen als je dat wilt.",
+        "message": "Let op dat het aanpassen van de kleur temperatuur alleen beschikbaar is op sommige native VR headsets, zoals de Valve Index, Bigscreen Beyond, of HTC Vive (Pro).\n\nAls een andere headset gebruikt, is de kans groot dat deze feature geen effect zal hebben.\n\nJe kan kleur temperatuur besturing uitschakelen in de instellingen als je dat wilt.",
         "title": "Feature Beschikbaarheid"
       },
       "OSC_SCRIPT_SIMPLE_EDITOR_VRCHAT_AUTOCOMPLETE_INFO": {
@@ -1777,7 +1777,7 @@
           "onSleepModeDisable": "Wanneer ik wakker word",
           "onSleepModeEnable": "Wanneer ik ga slapen",
           "onSleepPreparation": "Wanneer ik me voorbereid om te gaan slapen",
-          "onSteamVRStop": "Wanneer SteamVR stopt",
+          "onVRStop": "Wanneer VR stopt",
           "onlyWhileSleepModeEnabled": "Alleen terwijl slaapmodus is ingeschakeld"
         }
       },
@@ -1788,7 +1788,7 @@
         "triggers": {
           "onOyasumiStart": "Wanneer OyasumiVR start",
           "onSleepModeDisable": "Wanneer ik wakker word",
-          "onSteamVRStart": "Wanneer SteamVR start"
+          "onVRStart": "Wanneer VR start"
         }
       }
     },
@@ -1796,7 +1796,7 @@
       "adapterError": "Er is een fout opgetreden bij het verbinden met je bluetooth adapter. Check of je bluetooth adapter is ingeschakeld, en probeer het nog eens.",
       "noAdapter": "Er kon geen bluetooth adapter worden gevonden in je systeem. Zorg dat je computer beschikt over een bluetooth adapter, en dat deze is ingeschakeld."
     },
-    "powerManagementWarning": "Als je OyasumiVR's automatiseringen gebruikt om je base stations aan of uit te zetten, wordt het aangeraden om Power Management uit te zetten in SteamVR's base station instellingen.",
+    "powerManagementWarning": "Als je OyasumiVR's automatiseringen gebruikt om je base stations aan of uit te zetten, wordt het aangeraden om Power Management uit te zetten in VR's base station instellingen.",
     "tabs": {
       "devices": "Apparaten",
       "windowsPowerPolicy": "Energiebeheer"
@@ -1804,7 +1804,7 @@
     "title": "Energie Automatiseringen",
     "windowsPowerPolicy": {
       "automations": "Automatiseringen",
-      "description": "OyasumiVR kan automatisch het actieve energiebeheerschema van Windows aanpassen wanneer je gaat slapen of wakker wordt. Dit kan handig zijn om je stroomverbruik te verminderen wanneer je slaapt, en een beter presterend schema te activeren wanneer je weer wakker word.",
+      "description": "OyasumiVR kan automatisch het actieve energiebeheerschema van System aanpassen wanneer je gaat slapen of wakker wordt. Dit kan handig zijn om je stroomverbruik te verminderen wanneer je slaapt, en een beter presterend schema te activeren wanneer je weer wakker word.",
       "sleepModeDisable": {
         "description": "Stel het volgende energiebeheerschema in",
         "title": "Wanneer ik wakker word"
@@ -1824,7 +1824,7 @@
     }
   },
   "resolution-automations": {
-    "description": "OyasumiVR kan automatisch de render resolutie van SteamVR aanpassen wanneer de slaap modus wordt ingeschakeld of uitgeschakeld.",
+    "description": "OyasumiVR kan automatisch de render resolutie van VR aanpassen wanneer de slaap modus wordt ingeschakeld of uitgeschakeld.",
     "onSleepDisable": {
       "description": "Pas de render resolutie aan",
       "title": "Wanneer ik wakker word"
@@ -1842,7 +1842,7 @@
   },
   "runAutomations": {
     "commandsToRun": "Uit te voeren commando's",
-    "description": "Hier kun je OyasumiVR automatisch commando's laten uitvoeren via de Windows opdrachtprompt wanneer je in slaap valt, wakker wordt of je voorbereidt om te slapen.\\n\\nAlle commando's worden geïnterpreteerd via cmd.exe.",
+    "description": "Hier kun je OyasumiVR automatisch commando's laten uitvoeren via de System opdrachtprompt wanneer je in slaap valt, wakker wordt of je voorbereidt om te slapen.\\n\\nAlle commando's worden geïnterpreteerd via cmd.exe.",
     "onSleepDisable": {
       "description": "Commando's uitvoeren",
       "title": "Wanneer ik wakker word"
@@ -1862,8 +1862,8 @@
     "advanced": {
       "application": {
         "openVrInitDelayFix": {
-          "description": "Het inschakelen hiervan zorgt ervoor dat OyasumiVR even wacht om te interacteren met SteamVR zodra het is gedetecteerd, waardoor SteamVR wat extra tijd krijgt om op te starten. Als je problemen ondervindt met het starten van SteamVR terwijl OyasumiVR al draait, kan dit helpen.",
-          "title": "OpenVR Initialisatie Vertragen"
+          "description": "Het inschakelen hiervan zorgt ervoor dat OyasumiVR even wacht om te interacteren met VR zodra het is gedetecteerd, waardoor VR wat extra tijd krijgt om op te starten. Als je problemen ondervindt met het starten van VR terwijl OyasumiVR al draait, kan dit helpen.",
+          "title": "VR Initialisatie Vertragen"
         },
         "overlayGpuAcceleration": {
           "description": "Als je problemen ondervindt met de overlay die niet goed wordt weergegeven, kan het uitschakelen van deze optie het probleem oplossen op sommige systemen (bijv. die met hybride graphics).",
@@ -1965,7 +1965,7 @@
         "title": "Probleemoplossing",
         "vrManifestReregister": {
           "action": "Herregistreer Manifest",
-          "description": "Herregistreert OyasumiVR's VR application manifest met SteamVR",
+          "description": "Herregistreert OyasumiVR's VR application manifest met VR",
           "modal": {
             "FLAVOUR_NOT_ELIGIBLE": {
               "message": "Als je een build van OyasumiVR gebruikt die niet in aanmerking komt (e.g. de Steam versie), dan is de registratie van het application manifest ongedaan gemaakt, maar niet opnieuw geregistreerd. Dit is geen fout! Herstart OyasumiVR a.u.b.",
@@ -1976,11 +1976,11 @@
               "title": "Herregistratie van VR Application Manifest Mislukt"
             },
             "MANIFEST_CHECK_FAILED": {
-              "message": "Het kon niet worden gecheckt of OyasumiVR's manifest al was geregistreerd met SteamVR. Herstart a.u.b. OyasumiVR en check de log bestanden.",
+              "message": "Het kon niet worden gecheckt of OyasumiVR's manifest al was geregistreerd met VR. Herstart a.u.b. OyasumiVR en check de log bestanden.",
               "title": "Herregistratie van VR Application Manifest Mislukt"
             },
             "MANIFEST_NOT_REGISTERED": {
-              "message": "OyasumiVR had geen geregistreerd manifest met SteamVR. Het manifest is niet (her)geregistreerd. Herstart a.u.b. OyasumiVR.",
+              "message": "OyasumiVR had geen geregistreerd manifest met VR. Het manifest is niet (her)geregistreerd. Herstart a.u.b. OyasumiVR.",
               "title": "Herregistratie van VR Application Manifest Mislukt"
             },
             "MANIFEST_REMOVE_FAILED": {
@@ -1988,15 +1988,15 @@
               "title": "Herregistratie van VR Application Manifest Mislukt"
             },
             "UNKNOWN": {
-              "message": "OyasumiVR's manifest kon niet worden hergeregistreerd met SteamVR door een onbekende fout. Herstart a.u.b. OyasumiVR en check de log bestanden.",
+              "message": "OyasumiVR's manifest kon niet worden hergeregistreerd met VR door een onbekende fout. Herstart a.u.b. OyasumiVR en check de log bestanden.",
               "title": "Herregistratie van VR Application Manifest Mislukt"
             },
             "success": {
-              "message": "OyasumiVR's Manifest is met success hergeregistreerd met SteamVR.",
+              "message": "OyasumiVR's Manifest is met success hergeregistreerd met VR.",
               "title": "VR Application Manifest Hergeregistreerd"
             }
           },
-          "title": "Herregistreet SteamVR application manifest"
+          "title": "Herregistreet VR application manifest"
         }
       }
     },
@@ -2046,7 +2046,7 @@
         "title": "Taal"
       },
       "lighthouseConsole": {
-        "description": "OyasumiVR heeft de locatie van de <strong>lighthouse_console.exe</strong> van je SteamVR installatie nodig.\nAls OyasumiVR deze niet kan vinden op de standaard locatie, moet je zelf aangeven waar deze kan worden gevonden.",
+        "description": "OyasumiVR heeft de locatie van de <strong>lighthouse_console.exe</strong> van je VR installatie nodig.\nAls OyasumiVR deze niet kan vinden op de standaard locatie, moet je zelf aangeven waar deze kan worden gevonden.",
         "status": {
           "CHECKING": "Aan het checken voor een geldige <strong>lighthouse_console.exe</strong>",
           "INVALID_EXECUTABLE": "De <strong>lighthouse_console.exe</strong> op deze locatie werkt niet zoals verwacht.",
@@ -2075,11 +2075,11 @@
           },
           "title": "Voorkeurs modus voor uitzetten"
         },
-        "title": "Aansturing van SteamVR Base Stations"
+        "title": "Aansturing van VR Base Stations"
       },
       "overlay": {
         "binding": {
-          "description": "Welke controller knop(pen) het overlay menu kunnen openen kan geconfigureerd worden in SteamVR's binding menu.",
+          "description": "Welke controller knop(pen) het overlay menu kunnen openen kan geconfigureerd worden in VR's binding menu.",
           "title": "Controller knop binding"
         },
         "onlyOpenMenuWhenVRChatRunning": {
@@ -2116,14 +2116,14 @@
       "startStop": {
         "title": "Start & Stop"
       },
-      "startWithSteamVR": {
-        "description": "Start OyasumiVR wanneer SteamVR wordt gestart",
+      "startWithVR": {
+        "description": "Start OyasumiVR wanneer VR wordt gestart",
         "howTo": "Instructies",
-        "label": "Start samen met SteamVR"
+        "label": "Start samen met VR"
       },
-      "stopWithSteamVR": {
-        "description": "Stop OyasumiVR wanneer SteamVR is gestopt voor een bepaalde tijd",
-        "label": "Stop samen met SteamVR",
+      "stopWithVR": {
+        "description": "Stop OyasumiVR wanneer VR is gestopt voor een bepaalde tijd",
+        "label": "Stop samen met VR",
         "options": {
           "AFTERDELAY": "Na 2 minuten",
           "DISABLED": "Uitgeschakeld",
@@ -2302,14 +2302,14 @@
     "overlay": {
       "cancel": "Annuleer",
       "stage": {
-        "POWERING_DOWN": "Windows Afsluiten...",
-        "QUITTING_STEAMVR": "Stoppen van SteamVR...",
+        "POWERING_DOWN": "System Afsluiten...",
+        "QUITTING_STEAMVR": "Stoppen van VR...",
         "TURNING_OFF_DEVICES": "Apparaten uitschakelen..."
       },
       "title": "Uitschakelen..."
     },
     "sequence": {
-      "powerDownWindows": {
+      "powerDownSystem": {
         "description": "Probeert je computer uit te zetten",
         "options": {
           "HIBERNATE": "Sluimerstand",
@@ -2320,16 +2320,16 @@
         },
         "rebootMessage": "OyasumiVR herstart je PC",
         "shutdownMessage": "OyasumiVR sluit je PC af",
-        "title": "Windows Uitzetten"
+        "title": "System Uitzetten"
       },
-      "quitSteamVR": {
+      "quitVR": {
         "conflict": {
-          "description": "Je hebt OyasumiVR zo geconfigureerd om direct af te sluiten wanneer SteamVR stopt. Hierdoor kunnen sommige taken misschien niet draaien. Om dit op te lossen, kun je deze taak uitschakelen, of in de algemene instellingen OyasumiVR te configureren om niet meteen te stoppen wanneer SteamVR stopt.",
+          "description": "Je hebt OyasumiVR zo geconfigureerd om direct af te sluiten wanneer VR stopt. Hierdoor kunnen sommige taken misschien niet draaien. Om dit op te lossen, kun je deze taak uitschakelen, of in de algemene instellingen OyasumiVR te configureren om niet meteen te stoppen wanneer VR stopt.",
           "goToSettings": "Algemene Instellingen",
           "title": "Waarschuwing: Door deze taak uit te voeren stop je OyasumiVR direct."
         },
-        "description": "Dit stopt ook alle SteamVR games en overlays die je hebt draaien",
-        "title": "Stop SteamVR"
+        "description": "Dit stopt ook alle VR games en overlays die je hebt draaien",
+        "title": "Stop VR"
       },
       "run": "Start Afsluit Procedure",
       "title": "Afsluit Procedure Acties",
@@ -2404,7 +2404,7 @@
       "description": "Automatisch de slaap modus uitschakelen",
       "onDevicePowerOn": "Wanneer een apparaat wordt aangezet",
       "onPlayerJoinOrLeave": "Wanneer een VRChat speler je wereld betreed of verlaat",
-      "onSteamVRStop": "Wanneer SteamVR stopt",
+      "onVRStop": "Wanneer VR stopt",
       "onUprightPose": "Wanneer je recht op zit/staat na gelegen te hebben."
     },
     "enableAutomations": {
@@ -2582,7 +2582,7 @@
           "stepPrefix": "Het kalibratieproces werkt als volgt:",
           "stepSuffix": "Dat is alles! Na kalibratie zou OyasumiVR moeten kunnen detecteren of je in slaap bent gevallen, gebaseerd op de beweging van je VR bril."
         },
-        "noSteamVR": "Om de kalibratie te kunnen beginnen moet SteamVR gestart zijn en je VR headset verbonden zijn.",
+        "noVR": "Om de kalibratie te kunnen beginnen moet VR gestart zijn en je VR headset verbonden zijn.",
         "prepare": {
           "instruction": "Zet je VR bril op en ga liggen.",
           "note": "Als je er klaar voor bent, en je dit venster kunt zien vanuit je overlay, druk je op 'Begin Kalibratie' om te beginnen."

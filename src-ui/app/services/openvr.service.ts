@@ -15,14 +15,14 @@ import { orderBy } from 'lodash';
 import { AppSettingsService } from './app-settings.service';
 import { error, info } from '@tauri-apps/plugin-log';
 
-export type OpenVRStatus = 'INACTIVE' | 'INITIALIZING' | 'INITIALIZED';
+export type VRStatus = 'INACTIVE' | 'INITIALIZING' | 'INITIALIZED';
 
 @Injectable({
   providedIn: 'root',
 })
-export class OpenVRService {
-  private _status: BehaviorSubject<OpenVRStatus> = new BehaviorSubject<OpenVRStatus>('INACTIVE');
-  public status: Observable<OpenVRStatus> = this._status.asObservable();
+export class VRService {
+  private _status: BehaviorSubject<VRStatus> = new BehaviorSubject<VRStatus>('INACTIVE');
+  public status: Observable<VRStatus> = this._status.asObservable();
   private _devices: BehaviorSubject<OVRDevice[]> = new BehaviorSubject<OVRDevice[]>([]);
   public devices: Observable<OVRDevice[]> = this._devices.asObservable();
 
@@ -36,7 +36,7 @@ export class OpenVRService {
   ) {}
 
   async init() {
-    this._status.next(await invoke<OpenVRStatus>('vr_status'));
+    this._status.next(await invoke<VRStatus>('vr_status'));
     this.appSettings.settings
       .pipe(
         map((settings) => settings.openVrInitDelayFix),
@@ -46,14 +46,14 @@ export class OpenVRService {
       )
       .subscribe((fixEnabled) => {
         this.applyOpenVrInitDelayFix(fixEnabled);
-        if (fixEnabled) info('[OpenVR] Applying OpenVR Initialization delay fix');
-        else info('[OpenVR] Removing OpenVR initialization delay fix');
+        if (fixEnabled) info('[VR] Applying VR Initialization delay fix');
+        else info('[VR] Removing VR initialization delay fix');
       });
     await Promise.all([
       listen<DeviceUpdateEvent>('OVR_DEVICE_UPDATE', (event) =>
         this.onDeviceUpdate(event.payload.device)
       ),
-      listen<OpenVRStatus>('VR_STATUS_UPDATE', (event) => this.onStatusUpdate(event.payload)),
+      listen<VRStatus>('VR_STATUS_UPDATE', (event) => this.onStatusUpdate(event.payload)),
       listen<any>('OVR_POSE_UPDATE', (event) => {
         // const poses = structuredClone(this._devicePoses.value);
         const {
@@ -93,8 +93,8 @@ export class OpenVRService {
     if (typeof analogGain === 'number' && isFinite(analogGain)) {
       return invoke('openvr_set_analog_gain', { analogGain });
     } else {
-      console.error('[OpenVR] Attempted to set analogGain to invalid value', analogGain);
-      error('[OpenVR] Attempted to set analogGain to invalid value: ' + analogGain);
+      console.error('[VR] Attempted to set analogGain to invalid value', analogGain);
+      error('[VR] Attempted to set analogGain to invalid value: ' + analogGain);
     }
   }
 
@@ -118,7 +118,7 @@ export class OpenVRService {
     return invoke<number>('openvr_get_fade_distance');
   }
 
-  private onStatusUpdate(status: OpenVRStatus) {
+  private onStatusUpdate(status: VRStatus) {
     this._status.next(status);
     switch (status) {
       case 'INACTIVE':

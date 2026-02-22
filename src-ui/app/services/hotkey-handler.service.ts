@@ -7,11 +7,11 @@ import { filter, firstValueFrom, map, take } from 'rxjs';
 import { warn } from '@tauri-apps/plugin-log';
 import { LighthouseConsoleService } from './lighthouse-console.service';
 import { LighthouseService } from './lighthouse.service';
-import { OpenVRService } from './openvr.service';
+import { VRService } from './openvr.service';
 import { AppSettingsService } from './app-settings.service';
 import {
   EventLogLighthouseSetPowerState,
-  EventLogTurnedOffOpenVRDevices,
+  EventLogTurnedOffVRDevices,
 } from '../models/event-log-entry';
 import { EventLogService } from './event-log.service';
 
@@ -26,7 +26,7 @@ export class HotkeyHandlerService {
     private shutdownSequence: ShutdownAutomationsService,
     private lighthouseService: LighthouseService,
     private lighthouseConsoleService: LighthouseConsoleService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private appSettings: AppSettingsService,
     private eventLog: EventLogService
   ) {}
@@ -85,10 +85,10 @@ export class HotkeyHandlerService {
       .subscribe((controllers) => {
         this.lighthouseConsoleService.turnOffDevices(controllers);
         this.eventLog.logEvent({
-          type: 'turnedOffOpenVRDevices',
+          type: 'turnedOffVRDevices',
           reason: 'HOTKEY',
           devices: controllers.length > 1 ? 'CONTROLLERS' : 'CONTROLLER',
-        } as EventLogTurnedOffOpenVRDevices);
+        } as EventLogTurnedOffVRDevices);
       });
   }
 
@@ -102,10 +102,10 @@ export class HotkeyHandlerService {
       .subscribe((trackers) => {
         this.lighthouseConsoleService.turnOffDevices(trackers);
         this.eventLog.logEvent({
-          type: 'turnedOffOpenVRDevices',
+          type: 'turnedOffVRDevices',
           reason: 'HOTKEY',
           devices: trackers.length > 1 ? 'TRACKERS' : 'TRACKER',
-        } as EventLogTurnedOffOpenVRDevices);
+        } as EventLogTurnedOffVRDevices);
       });
   }
 

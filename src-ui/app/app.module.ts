@@ -18,7 +18,7 @@ import { SleepModeEnableAtTimeAutomationService } from './services/sleep-detecti
 import { SleepModeDisableAtTimeAutomationService } from './services/sleep-detection-automations/sleep-mode-disable-at-time-automation.service';
 import { SleepModeDisableOnDevicePowerOnAutomationService } from './services/sleep-detection-automations/sleep-mode-disable-on-device-power-on-automation.service';
 import { NvmlService } from './services/nvml.service';
-import { OpenVRService } from './services/openvr.service';
+import { VRService } from './services/openvr.service';
 import { GpuAutomationsViewComponent } from './views/dashboard-view/views/gpu-automations-view/gpu-automations-view.component';
 import { SleepService } from './services/sleep.service';
 import { GpuAutomationsService } from './services/gpu-automations.service';
@@ -60,7 +60,7 @@ import { ImageCachePipe } from './pipes/image-cache.pipe';
 import { InviteAutomationsService } from './services/invite-automations.service';
 import { MsiAfterburnerPaneComponent } from './views/dashboard-view/views/gpu-automations-view/msi-afterburner-pane/msi-afterburner-pane.component';
 import { invoke } from '@tauri-apps/api/core';
-import { SleepModeChangeOnSteamVRStatusAutomationService } from './services/sleep-detection-automations/sleep-mode-change-on-steamvr-status-automation.service';
+import { SleepModeChangeOnVRStatusAutomationService } from './services/sleep-detection-automations/sleep-mode-change-on-steamvr-status-automation.service';
 import { ImageFallbackDirective } from './directives/image-fallback.directive';
 import { SleepModeForSleepDetectorAutomationService } from './services/sleep-detection-automations/sleep-mode-for-sleep-detector-automation.service';
 import { HardwareBrightnessControlService } from './services/brightness-control/hardware-brightness-control.service';
@@ -111,7 +111,7 @@ import { AutomationConfigService } from './services/automation-config.service';
 import { FontLoaderService } from './services/font-loader.service';
 import { NotificationService } from './services/notification.service';
 import { PowerPolicyTabComponent } from './views/dashboard-view/views/power-automations-view/tabs/power-policy-tab/power-policy-tab.component';
-import { SetWindowsPowerPolicyOnSleepModeAutomationService } from './services/power-automations/set-windows-power-policy-on-sleep-mode-automation.service';
+import { SetSystemPowerPolicyOnSleepModeAutomationService } from './services/power-automations/set-windows-power-policy-on-sleep-mode-automation.service';
 import { SteamService } from './services/steam.service';
 import { TooltipDirective } from './directives/tooltip.directive';
 import { SimpleBrightnessControlService } from './services/brightness-control/simple-brightness-control.service';
@@ -125,7 +125,7 @@ import { SleepPreparationService } from './services/sleep-preparation.service';
 import { PulsoidService } from './services/integrations/pulsoid.service';
 import { ObfuscatedValueDirective } from './directives/obfuscated-value.directive';
 import { SleepModeEnableOnHeartRateCalmPeriodAutomationService } from './services/sleep-detection-automations/sleep-mode-enable-on-heart-rate-calm-period-automation.service';
-import { QuitWithSteamVRService } from './services/quit-with-steamvr.service';
+import { QuitWithVRService } from './services/quit-with-steamvr.service';
 import { VRChatMicMuteAutomationService } from './services/osc-automations/vrchat-mic-mute-automation.service';
 import { MiscTestingComponent } from './components/developer-debug-modal/misc-testing/misc-testing.component';
 import { VRChatMicMuteAutomationsViewComponent } from './views/dashboard-view/views/vrchat-mic-mute-automations-view/vrchat-mic-mute-automations-view.component';
@@ -145,13 +145,13 @@ import { AudioVolumeAutomationsViewComponent } from './views/dashboard-view/view
 import { AudioVolumeEntriesComponent } from './views/dashboard-view/views/audio-volume-automations-view/audio-volume-entries/audio-volume-entries.component';
 import { AudioDevicePickerComponent } from './views/dashboard-view/views/audio-volume-automations-view/audio-device-picker/audio-device-picker.component';
 import { AudioDeviceAutomationsService } from './services/audio-device-automations.service';
-import { WindowsService } from './services/windows.service';
+import { SystemService } from './services/windows.service';
 import { SettingsAdvancedViewComponent } from './views/dashboard-view/views/settings-advanced-view/settings-advanced-view.component';
 import { SettingsNotificationsViewComponent } from './views/dashboard-view/views/settings-notifications-view/settings-notifications-view.component';
 import { SettingsOscViewComponent } from './views/dashboard-view/views/settings-osc-view/settings-osc-view.component';
 import { SettingsGeneralViewComponent } from './views/dashboard-view/views/settings-general-view/settings-general-view.component';
 import { SettingsUpdatesViewComponent } from './views/dashboard-view/views/settings-updates-view/settings-updates-view.component';
-import { StartWithSteamVRHowToModalComponent } from './views/dashboard-view/views/settings-general-view/start-with-steamvr-how-to-modal/start-with-steamvr-how-to-modal.component';
+import { StartWithVRHowToModalComponent } from './views/dashboard-view/views/settings-general-view/start-with-steamvr-how-to-modal/start-with-steamvr-how-to-modal.component';
 import { SettingsIntegrationsViewComponent } from './views/dashboard-view/views/settings-integrations-view/settings-integrations-view.component';
 import { SettingsHotkeyViewComponent } from './views/dashboard-view/views/settings-hotkey-view/settings-hotkey-view.component';
 import { HotkeySelectorComponent } from './components/hotkey-selector/hotkey-selector.component';
@@ -250,7 +250,7 @@ import { DevicePowerButtonComponent } from './components/device-power-button/dev
 import { DeviceManagerDevicesTabComponent } from './views/dashboard-view/views/device-manager-view/tabs/device-manager-devices-tab/device-manager-devices-tab.component';
 import { DeviceManagerTagsTabComponent } from './views/dashboard-view/views/device-manager-view/tabs/device-manager-tags-tab/device-manager-tags-tab.component';
 import { LighthouseForceStatePopoverComponent } from './components/lighthouse-force-state-popover/lighthouse-force-state-popover.component';
-import { OyasumiVRSteamVRDevicePowerAutomationsService } from './services/power-automations/oyasumivr-steamvr-device-power-automations.service';
+import { OyasumiVRVRDevicePowerAutomationsService } from './services/power-automations/oyasumivr-steamvr-device-power-automations.service';
 import { SleepDevicePowerAutomationsService } from './services/power-automations/sleep-device-power-automations.service';
 import { TurnOffDevicesWhenChargingAutomationService } from './services/power-automations/turn-off-devices-when-charging-automation.service';
 import { VRCXService } from './services/vrcx.service';
@@ -355,7 +355,7 @@ export function createTranslateLoader(http: HttpClient) {
     ObfuscatedValueDirective,
     HeartRateCalmPeriodEnableSleepModeModalComponent,
     HeartRateChartComponent,
-    StartWithSteamVRHowToModalComponent,
+    StartWithVRHowToModalComponent,
     MiscTestingComponent,
     VRChatMicMuteAutomationsViewComponent,
     SystemMicMuteAutomationsViewComponent,
@@ -451,7 +451,7 @@ export function createTranslateLoader(http: HttpClient) {
 export class AppModule {
   constructor(
     private http: HttpClient,
-    private openvrService: OpenVRService,
+    private openvrService: VRService,
     private nvmlService: NvmlService,
     private sleepService: SleepService,
     private oscService: OscService,
@@ -478,10 +478,10 @@ export class AppModule {
     private deepLinkService: DeepLinkService,
     private sleepPreparationService: SleepPreparationService,
     private pulsoidService: PulsoidService,
-    private quitWithSteamVRService: QuitWithSteamVRService,
+    private quitWithVRService: QuitWithVRService,
     private audioDeviceService: AudioDeviceService,
     private overlayService: OverlayService,
-    private windowsService: WindowsService,
+    private windowsService: SystemService,
     private hotkeyService: HotkeyService,
     private hotkeyHandlerService: HotkeyHandlerService,
     private discordService: DiscordService,
@@ -504,18 +504,18 @@ export class AppModule {
     private sleepModeEnableAtBatteryPercentageAutomation: SleepModeEnableAtBatteryPercentageAutomationService,
     private sleepModeEnableAtTimeAutomationService: SleepModeEnableAtTimeAutomationService,
     private sleepModeEnableOnHeartRateCalmPeriodAutomationService: SleepModeEnableOnHeartRateCalmPeriodAutomationService,
-    private sleepModeChangeOnSteamVRStatusAutomationService: SleepModeChangeOnSteamVRStatusAutomationService,
+    private sleepModeChangeOnVRStatusAutomationService: SleepModeChangeOnVRStatusAutomationService,
     private sleepModeDisableAtTimeAutomationService: SleepModeDisableAtTimeAutomationService,
     private sleepModeDisableAfterTimeAutomationService: SleepModeDisableAfterTimeAutomationService,
     private sleepModeDisableOnDevicePowerOnAutomationService: SleepModeDisableOnDevicePowerOnAutomationService,
     private sleepModeDisableOnUprightPoseAutomationService: SleepModeDisableOnUprightPoseAutomationService,
     private sleepModeDisableOnPlayerJoinLeaveAutomationService: SleepModeDisableOnPlayerJoinLeaveAutomationService,
     // Power automations
-    private oyasumivrSteamvrDevicePowerAutomationsService: OyasumiVRSteamVRDevicePowerAutomationsService,
+    private oyasumivrSteamvrDevicePowerAutomationsService: OyasumiVRVRDevicePowerAutomationsService,
     private sleepDevicePowerAutomationsService: SleepDevicePowerAutomationsService,
     private turnOffDevicesOnBatteryLevelAutomationService: TurnOffDevicesOnBatteryLevelAutomationService,
     private turnOffDevicesWhenChargingAutomationService: TurnOffDevicesWhenChargingAutomationService,
-    private setSystemPowerPolicyOnSleepModeAutomationService: SetWindowsPowerPolicyOnSleepModeAutomationService,
+    private setSystemPowerPolicyOnSleepModeAutomationService: SetSystemPowerPolicyOnSleepModeAutomationService,
     // OSC automations
     private oscGeneralAutomationsService: OscGeneralAutomationsService,
     private sleepingAnimationsAutomationService: SleepingAnimationsAutomationService,
@@ -596,7 +596,7 @@ export class AppModule {
           await this.logInit('Initializing system tray', this.systemTrayService.init());
           // Initialize "base" services
           await Promise.all([
-            this.logInit('Initializing OpenVR', this.openvrService.init()),
+            this.logInit('Initializing VR', this.openvrService.init()),
             this.logInit('Initializing OSC', this.oscService.init())
               .then(() => this.logInit('Initializing OSC control', this.oscControlService.init()))
               .then(() =>
@@ -612,9 +612,9 @@ export class AppModule {
             this.logInit('Initializing frame limiting', this.frameLimiterService.init()),
             this.logInit('Initializing sleep preparation', this.sleepPreparationService.init()),
             this.logInit('Initializing Pulsoid', this.pulsoidService.init()),
-            this.logInit('Initializing quitting with SteamVR', this.quitWithSteamVRService.init()),
+            this.logInit('Initializing quitting with VR', this.quitWithVRService.init()),
             this.logInit('Initializing audio device services', this.audioDeviceService.init()),
-            this.logInit('Initializing Windows services', this.windowsService.init()),
+            this.logInit('Initializing System services', this.windowsService.init()),
             this.logInit('Initializing hotkey service', this.hotkeyService.init()),
             this.logInit('Initializing hotkey handlers', this.hotkeyHandlerService.init()),
             this.logInit('Initializing message centers', this.messageCenterService.init()),
@@ -694,7 +694,7 @@ export class AppModule {
             ),
             this.logInit(
               'Initializing sleep mode automation (#5)',
-              this.sleepModeChangeOnSteamVRStatusAutomationService.init()
+              this.sleepModeChangeOnVRStatusAutomationService.init()
             ),
             this.logInit(
               'Initializing sleep mode automation (#6)',
@@ -720,7 +720,7 @@ export class AppModule {
             this.logInit('Initializing sleep mode automation (#12)', this.notificationsAutomationsService.init()),
             // Power automations
             this.logInit(
-              'Initializing device power automations (SteamVR/OyasumiVR)',
+              'Initializing device power automations (VR/OyasumiVR)',
               this.oyasumivrSteamvrDevicePowerAutomationsService.init()
             ),
             this.logInit(
@@ -736,7 +736,7 @@ export class AppModule {
               this.turnOffDevicesWhenChargingAutomationService.init()
             ),
             this.logInit(
-              'Initializing Windows power policy automations',
+              'Initializing System power policy automations',
               this.setSystemPowerPolicyOnSleepModeAutomationService.init()
             ),
             // OSC automations

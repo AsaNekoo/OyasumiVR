@@ -26,7 +26,7 @@ import { EventLogService } from '../../../../services/event-log.service';
 import { appLogDir } from '@tauri-apps/api/path';
 import { IPCService } from '../../../../services/ipc.service';
 import { SetDebugTranslationsRequest } from '../../../../../../src-grpc-web-client/overlay-sidecar_pb';
-import { OpenVRService } from 'src-ui/app/services/openvr.service';
+import { VRService } from 'src-ui/app/services/openvr.service';
 import { AppSettingsService } from '../../../../services/app-settings.service';
 import { FLAVOUR } from '../../../../../build';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -66,7 +66,7 @@ export class SettingsAdvancedViewComponent {
     private eventLogService: EventLogService,
     private ipcService: IPCService,
     private settingsService: AppSettingsService,
-    protected openvr: OpenVRService
+    protected openvr: VRService
   ) {
     this.settingsService.settings.pipe(takeUntilDestroyed()).subscribe((settings) => {
       this.overlayGpuAcceleration = settings.overlayGpuAcceleration;

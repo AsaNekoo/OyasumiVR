@@ -167,9 +167,9 @@ Selain itu, Anda dapat membuat kontroler dan/atau tracker Anda mati pada level b
   </tr>
   <tr>
     <td>
-<b>Kebijakan Daya Windows</b>
+<b>Kebijakan Daya System</b>
 <br>
-Hemat listrik dengan mengatur Kebijakan Daya Windows secara otomatis saat Anda tidur dan bangun! Cukup setel kebijakan yang lebih konservatif (seperti "Penghemat Daya") saat Anda tidur, lalu kembalikan kebijakan kinerja yang lebih tinggi saat Anda bangun lagi. 
+Hemat listrik dengan mengatur Kebijakan Daya System secara otomatis saat Anda tidur dan bangun! Cukup setel kebijakan yang lebih konservatif (seperti "Penghemat Daya") saat Anda tidur, lalu kembalikan kebijakan kinerja yang lebih tinggi saat Anda bangun lagi. 
     </td>
     <td width="380"><img src="https://github.com/Raphiiko/OyasumiVR/assets/111654848/05398894-a058-4715-b66a-067857b90e43"></td>
   </tr>
@@ -327,7 +327,7 @@ Depending on which actions you configure, it will do any of the following:
   <li>Turn off your controllers and/or Trackers</li>
   <li>Turn off your Base Stations</li>
   <li>Quit SteamVR <i>(And any running game or overlay along with it)</i></li>
-  <li>Shut down Windows</li>
+  <li>Shut down System</li>
 </ul>
 <br>
 With the shutdown sequence configured, you can fall asleep soundly in VR, knowing that everything will shut down when you don't need to be in VR anymore!

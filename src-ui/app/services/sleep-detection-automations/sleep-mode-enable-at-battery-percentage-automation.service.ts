@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { AutomationConfigService } from '../automation-config.service';
-import { OpenVRService } from '../openvr.service';
+import { VRService } from '../openvr.service';
 import { map } from 'rxjs';
 import { OVRDevice, OVRDeviceClass } from '../../models/ovr-device';
 import {
@@ -26,7 +26,7 @@ export class SleepModeEnableAtBatteryPercentageAutomationService {
 
   constructor(
     private automationConfig: AutomationConfigService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private sleep: SleepService
   ) {}
 

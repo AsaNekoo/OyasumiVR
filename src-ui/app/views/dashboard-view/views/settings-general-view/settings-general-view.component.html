@@ -180,16 +180,16 @@
         <div class="settings">
           <div class="setting-row">
             <div class="setting-row-label" translate>
-              <span translate>settings.general.stopWithSteamVR.label</span>
-              <span translate>settings.general.stopWithSteamVR.description</span>
+              <span translate>settings.general.stopWithVR.label</span>
+              <span translate>settings.general.stopWithVR.description</span>
             </div>
             <div class="setting-row-action">
               <app-select-box
                 type="SMALL"
                 class="stop-with-steamvr-dropdown"
-                [items]="stopWithSteamVROptions"
-                [selected]="stopWithSteamVROption"
-                (selectedChange)="onChangeStopWithSteamVROption($event)"
+                [items]="stopWithVROptions"
+                [selected]="stopWithVROption"
+                (selectedChange)="onChangeStopWithVROption($event)"
               ></app-select-box>
             </div>
           </div>

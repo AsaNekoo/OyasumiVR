@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 
 import { AutomationConfigService } from '../automation-config.service';
-import { OpenVRService } from '../openvr.service';
+import { VRService } from '../openvr.service';
 import { combineLatest, map } from 'rxjs';
 import { AUTOMATION_CONFIGS_DEFAULT, DevicePowerAutomationsConfig } from '../../models/automations';
 import { EventLogService } from '../event-log.service';
 import { OVRDevice, OVRDeviceClass } from '../../models/ovr-device';
 import { LighthouseConsoleService } from '../lighthouse-console.service';
 import { error } from '@tauri-apps/plugin-log';
-import { EventLogTurnedOffOpenVRDevices } from '../../models/event-log-entry';
+import { EventLogTurnedOffVRDevices } from '../../models/event-log-entry';
 import { SleepService } from '../sleep.service';
 import { DeviceManagerService } from '../device-manager.service';
 
@@ -28,7 +28,7 @@ export class TurnOffDevicesOnBatteryLevelAutomationService {
 
   constructor(
     private automationConfig: AutomationConfigService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private lighthouse: LighthouseConsoleService,
     private eventLog: EventLogService,
     private sleep: SleepService,
@@ -71,7 +71,7 @@ export class TurnOffDevicesOnBatteryLevelAutomationService {
     threshold = this.config.turnOffDevicesBelowBatteryLevel_threshold;
     // Log the event
     this.eventLog.logEvent({
-      type: 'turnedOffOpenVRDevices',
+      type: 'turnedOffVRDevices',
       reason: 'BATTERY_LEVEL',
       batteryThreshold: threshold,
       devices: (() => {
@@ -88,7 +88,7 @@ export class TurnOffDevicesOnBatteryLevelAutomationService {
           }
         }
       })(),
-    } as EventLogTurnedOffOpenVRDevices);
+    } as EventLogTurnedOffVRDevices);
     // Turn off the device
     await this.lighthouse.turnOffDevices([device]);
   }

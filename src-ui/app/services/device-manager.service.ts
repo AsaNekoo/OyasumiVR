@@ -22,7 +22,7 @@ import {
 } from '../models/device-manager';
 import { migrateDeviceManagerData } from '../migrations/device-manager.migrations';
 import { SETTINGS_KEY_DEVICE_MANAGER, SETTINGS_STORE } from '../globals';
-import { OpenVRService } from './openvr.service';
+import { VRService } from './openvr.service';
 import { LighthouseService } from './lighthouse.service';
 import { OVRDevice } from '../models/ovr-device';
 import { LighthouseDevice } from '../models/lighthouse-device';
@@ -41,13 +41,13 @@ export class DeviceManagerService {
   public readonly tags = this._data.pipe(map((data) => data.tags));
 
   constructor(
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private lighthouse: LighthouseService
   ) {}
 
   async init() {
     await this.loadData();
-    this.listenForOpenVRDevices();
+    this.listenForVRDevices();
     this.listenForLighthouseDevices();
     this._data
       .pipe(
@@ -229,7 +229,7 @@ export class DeviceManagerService {
                 ...devices
                   .filter((d) => d.class === 'HMD')
                   .filter((d) => {
-                    const knownDevice = this.getKnownDeviceById(this.getIdForOpenVRDevice(d));
+                    const knownDevice = this.getKnownDeviceById(this.getIdForVRDevice(d));
                     return !knownDevice?.disabled;
                   })
               );
@@ -239,7 +239,7 @@ export class DeviceManagerService {
                 ...devices
                   .filter((d) => d.class === 'Controller')
                   .filter((d) => {
-                    const knownDevice = this.getKnownDeviceById(this.getIdForOpenVRDevice(d));
+                    const knownDevice = this.getKnownDeviceById(this.getIdForVRDevice(d));
                     return !knownDevice?.disabled;
                   })
               );
@@ -249,7 +249,7 @@ export class DeviceManagerService {
                 ...devices
                   .filter((d) => d.class === 'GenericTracker')
                   .filter((d) => {
-                    const knownDevice = this.getKnownDeviceById(this.getIdForOpenVRDevice(d));
+                    const knownDevice = this.getKnownDeviceById(this.getIdForVRDevice(d));
                     return !knownDevice?.disabled;
                   })
               );
@@ -284,7 +284,7 @@ export class DeviceManagerService {
         if (!result.knownDevices.find((d) => d.id === device.id)) {
           result.knownDevices.push(device);
         }
-        const ovrDeviceId = this.getOpenVRIdForKnownDevice(device);
+        const ovrDeviceId = this.getVRIdForKnownDevice(device);
         const ovrDevice = openvrDevices.find((d) => d.serialNumber === ovrDeviceId);
         if (ovrDevice && !result.ovrDevices.find((d) => d.serialNumber === ovrDeviceId))
           result.ovrDevices.push(ovrDevice);
@@ -307,7 +307,7 @@ export class DeviceManagerService {
       if (!result.knownDevices.find((d) => d.id === device.id)) {
         result.knownDevices.push(device);
       }
-      const ovrDeviceId = this.getOpenVRIdForKnownDevice(device);
+      const ovrDeviceId = this.getVRIdForKnownDevice(device);
       const ovrDevice = openvrDevices.find((d) => d.serialNumber === ovrDeviceId);
       if (ovrDevice && !result.ovrDevices.find((d) => d.serialNumber === ovrDeviceId))
         result.ovrDevices.push(ovrDevice);
@@ -322,12 +322,12 @@ export class DeviceManagerService {
     return result;
   }
 
-  private listenForOpenVRDevices() {
+  private listenForVRDevices() {
     this.openvr.devices
       .pipe(
         map((devices) => ({
           devices,
-          deviceIds: devices.map((d) => this.getIdForOpenVRDevice(d)),
+          deviceIds: devices.map((d) => this.getIdForVRDevice(d)),
         })),
         // Update any already known devices that have received a different default name
         tap(({ devices, deviceIds }) => {
@@ -359,7 +359,7 @@ export class DeviceManagerService {
         // Construct new known devices for any new devices
         const _devices = devices
           .map((d) => ({
-            id: this.getIdForOpenVRDevice(d),
+            id: this.getIdForVRDevice(d),
             device: d,
           }))
           .filter(({ id }) => !this.getKnownDeviceById(id))
@@ -461,7 +461,7 @@ export class DeviceManagerService {
       });
   }
 
-  public getIdForOpenVRDevice(device: OVRDevice): string {
+  public getIdForVRDevice(device: OVRDevice): string {
     return `OVR_${device.class}_${device.serialNumber}`;
   }
 
@@ -469,7 +469,7 @@ export class DeviceManagerService {
     return `LH_${device.deviceType}_${device.id}`;
   }
 
-  public getOpenVRIdForKnownDevice(device: DMKnownDevice): string | null {
+  public getVRIdForKnownDevice(device: DMKnownDevice): string | null {
     if (!device.id.startsWith('OVR_')) return null;
     return device.id.split('_')[2];
   }

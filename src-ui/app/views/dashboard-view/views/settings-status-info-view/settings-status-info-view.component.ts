@@ -7,7 +7,7 @@ import { BUILD_ID, FLAVOUR } from 'src-ui/build';
 import { OscService } from '../../../../services/osc.service';
 import { ElevatedSidecarService } from '../../../../services/elevated-sidecar.service';
 import { OverlayService } from '../../../../services/overlay/overlay.service';
-import { OpenVRService } from '../../../../services/openvr.service';
+import { VRService } from '../../../../services/openvr.service';
 import { FontLoaderService } from '../../../../services/font-loader.service';
 import { invoke } from '@tauri-apps/api/core';
 import { hshrink } from '../../../../utils/animations';
@@ -38,7 +38,7 @@ export class SettingsStatusInfoViewComponent {
     osc: OscService,
     elevatedSidecar: ElevatedSidecarService,
     overlaySidecar: OverlayService,
-    openvr: OpenVRService,
+    openvr: VRService,
     fontLoader: FontLoaderService,
     private tsTranslate: TStringTranslatePipe
   ) {
@@ -67,10 +67,10 @@ export class SettingsStatusInfoViewComponent {
         ],
       },
       {
-        name: this.is_windows?'OpenVR':'OpenXR',
+        name: this.is_windows?'VR':'OpenXR',
         entries: [
           {
-            key: this.is_windows?'SteamVR':'State',
+            key: this.is_windows?'VR':'State',
             value: openvr.status.pipe(
               map((s) => {
                 switch (s) {

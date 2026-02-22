@@ -207,11 +207,11 @@ function from17to18(data: any): any {
   }
 
   if (data.TURN_ON_LIGHTHOUSES_ON_STEAMVR_START?.enabled) {
-    data.DEVICE_POWER_AUTOMATIONS.turnOnDevicesOnSteamVRStart.types.push('LIGHTHOUSE');
+    data.DEVICE_POWER_AUTOMATIONS.turnOnDevicesOnVRStart.types.push('LIGHTHOUSE');
   }
 
   if (data.TURN_OFF_LIGHTHOUSES_ON_STEAMVR_STOP?.enabled) {
-    data.DEVICE_POWER_AUTOMATIONS.turnOffDevicesOnSteamVRStop.types.push('LIGHTHOUSE');
+    data.DEVICE_POWER_AUTOMATIONS.turnOffDevicesOnVRStop.types.push('LIGHTHOUSE');
   }
 
   // Delete old automation configs
@@ -432,9 +432,9 @@ function from10to11(data: any): any {
 function from9to10(data: any): any {
   data.version = 10;
   if (data.SHUTDOWN_AUTOMATIONS) {
-    data.SHUTDOWN_AUTOMATIONS.powerDownWindows = data.SHUTDOWN_AUTOMATIONS.shutdownWindows;
-    data.SHUTDOWN_AUTOMATIONS.powerDownWindowsMode = 'SHUTDOWN';
-    delete data.SHUTDOWN_AUTOMATIONS.shutdownWindows;
+    data.SHUTDOWN_AUTOMATIONS.powerDownSystem = data.SHUTDOWN_AUTOMATIONS.shutdownSystem;
+    data.SHUTDOWN_AUTOMATIONS.powerDownSystemMode = 'SHUTDOWN';
+    delete data.SHUTDOWN_AUTOMATIONS.shutdownSystem;
   }
   return data;
 }

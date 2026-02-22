@@ -167,9 +167,9 @@ OyasumiVR 配備了自己的 SteamVR 疊層畫面，允許你在虛擬實境中�
   </tr>
   <tr>
     <td>
-<b>Windows 電源策略</b>
+<b>System 電源策略</b>
 <br>
-入睡時自動設定 Windows 的電源策略，並在醒來時恢復到更高性能的策略！ 
+入睡時自動設定 System 的電源策略，並在醒來時恢復到更高性能的策略！ 
     </td>
     <td width="380"><img src="https://github.com/Raphiiko/OyasumiVR/assets/111654848/05398894-a058-4715-b66a-067857b90e43"></td>
   </tr>
@@ -327,7 +327,7 @@ Depending on which actions you configure, it will do any of the following:
   <li>Turn off your controllers and/or Trackers</li>
   <li>Turn off your Base Stations</li>
   <li>Quit SteamVR <i>(And any running game or overlay along with it)</i></li>
-  <li>Shut down Windows</li>
+  <li>Shut down System</li>
 </ul>
 <br>
 With the shutdown sequence configured, you can fall asleep soundly in VR, knowing that everything will shut down when you don't need to be in VR anymore!

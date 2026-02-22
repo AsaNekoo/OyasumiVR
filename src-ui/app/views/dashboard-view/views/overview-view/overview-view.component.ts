@@ -1,7 +1,7 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
 import { fade, hshrink, noop } from '../../../../utils/animations';
 import { SleepService } from '../../../../services/sleep.service';
-import { OpenVRService } from '../../../../services/openvr.service';
+import { VRService } from '../../../../services/openvr.service';
 import { OscService } from '../../../../services/osc.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SleepPreparationService } from '../../../../services/sleep-preparation.service';
@@ -24,7 +24,7 @@ export class OverviewViewComponent implements OnInit {
 
   constructor(
     private sleep: SleepService,
-    public openvr: OpenVRService,
+    public openvr: VRService,
     public osc: OscService,
     private destroyRef: DestroyRef,
     protected sleepPreparation: SleepPreparationService

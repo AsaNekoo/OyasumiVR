@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { AutomationConfigService } from '../automation-config.service';
-import { OpenVRService } from '../openvr.service';
+import { VRService } from '../openvr.service';
 import { map } from 'rxjs';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
@@ -20,7 +20,7 @@ export class SleepModeEnableOnControllersPoweredOffAutomationService {
 
   constructor(
     private automationConfig: AutomationConfigService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private sleep: SleepService
   ) {}
 

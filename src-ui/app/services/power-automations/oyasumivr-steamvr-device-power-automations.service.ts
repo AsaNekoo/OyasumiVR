@@ -17,7 +17,7 @@ import {
   startWith,
   throttleTime,
 } from 'rxjs';
-import { OpenVRService } from '../openvr.service';
+import { VRService } from '../openvr.service';
 import { EventLogLighthouseSetPowerState } from 'src-ui/app/models/event-log-entry';
 import { AppSettingsService } from '../app-settings.service';
 import { LighthouseDevice } from '../../models/lighthouse-device';
@@ -26,7 +26,7 @@ import { DeviceManagerService } from '../device-manager.service';
 @Injectable({
   providedIn: 'root',
 })
-export class OyasumiVRSteamVRDevicePowerAutomationsService {
+export class OyasumiVRVRDevicePowerAutomationsService {
   config: DevicePowerAutomationsConfig = structuredClone(
     AUTOMATION_CONFIGS_DEFAULT.DEVICE_POWER_AUTOMATIONS
   );
@@ -35,7 +35,7 @@ export class OyasumiVRSteamVRDevicePowerAutomationsService {
   constructor(
     private automationConfig: AutomationConfigService,
     private lighthouse: LighthouseService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private eventLog: EventLogService,
     private appSettings: AppSettingsService,
     private deviceManager: DeviceManagerService
@@ -47,7 +47,7 @@ export class OyasumiVRSteamVRDevicePowerAutomationsService {
       .pipe(map((configs) => configs.DEVICE_POWER_AUTOMATIONS))
       .subscribe((config) => (this.config = config));
 
-    // Detect SteamVR stops
+    // Detect VR stops
     this.openvr.status
       .pipe(
         pairwise(),
@@ -56,10 +56,10 @@ export class OyasumiVRSteamVRDevicePowerAutomationsService {
         throttleTime(5000, asyncScheduler, { leading: true, trailing: false })
       )
       .subscribe(() => {
-        this.handleSteamVRStop();
+        this.handleVRStop();
       });
 
-    // Detect SteamVR starts
+    // Detect VR starts
     this.openvr.status
       .pipe(
         pairwise(),
@@ -72,7 +72,7 @@ export class OyasumiVRSteamVRDevicePowerAutomationsService {
         throttleTime(5000, asyncScheduler, { leading: true, trailing: false })
       )
       .subscribe(() => {
-        this.handleSteamVRStart();
+        this.handleVRStart();
       });
 
     // Listen for newly discovered lighthouses
@@ -89,9 +89,9 @@ export class OyasumiVRSteamVRDevicePowerAutomationsService {
       });
   }
 
-  private async handleSteamVRStop() {
+  private async handleVRStop() {
     const applicableDevices = await this.deviceManager.getDevicesForSelection(
-      this.config.turnOffDevicesOnSteamVRStop
+      this.config.turnOffDevicesOnVRStop
     );
     const applicableLighthouses = applicableDevices.lighthouseDevices.filter(
       (d) => d.powerState === 'on' || d.powerState === 'booting'
@@ -114,9 +114,9 @@ export class OyasumiVRSteamVRDevicePowerAutomationsService {
     }
   }
 
-  private async handleSteamVRStart() {
+  private async handleVRStart() {
     const applicableDevices = await this.deviceManager.getDevicesForSelection(
-      this.config.turnOnDevicesOnSteamVRStart
+      this.config.turnOnDevicesOnVRStart
     );
     const applicableLighthouses = applicableDevices.lighthouseDevices.filter(
       (d) => d.powerState === 'sleep' || d.powerState === 'standby'
@@ -134,16 +134,16 @@ export class OyasumiVRSteamVRDevicePowerAutomationsService {
     }
   }
 
-  // This handler turns newly discovered lighthouses on or off based on the SteamVR status, if they are configured to be affected.
+  // This handler turns newly discovered lighthouses on or off based on the VR status, if they are configured to be affected.
   private async handleNewLighthouseDevice(device: LighthouseDevice) {
     this.seenLighthouseIds.add(device.id);
     let lighthouseStateChanged = false;
 
-    // Handle SteamVR status based changesz
+    // Handle VR status based changesz
     const steamVRActive = (await firstValueFrom(this.openvr.status)) === 'INITIALIZED';
     if (steamVRActive) {
       const applicableDevices = this.deviceManager.getDevicesForSelection(
-        this.config.turnOnDevicesOnSteamVRStart
+        this.config.turnOnDevicesOnVRStart
       );
       const isLighthouseApplicable = (await applicableDevices).lighthouseDevices.some(
         (d) => d.id === device.id
@@ -163,7 +163,7 @@ export class OyasumiVRSteamVRDevicePowerAutomationsService {
       }
     } else {
       const applicableDevices = this.deviceManager.getDevicesForSelection(
-        this.config.turnOffDevicesOnSteamVRStop
+        this.config.turnOffDevicesOnVRStop
       );
       const isLighthouseApplicable = (await applicableDevices).lighthouseDevices.some(
         (d) => d.id === device.id

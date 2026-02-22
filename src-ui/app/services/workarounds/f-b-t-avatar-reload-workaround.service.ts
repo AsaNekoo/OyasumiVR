@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { OpenVRService } from '../openvr.service';
+import { VRService } from '../openvr.service';
 import {
   asyncScheduler,
   distinctUntilChanged,
@@ -25,7 +25,7 @@ export class FBTAvatarReloadWorkaroundService {
   private enabled = false;
 
   constructor(
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private osc: OscService,
     private vrchat: VRChatService,
     private sleepAnimations: SleepingAnimationsAutomationService,

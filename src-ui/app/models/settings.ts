@@ -12,7 +12,7 @@ export interface AppSettings {
   exitInSystemTray: boolean;
   startInSystemTray: boolean;
   sleepModeStartupBehaviour: 'PERSIST' | 'ACTIVE' | 'INACTIVE';
-  quitWithSteamVR: QuitWithSteamVRMode;
+  quitWithVR: QuitWithVRMode;
   hotkeys: { [hotkeyId: string]: string[] };
   playerListPresets: PlayerListPreset[];
   hideSnowverlay: boolean;
@@ -67,7 +67,7 @@ export type VRCXEventLogType = 'SleepMode';
 
 export type DiscordActivityMode = 'ENABLED' | 'ONLY_ASLEEP' | 'DISABLED';
 
-export type QuitWithSteamVRMode = 'DISABLED' | 'IMMEDIATELY' | 'AFTERDELAY';
+export type QuitWithVRMode = 'DISABLED' | 'IMMEDIATELY' | 'AFTERDELAY';
 
 export type OSCTarget = 'VRCHAT_OSCQUERY' | 'CUSTOM';
 
@@ -101,7 +101,7 @@ export const APP_SETTINGS_DEFAULT: AppSettings = {
   exitInSystemTray: false,
   startInSystemTray: false,
   sleepModeStartupBehaviour: 'PERSIST',
-  quitWithSteamVR: 'DISABLED',
+  quitWithVR: 'DISABLED',
   hotkeys: {},
   playerListPresets: [],
   hideSnowverlay: false,
@@ -125,7 +125,7 @@ export const APP_SETTINGS_DEFAULT: AppSettings = {
   overlayMenuOnlyOpenWhenVRChatIsRunning: false,
   // Lighthouse
   lighthouseConsolePath:
-    'C:\\Program Files (x86)\\Steam\\steamapps\\common\\SteamVR\\tools\\lighthouse\\bin\\win64\\lighthouse_console.exe',
+    'C:\\Program Files (x86)\\Steam\\steamapps\\common\\VR\\tools\\lighthouse\\bin\\win64\\lighthouse_console.exe',
   lighthousePowerControl: true,
   lighthousePowerOffState: 'sleep',
   v1LighthouseIdentifiers: {},

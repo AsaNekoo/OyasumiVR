@@ -17,7 +17,7 @@ export const EVENT_LOG_DEFAULT: EventLog = {
 export type EventLogEntry =
   | EventLogSleepModeEnabled
   | EventLogSleepModeDisabled
-  | EventLogTurnedOffOpenVRDevices
+  | EventLogTurnedOffVRDevices
   | EventLogLighthouseSetPowerState
   | EventLogGpuPowerLimitChanged
   | EventLogSimpleBrightnessChanged
@@ -54,7 +54,7 @@ export type EventLogDraft = Omit<EventLogEntry, 'time' | 'id'>;
 export type EventLogType =
   | 'sleepModeEnabled'
   | 'sleepModeDisabled'
-  | 'turnedOffOpenVRDevices'
+  | 'turnedOffVRDevices'
   | 'lighthouseSetPowerState'
   | 'gpuPowerLimitChanged'
   | 'simpleBrightnessChanged'
@@ -120,8 +120,8 @@ export interface EventLogSleepModeDisabled extends EventLogBase {
   reason: SleepModeStatusChangeReason;
 }
 
-export interface EventLogTurnedOffOpenVRDevices extends EventLogBase {
-  type: 'turnedOffOpenVRDevices';
+export interface EventLogTurnedOffVRDevices extends EventLogBase {
+  type: 'turnedOffVRDevices';
   reason:
     | 'MANUAL'
     | 'OSC_CONTROL'

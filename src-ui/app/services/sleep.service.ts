@@ -15,7 +15,7 @@ import { SleepModeStatusChangeReason, SleepState } from '../models/sleep-mode';
 import { SETTINGS_KEY_SLEEP_MODE, SETTINGS_STORE } from '../globals';
 import { SleepingPose } from '../models/sleeping-pose';
 import { uniq } from 'lodash';
-import { OpenVRService } from './openvr.service';
+import { VRService } from './openvr.service';
 import { VRDevicePose } from '../models/ovr-device';
 import { SleepingPoseDetector } from '../utils/sleeping-pose-detector';
 import * as THREE from 'three';
@@ -61,7 +61,7 @@ export class SleepService {
   ).pipe(startWith('UNKNOWN' as SleepingPose), distinctUntilChanged()) as Observable<SleepingPose>;
 
   constructor(
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private notifications: NotificationService,
     private eventLog: EventLogService,
     private appSettings: AppSettingsService,

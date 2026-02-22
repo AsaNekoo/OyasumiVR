@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, DestroyRef } from '@angular/core';
 import { DeviceManagerService } from '../../../../../../services/device-manager.service';
-import { OpenVRService } from '../../../../../../services/openvr.service';
+import { VRService } from '../../../../../../services/openvr.service';
 import { LighthouseService } from '../../../../../../services/lighthouse.service';
 import { LighthouseConsoleService } from '../../../../../../services/lighthouse-console.service';
 import { ModalService } from '../../../../../../services/modal.service';
@@ -73,7 +73,7 @@ export class DeviceManagerDevicesTabComponent implements OnInit, AfterViewInit {
 
   constructor(
     private deviceManager: DeviceManagerService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private lighthouse: LighthouseService,
     private lighthouseConsole: LighthouseConsoleService,
     private modalService: ModalService,
@@ -290,7 +290,7 @@ export class DeviceManagerDevicesTabComponent implements OnInit, AfterViewInit {
 
   getDeviceOVR(device: DMKnownDevice): OVRDevice | undefined {
     if (!device.id.startsWith('OVR_')) return undefined;
-    return this.ovrDevices.find((d) => this.deviceManager['getIdForOpenVRDevice'](d) === device.id);
+    return this.ovrDevices.find((d) => this.deviceManager['getIdForVRDevice'](d) === device.id);
   }
 
   getDeviceLighthouse(device: DMKnownDevice): LighthouseDevice | undefined {

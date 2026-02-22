@@ -1,5 +1,5 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
-import { OpenVRService } from '../../../../services/openvr.service';
+import { VRService } from '../../../../services/openvr.service';
 import { AutomationConfigService } from '../../../../services/automation-config.service';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
@@ -24,7 +24,7 @@ export class ChaperoneAutomationsViewComponent implements OnInit {
     structuredClone(AUTOMATION_CONFIGS_DEFAULT.CHAPERONE_FADE_DISTANCE_ON_SLEEP_MODE_DISABLE);
 
   constructor(
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private automationConfigService: AutomationConfigService,
     private destroyRef: DestroyRef
   ) {}

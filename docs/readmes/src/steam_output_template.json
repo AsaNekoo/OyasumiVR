@@ -21,7 +21,7 @@
   "app[content][sysreqs][windows][min][processor]": "",
   "app[content][sysreqs][windows][min][graphics]": "",
   "app[content][sysreqs][windows][min][soundcard]": "",
-  "app[content][sysreqs][windows][min][vrsupport]": "SteamVR",
+  "app[content][sysreqs][windows][min][vrsupport]": "VR",
   "app[content][sysreqs][windows][min][notes]": "",
   "app[content][sysreqs][windows][req][osversion]": "",
   "app[content][sysreqs][windows][req][processor]": "",

@@ -4,7 +4,7 @@ import { VRChatService } from '../../services/vrchat-api/vrchat.service';
 import { UserStatus } from 'vrchat/dist';
 import { hshrink, noop } from '../../utils/animations';
 import { firstValueFrom } from 'rxjs';
-import { OpenVRService } from '../../services/openvr.service';
+import { VRService } from '../../services/openvr.service';
 import { BackgroundService } from '../../services/background.service';
 import { OscService } from '../../services/osc.service';
 import { HardwareBrightnessControlService } from '../../services/brightness-control/hardware-brightness-control.service';
@@ -52,7 +52,7 @@ export class MainStatusBarComponent implements OnInit {
     private destroyRef: DestroyRef,
     private mqttService: MqttService,
     protected systemMicMuteAutomation: SystemMicMuteAutomationService,
-    protected openvr: OpenVRService,
+    protected openvr: VRService,
     protected background: BackgroundService,
     protected osc: OscService,
     protected hardwareBrightnessControl: HardwareBrightnessControlService,

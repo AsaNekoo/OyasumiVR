@@ -1,5 +1,5 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
-import { OpenVRService } from '../../../../services/openvr.service';
+import { VRService } from '../../../../services/openvr.service';
 import { AutomationConfigService } from '../../../../services/automation-config.service';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
@@ -26,7 +26,7 @@ export class ResolutionAutomationsViewComponent implements OnInit {
   );
 
   constructor(
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private automationConfigService: AutomationConfigService,
     private destroyRef: DestroyRef
   ) {}

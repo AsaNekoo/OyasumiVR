@@ -1,7 +1,7 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { BaseModalComponent } from 'src-ui/app/components/base-modal/base-modal.component';
 import { fade, fadeUp, triggerChildren, vshrink } from '../../../../../../utils/animations';
-import { OpenVRService } from '../../../../../../services/openvr.service';
+import { VRService } from '../../../../../../services/openvr.service';
 import { SleepModeForSleepDetectorAutomationService } from '../../../../../../services/sleep-detection-automations/sleep-mode-for-sleep-detector-automation.service';
 
 export interface SleepDetectorCalibrationModalInputModel {
@@ -35,7 +35,7 @@ export class SleepDetectorCalibrationModalComponent
   }
 
   constructor(
-    protected openvr: OpenVRService,
+    protected openvr: VRService,
     private automation: SleepModeForSleepDetectorAutomationService
   ) {
     super();

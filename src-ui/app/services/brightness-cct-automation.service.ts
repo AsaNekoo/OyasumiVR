@@ -41,7 +41,7 @@ import { SoftwareBrightnessControlService } from './brightness-control/software-
 import { CCTControlService } from './cct-control/cct-control.service';
 import { SetBrightnessOrCCTReason } from './brightness-control/brightness-control-models';
 import { error } from '@tauri-apps/plugin-log';
-import { OpenVRService } from './openvr.service';
+import { VRService } from './openvr.service';
 import { invoke } from '@tauri-apps/api/core';
 
 @Injectable({
@@ -99,7 +99,7 @@ export class BrightnessCctAutomationService {
     private cctControl: CCTControlService,
     private eventLog: EventLogService,
     private sleepPreparation: SleepPreparationService,
-    private openvr: OpenVRService
+    private openvr: VRService
   ) {}
 
   async init() {

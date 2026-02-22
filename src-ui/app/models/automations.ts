@@ -59,7 +59,7 @@ export interface AutomationConfigs {
   SLEEP_MODE_ENABLE_AT_BATTERY_PERCENTAGE: SleepModeEnableAtBatteryPercentageAutomationConfig;
   SLEEP_MODE_ENABLE_ON_CONTROLLERS_POWERED_OFF: SleepModeEnableAtControllersPoweredOffAutomationConfig;
   SLEEP_MODE_ENABLE_ON_HEART_RATE_CALM_PERIOD: SleepModeEnableOnHeartRateCalmPeriodAutomationConfig;
-  SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS: SleepModeChangeOnSteamVRStatusAutomationConfig;
+  SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS: SleepModeChangeOnVRStatusAutomationConfig;
   SLEEP_MODE_DISABLE_AT_TIME: SleepModeDisableAtTimeAutomationConfig;
   SLEEP_MODE_DISABLE_AFTER_TIME: SleepModeDisableAfterTimeAutomationConfig;
   SLEEP_MODE_DISABLE_ON_DEVICE_POWER_ON: SleepModeDisableOnDevicePowerOnAutomationConfig;
@@ -226,8 +226,8 @@ export interface SleepModeEnableOnHeartRateCalmPeriodAutomationConfig extends Au
   periodDuration: number;
 }
 
-export interface SleepModeChangeOnSteamVRStatusAutomationConfig extends AutomationConfig {
-  disableOnSteamVRStop: boolean;
+export interface SleepModeChangeOnVRStatusAutomationConfig extends AutomationConfig {
+  disableOnVRStop: boolean;
 }
 
 export interface SleepModeDisableAtTimeAutomationConfig extends AutomationConfig {
@@ -265,8 +265,8 @@ export interface DevicePowerAutomationsConfig extends AutomationConfig {
   turnOffDevicesBelowBatteryLevel: DeviceSelection;
   turnOffDevicesBelowBatteryLevel_threshold: number;
   turnOffDevicesBelowBatteryLevel_onlyWhileAsleep: boolean;
-  turnOffDevicesOnSteamVRStop: DeviceSelection;
-  turnOnDevicesOnSteamVRStart: DeviceSelection;
+  turnOffDevicesOnVRStop: DeviceSelection;
+  turnOnDevicesOnVRStart: DeviceSelection;
   turnOnDevicesOnOyasumiStart: DeviceSelection;
   turnOnDevicesOnSleepModeDisable: DeviceSelection;
 }
@@ -475,7 +475,7 @@ export interface VRChatGroupAutomationsConfig extends AutomationConfig {
   representGroupIdOnSleepPreparation: string | 'DONT_CHANGE' | 'CLEAR_GROUP';
 }
 
-export type PowerDownWindowsMode = 'SHUTDOWN' | 'REBOOT' | 'SLEEP' | 'HIBERNATE' | 'LOGOUT';
+export type PowerDownSystemMode = 'SHUTDOWN' | 'REBOOT' | 'SLEEP' | 'HIBERNATE' | 'LOGOUT';
 
 export interface ShutdownAutomationsConfig extends AutomationConfig {
   triggersEnabled: boolean;
@@ -490,10 +490,10 @@ export interface ShutdownAutomationsConfig extends AutomationConfig {
   triggerWhenAloneActivationWindow: boolean;
   triggerWhenAloneActivationWindowStart: [number, number];
   triggerWhenAloneActivationWindowEnd: [number, number];
-  quitSteamVR: boolean;
+  quitVR: boolean;
   turnOffDevices: DeviceSelection;
-  powerDownWindows: boolean;
-  powerDownWindowsMode: PowerDownWindowsMode;
+  powerDownSystem: boolean;
+  powerDownSystemMode: PowerDownSystemMode;
 }
 
 export interface NightmareDetectionAutomationsConfig extends AutomationConfig {
@@ -582,7 +582,7 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
   },
   SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS: {
     enabled: true,
-    disableOnSteamVRStop: false,
+    disableOnVRStop: false,
   },
   SLEEP_MODE_DISABLE_AT_TIME: {
     enabled: false,
@@ -652,12 +652,12 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
     },
     turnOffDevicesBelowBatteryLevel_threshold: 50,
     turnOffDevicesBelowBatteryLevel_onlyWhileAsleep: false,
-    turnOffDevicesOnSteamVRStop: {
+    turnOffDevicesOnVRStop: {
       devices: [],
       types: [],
       tagIds: [],
     },
-    turnOnDevicesOnSteamVRStart: {
+    turnOnDevicesOnVRStart: {
       devices: [],
       types: [],
       tagIds: [],
@@ -945,14 +945,14 @@ export const AUTOMATION_CONFIGS_DEFAULT: AutomationConfigs = {
     triggerWhenAloneActivationWindow: false,
     triggerWhenAloneActivationWindowStart: [23, 0],
     triggerWhenAloneActivationWindowEnd: [7, 0],
-    quitSteamVR: true,
+    quitVR: true,
     turnOffDevices: {
       devices: [],
       types: [],
       tagIds: [],
     },
-    powerDownWindows: true,
-    powerDownWindowsMode: 'SHUTDOWN',
+    powerDownSystem: true,
+    powerDownSystemMode: 'SHUTDOWN',
   },
   RUN_AUTOMATIONS: {
     enabled: true,

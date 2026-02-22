@@ -7,13 +7,13 @@ import {
   SystemPowerPolicyOnSleepModeAutomationConfig,
 } from '../../models/automations';
 import { SleepService } from '../sleep.service';
-import { WindowsService } from '../windows.service';
+import { SystemService } from '../windows.service';
 import { SleepPreparationService } from '../sleep-preparation.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SetWindowsPowerPolicyOnSleepModeAutomationService {
+export class SetSystemPowerPolicyOnSleepModeAutomationService {
   onSleepModeEnableConfig: SystemPowerPolicyOnSleepModeAutomationConfig = structuredClone(
     AUTOMATION_CONFIGS_DEFAULT.SYSTEM_POWER_POLICY_ON_SLEEP_MODE_ENABLE
   );
@@ -26,7 +26,7 @@ export class SetWindowsPowerPolicyOnSleepModeAutomationService {
 
   constructor(
     private automationConfig: AutomationConfigService,
-    private windows: WindowsService,
+    private windows: SystemService,
     private sleepMode: SleepService,
     private sleepPrepare: SleepPreparationService
   ) {}

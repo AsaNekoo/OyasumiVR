@@ -11,13 +11,13 @@ mod framelimiter;
 
 use crate::{
     globals::STEAM_APP_KEY,
-    vr::models::{OpenVRAction, OpenVRActionSet},
+    vr::models::{VRAction, VRActionSet},
     utils::send_event,
 };
 use chrono::{DateTime, Utc};
 use gesture_detector::GestureDetector;
 use log::{error, info};
-use models::OpenVRStatus;
+use models::VRStatus;
 use ovr::input::ActiveActionSet;
 use ovr_overlay as ovr;
 use sleep_detector::SleepDetector;
@@ -26,17 +26,17 @@ use substring::Substring;
 use tokio::sync::Mutex;
 
 #[derive(Default)]
-pub struct OpenVRInputContext {
-    pub actions: Vec<OpenVRAction>,
-    pub action_sets: Vec<OpenVRActionSet>,
+pub struct VRInputContext {
+    pub actions: Vec<VRAction>,
+    pub action_sets: Vec<VRActionSet>,
     pub active_sets: Vec<ActiveActionSet>,
 }
 
 
 pub static OVR_CONTEXT: LazyLock<Mutex<Option<ovr::Context>>> = LazyLock::new(Default::default);
-static OVR_STATUS: LazyLock<Mutex<OpenVRStatus>> = LazyLock::new(|| Mutex::new(OpenVRStatus::Inactive));
+static OVR_STATUS: LazyLock<Mutex<VRStatus>> = LazyLock::new(|| Mutex::new(VRStatus::Inactive));
 static OVR_ACTIVE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
-pub static OVR_INPUT_CONTEXT: LazyLock<Mutex<OpenVRInputContext>> = LazyLock::new(Mutex::default);
+pub static OVR_INPUT_CONTEXT: LazyLock<Mutex<VRInputContext>> = LazyLock::new(Mutex::default);
 static OVR_INIT_DELAY_FIX: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 
 pub async fn init() {
@@ -53,28 +53,28 @@ pub async fn task() {
     'ovr_loop: loop {
         tokio::time::sleep(Duration::from_millis(32)).await;
         if *OVR_ACTIVE.lock().await {
-            // If we're not active, try to initialize OpenVR
+            // If we're not active, try to initialize VR
             if OVR_CONTEXT.lock().await.is_none() {
-                // Stop if we cannot yet (re)initialize OpenVR
+                // Stop if we cannot yet (re)initialize VR
                 if (Utc::now() - ovr_next_init).num_milliseconds() <= 0 {
                     continue;
                 }
-                // If we need to reinitialize OpenVR after this, wait at least 3 seconds
+                // If we need to reinitialize VR after this, wait at least 3 seconds
                 ovr_next_init = Utc::now() + chrono::Duration::seconds(3);
-                // Check if SteamVR is running, snd stop initializing if it's not.
+                // Check if VR is running, snd stop initializing if it's not.
                 if !crate::utils::is_process_active(crate::utils::TrackedProcess::Steamvr).await {
-                    update_status(OpenVRStatus::Inactive).await;
+                    update_status(VRStatus::Inactive).await;
                     continue;
                 }
                 // Update the status
-                update_status(OpenVRStatus::Initializing).await;
+                update_status(VRStatus::Initializing).await;
                 // If we need to delay the initialization, do so
                 if *OVR_INIT_DELAY_FIX.lock().await {
                     tokio::time::sleep(Duration::from_secs(5)).await;
                 } else {
                     tokio::time::sleep(Duration::from_secs(1)).await;
                 }
-                // Try to initialize OpenVR
+                // Try to initialize VR
                 let ctx = match ovr::Context::init(
                     ovr::sys::EVRApplicationType::VRApplication_Background,
                 ) {
@@ -96,10 +96,10 @@ pub async fn task() {
                     *OVR_CONTEXT.lock().await = None;
                     continue;
                 }
-                // We've successfully initialized OpenVR
-                info!("[Core] OpenVR Initialized");
+                // We've successfully initialized VR
+                info!("[Core] VR Initialized");
                 ovr_active = true;
-                update_status(OpenVRStatus::Initialized).await;
+                update_status(VRStatus::Initialized).await;
                 // (Un)register manifest if needed
                 {
                     let ctx = OVR_CONTEXT.lock().await;
@@ -156,7 +156,7 @@ pub async fn task() {
                         }
                     }
                 }
-                // Set up SteamVR Input
+                // Set up VR Input
                 let mut actions = vec![];
                 let mut action_sets = vec![];
                 let mut active_sets = vec![];
@@ -193,7 +193,7 @@ pub async fn task() {
                                     continue;
                                 }
                             };
-                            actions.push(OpenVRAction {
+                            actions.push(VRAction {
                                 name: action.to_string(),
                                 handle,
                             });
@@ -217,7 +217,7 @@ pub async fn task() {
                                 unPadding: 0,
                                 nPriority: 0,
                             }));
-                            action_sets.push(OpenVRActionSet {
+                            action_sets.push(VRActionSet {
                                 name: action_set.to_string(),
                                 handle,
                             });
@@ -255,12 +255,12 @@ pub async fn task() {
                 };
                 // Handle Quit event
                 if event.event_type == ovr::sys::EVREventType::VREvent_Quit {
-                    info!("[Core] OpenVR is Quitting. Shutting down OpenVR module");
+                    info!("[Core] VR is Quitting. Shutting down VR module");
                     ovr_active = false;
-                    update_status(OpenVRStatus::Inactive).await;
+                    update_status(VRStatus::Inactive).await;
                     // Shutdown modules
                     brightness_overlay::on_ovr_quit().await;
-                    // Shutdown OpenVR
+                    // Shutdown VR
                     unsafe {
                         ovr::sys::VR_Shutdown();
                     }
@@ -274,14 +274,14 @@ pub async fn task() {
             }
         } else if ovr_active {
             ovr_active = false;
-            info!("[Core] Shutting down OpenVR module");
-            update_status(OpenVRStatus::Inactive).await;
+            info!("[Core] Shutting down VR module");
+            update_status(VRStatus::Inactive).await;
             let ctx = OVR_CONTEXT.lock().await;
             if ctx.is_some() {
                 drop(ctx);
                 // Shutdown modules
                 brightness_overlay::on_ovr_quit().await;
-                // Shutdown OpenVR
+                // Shutdown VR
                 unsafe {
                     ovr::sys::VR_Shutdown();
                 }
@@ -291,7 +291,7 @@ pub async fn task() {
     }
 }
 
-async fn update_status(new_status: OpenVRStatus) {
+async fn update_status(new_status: VRStatus) {
     let mut status = OVR_STATUS.lock().await;
     *status = new_status.clone();
     send_event(

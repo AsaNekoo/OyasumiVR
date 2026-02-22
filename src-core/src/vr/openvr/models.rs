@@ -2,12 +2,12 @@ use ovr_overlay::input::{ActionHandle, ActionSetHandle};
 use serde::{Deserialize, Serialize};
 use strum_macros::{EnumIter, IntoStaticStr};
 
-pub struct OpenVRAction {
+pub struct VRAction {
     pub name: String,
     pub handle: ActionHandle,
 }
 
-pub struct OpenVRActionSet {
+pub struct VRActionSet {
     pub name: String,
     pub handle: ActionSetHandle,
 }
@@ -16,7 +16,7 @@ pub struct OpenVRActionSet {
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct OpenVRInputEvent {
+pub struct VRInputEvent {
     pub action: String,
     pub pressed: bool,
     pub time_ago: f32,

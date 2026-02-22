@@ -3,7 +3,7 @@ import {
   HardwareBrightnessControlDriverBounds,
 } from './hardware-brightness-control-driver';
 import { clamp, ensurePrecision, lerp } from '../../../utils/number-utils';
-import { OpenVRService } from '../../openvr.service';
+import { VRService } from '../../openvr.service';
 import { combineLatest, debounceTime, map, Observable } from 'rxjs';
 import { AppSettings } from '../../../models/settings';
 
@@ -18,7 +18,7 @@ export const VALVE_INDEX_HARDWARE_BRIGHTNESS_CONTROL_DRIVER_BOUNDS: HardwareBrig
 export class ValveIndexHardwareBrightnessControlDriver extends HardwareBrightnessControlDriver {
   constructor(
     appSettings: Observable<AppSettings>,
-    private openvr: OpenVRService
+    private openvr: VRService
   ) {
     super(appSettings);
   }

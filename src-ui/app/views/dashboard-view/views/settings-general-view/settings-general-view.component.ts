@@ -5,12 +5,12 @@ import {
   APP_SETTINGS_DEFAULT,
   AppSettings,
   ExecutableReferenceStatus,
-  QuitWithSteamVRMode,
+  QuitWithVRMode,
 } from 'src-ui/app/models/settings';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SelectBoxItem } from 'src-ui/app/components/select-box/select-box.component';
 import { LighthouseDevicePowerState } from 'src-ui/app/models/lighthouse-device';
-import { StartWithSteamVRHowToModalComponent } from './start-with-steamvr-how-to-modal/start-with-steamvr-how-to-modal.component';
+import { StartWithVRHowToModalComponent } from './start-with-steamvr-how-to-modal/start-with-steamvr-how-to-modal.component';
 import { LighthouseConsoleService } from 'src-ui/app/services/lighthouse-console.service';
 import { AppSettingsService } from 'src-ui/app/services/app-settings.service';
 import { ModalService } from 'src-ui/app/services/modal.service';
@@ -68,21 +68,21 @@ export class SettingsGeneralViewComponent implements OnInit {
     },
   ];
   sleepModeStartupBehaviourOption: SelectBoxItem | undefined;
-  stopWithSteamVROptions: SelectBoxItem[] = [
+  stopWithVROptions: SelectBoxItem[] = [
     {
       id: 'DISABLED',
-      label: 'settings.general.stopWithSteamVR.options.DISABLED',
+      label: 'settings.general.stopWithVR.options.DISABLED',
     },
     {
       id: 'IMMEDIATELY',
-      label: 'settings.general.stopWithSteamVR.options.IMMEDIATELY',
+      label: 'settings.general.stopWithVR.options.IMMEDIATELY',
     },
     {
       id: 'AFTERDELAY',
-      label: 'settings.general.stopWithSteamVR.options.AFTERDELAY',
+      label: 'settings.general.stopWithVR.options.AFTERDELAY',
     },
   ];
-  stopWithSteamVROption: SelectBoxItem | undefined;
+  stopWithVROption: SelectBoxItem | undefined;
 
   constructor(
     private lighthouse: LighthouseConsoleService,
@@ -113,8 +113,8 @@ export class SettingsGeneralViewComponent implements OnInit {
         this.sleepModeStartupBehaviourOption = this.sleepModeStartupBehaviourOptions.find(
           (o) => o.id === settings.sleepModeStartupBehaviour
         );
-        this.stopWithSteamVROption = this.stopWithSteamVROptions.find(
-          (o) => o.id === settings.quitWithSteamVR
+        this.stopWithVROption = this.stopWithVROptions.find(
+          (o) => o.id === settings.quitWithVR
         );
       });
   }
@@ -148,7 +148,7 @@ export class SettingsGeneralViewComponent implements OnInit {
   async browseForLighthouseConsole() {
     const path = await openFile({
       defaultPath:
-        'C:\\Program Files (x86)\\Steam\\steamapps\\common\\SteamVR\\tools\\lighthouse\\bin\\win64',
+        'C:\\Program Files (x86)\\Steam\\steamapps\\common\\VR\\tools\\lighthouse\\bin\\win64',
       directory: false,
       multiple: false,
       filters: [
@@ -201,15 +201,15 @@ export class SettingsGeneralViewComponent implements OnInit {
     this.settingsService.updateSettings({ overlayMenuOnlyOpenWhenVRChatIsRunning: enabled });
   }
 
-  onChangeStopWithSteamVROption(option: SelectBoxItem | undefined) {
+  onChangeStopWithVROption(option: SelectBoxItem | undefined) {
     if (!option) return;
     this.settingsService.updateSettings({
-      quitWithSteamVR: option!.id as QuitWithSteamVRMode,
+      quitWithVR: option!.id as QuitWithVRMode,
     });
   }
 
-  showStartWithSteamVRHowToModal() {
-    this.modalService.addModal(StartWithSteamVRHowToModalComponent).subscribe();
+  showStartWithVRHowToModal() {
+    this.modalService.addModal(StartWithVRHowToModalComponent).subscribe();
   }
 
   protected readonly OVRInputEventAction = OVRInputEventAction;

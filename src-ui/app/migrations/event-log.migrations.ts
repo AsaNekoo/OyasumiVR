@@ -109,7 +109,7 @@ function from1to2(data: any): any {
   data.version = 2;
   data.logs = data.logs.map((log: any) => {
     if (log.type === 'turnedOffDevices') {
-      log.type = 'turnedOffOpenVRDevices';
+      log.type = 'turnedOffVRDevices';
     }
     return log;
   });

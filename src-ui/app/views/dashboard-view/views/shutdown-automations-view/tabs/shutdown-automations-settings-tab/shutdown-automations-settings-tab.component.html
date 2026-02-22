@@ -47,30 +47,30 @@
 
     <div class="setting-row">
       <div class="setting-row-label" translate>
-        <span translate>shutdown-automations.sequence.quitSteamVR.title</span>
-        <span translate>shutdown-automations.sequence.quitSteamVR.description</span>
+        <span translate>shutdown-automations.sequence.quitVR.title</span>
+        <span translate>shutdown-automations.sequence.quitVR.description</span>
       </div>
       <div class="setting-row-action">
         <label class="switch-toggle">
-          <input type="checkbox" [checked]="config.quitSteamVR" (change)="toggleQuitSteamVR()" />
+          <input type="checkbox" [checked]="config.quitVR" (change)="toggleQuitVR()" />
           <span class="switch-toggle-slider"></span>
         </label>
       </div>
     </div>
 
-    @if (config.quitSteamVR && quitWithSteamVRMode === 'IMMEDIATELY') {
+    @if (config.quitVR && quitWithVRMode === 'IMMEDIATELY') {
       <div class="setting-row-group" @vshrink>
         <div class="setting-row">
           <div class="setting-row-label conflict" translate>
             <span>
               <span><i class="material-icons">warning</i></span>
-              <span translate>shutdown-automations.sequence.quitSteamVR.conflict.title</span>
+              <span translate>shutdown-automations.sequence.quitVR.conflict.title</span>
             </span>
-            <span translate>shutdown-automations.sequence.quitSteamVR.conflict.description</span>
+            <span translate>shutdown-automations.sequence.quitVR.conflict.description</span>
           </div>
           <div class="setting-row-action">
             <button class="btn btn-secondary" (click)="goToGeneralSettings()" translate>
-              shutdown-automations.sequence.quitSteamVR.conflict.goToSettings
+              shutdown-automations.sequence.quitVR.conflict.goToSettings
             </button>
           </div>
         </div>
@@ -79,11 +79,11 @@
 
     <div class="setting-row">
       <div class="setting-row-label" translate>
-        <span translate>shutdown-automations.sequence.powerDownWindows.title</span>
-        <span translate>shutdown-automations.sequence.powerDownWindows.description</span>
+        <span translate>shutdown-automations.sequence.powerDownSystem.title</span>
+        <span translate>shutdown-automations.sequence.powerDownSystem.description</span>
       </div>
       <div class="setting-row-action">
-        @if (config.powerDownWindows) {
+        @if (config.powerDownSystem) {
           <div class="power-down-select-box-wrapper" @fade>
             <app-select-box
               type="SMALL"
@@ -98,8 +98,8 @@
         <label class="switch-toggle">
           <input
             type="checkbox"
-            [checked]="config.powerDownWindows"
-            (change)="togglePowerDownWindows()"
+            [checked]="config.powerDownSystem"
+            (change)="togglePowerDownSystem()"
           />
           <span class="switch-toggle-slider"></span>
         </label>

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use super::models::{
-    DeviceUpdateEvent, OVRDevice, VRDevicePose, OVRHandleType, OpenVRInputEvent,
+    DeviceUpdateEvent, OVRDevice, VRDevicePose, OVRHandleType, VRInputEvent,
     TrackedDeviceClass,
 };
 use super::{GestureDetector, SleepDetector, OVR_CONTEXT};
@@ -386,7 +386,7 @@ async fn detect_inputs() {
                             return;
                         }
                     };
-                    let event = OpenVRInputEvent {
+                    let event = VRInputEvent {
                         action: action.name.clone(),
                         pressed: data.0.bState,
                         time_ago: data.0.fUpdateTime,

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 
 import { AutomationConfigService } from '../automation-config.service';
-import { OpenVRService } from '../openvr.service';
+import { VRService } from '../openvr.service';
 import { combineLatest, distinctUntilChanged, map } from 'rxjs';
 import { AUTOMATION_CONFIGS_DEFAULT, DevicePowerAutomationsConfig } from '../../models/automations';
 import { LighthouseConsoleService } from '../lighthouse-console.service';
 import { error, info } from '@tauri-apps/plugin-log';
-import { EventLogTurnedOffOpenVRDevices } from '../../models/event-log-entry';
+import { EventLogTurnedOffVRDevices } from '../../models/event-log-entry';
 import { EventLogService } from '../event-log.service';
 import { DeviceManagerService } from '../device-manager.service';
 import { isEqual } from 'lodash';
@@ -23,7 +23,7 @@ export class TurnOffDevicesWhenChargingAutomationService {
 
   constructor(
     private automationConfig: AutomationConfigService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private lighthouse: LighthouseConsoleService,
     private eventLog: EventLogService,
     private deviceManager: DeviceManagerService
@@ -60,7 +60,7 @@ export class TurnOffDevicesWhenChargingAutomationService {
             `[TurnOffDevicesWhenChargingAutomationService] Detected device being put on charger. Turning off device (${device.class}:${device.serialNumber})`
           );
           this.eventLog.logEvent({
-            type: 'turnedOffOpenVRDevices',
+            type: 'turnedOffVRDevices',
             reason: 'CHARGING',
             devices: (() => {
               switch (device.class) {
@@ -76,7 +76,7 @@ export class TurnOffDevicesWhenChargingAutomationService {
                 }
               }
             })(),
-          } as EventLogTurnedOffOpenVRDevices);
+          } as EventLogTurnedOffVRDevices);
           this.lighthouse.turnOffDevices([device]);
         } else if (!device.isCharging && this.chargingDevices.includes(device.index)) {
           this.chargingDevices = this.chargingDevices.filter((d) => d !== device.index);

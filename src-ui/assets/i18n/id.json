@@ -30,7 +30,7 @@
     "title": "Automasi Kecerahan"
   },
   "chaperone-automations": {
-    "description": "OyasumiVR dapat secara otomatis menyesuaikan jarak pudar SteamVR chaperone ketika mode tidur diaktifkan atau dinonaktifkan.",
+    "description": "OyasumiVR dapat secara otomatis menyesuaikan jarak pudar VR chaperone ketika mode tidur diaktifkan atau dinonaktifkan.",
     "fadeDistance": {
       "title": "Mengubah jarak pudar chaperone ke"
     },
@@ -55,19 +55,19 @@
       "dropdown": {
         "description": "Buka Konfigurasi Binding",
         "desktop": "Mode Desktop",
-        "vr": "Mode SteamVR"
+        "vr": "Mode VR"
       },
       "errors": {
         "DASHBOARD_OPEN": {
-          "message": "Buka Dasbor\nSteamVR",
-          "tooltip": "Tutup Dasbor SteamVR untuk melihat bindings"
+          "message": "Buka Dasbor\nVR",
+          "tooltip": "Tutup Dasbor VR untuk melihat bindings"
         },
         "MISSING_CONTROLLER": {
           "tooltip": "Pastikan Kontroler kiri dan kanan terhubung"
         },
         "STEAMVR_INACTIVE": {
-          "message": "SteamVR Tidak Aktif",
-          "tooltip": "Untuk melihat atau mengubah bindings \npengontrol SteamVR harus berjalan"
+          "message": "VR Tidak Aktif",
+          "tooltip": "Untuk melihat atau mengubah bindings \npengontrol VR harus berjalan"
         },
         "UNKNOWN": {
           "message": "Konfigurasikan Bindings"
@@ -195,8 +195,8 @@
             "SLEEP_MODE_ENABLED": "Saat mode tidur dinyalakan"
           },
           "title": {
-            "auto": "Resolusi render SteamVR diatur ke 'auto'",
-            "custom": "Resolusi render SteamVR diatur ke {value}"
+            "auto": "Resolusi render VR diatur ke 'auto'",
+            "custom": "Resolusi render VR diatur ke {value}"
           }
         },
         "shutdownSequenceCancelled": {
@@ -229,7 +229,7 @@
           "reason": {
             "automation": {
               "NIGHTMARE_DETECTION": "Saat terdeteksi, Anda mungkin mengalami mimpi buruk",
-              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "Disaat SteamVR keluar",
+              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "Disaat VR keluar",
               "SLEEP_MODE_DISABLE_AT_TIME": "Disaat waktu tertentu",
               "SLEEP_MODE_DISABLE_ON_DEVICE_POWER_ON": "Disaat perangkat menyala",
               "unknown": "Dari otomatisasi yang tidak diketahui"
@@ -266,7 +266,7 @@
           },
           "title": "Mengubah status VRChat Anda dari {oldStatus} ke {newStatus}"
         },
-        "turnedOffOpenVRDevices": {
+        "turnedOffVRDevices": {
           "reason": {
             "BATTERY_LEVEL": "Saat level baterai turun di bawah {threshold}%",
             "CHARGING": "Disaat perangkat mengisi ulang",
@@ -288,7 +288,7 @@
             "SLEEP_MODE_DISABLED": "Saat mode tidur dimatikan",
             "SLEEP_MODE_ENABLED": "Saat mode tidur dinyalakan"
           },
-          "title": "Kebijakan Daya Windows diatur ke paket ''{policy}''"
+          "title": "Kebijakan Daya System diatur ke paket ''{policy}''"
         }
       }
     },
@@ -379,8 +379,8 @@
       "defaultPlaceholder": "Pilih..."
     },
     "start-with-steamvr-how-to-modal": {
-      "description": "Anda dapat mengonfigurasi OyasumiVR untuk diluncurkan bersama SteamVR dari dalam pengaturan SteamVR sendiri. Anda dapat menemukannya di:\n\nSteamVR -> Pengaturan -> Startup / Shutdown -> Pilih aplikasi overlay startup",
-      "title": "Mulai OyasumiVR dengan SteamVR"
+      "description": "Anda dapat mengonfigurasi OyasumiVR untuk diluncurkan bersama VR dari dalam pengaturan VR sendiri. Anda dapat menemukannya di:\n\nVR -> Pengaturan -> Startup / Shutdown -> Pilih aplikasi overlay startup",
+      "title": "Mulai OyasumiVR dengan VR"
     },
     "update-modal": {
       "message": "Pembaruan baru untuk OyasumiVR telah ditemukan: v{newVersion}.\n\nAnda saat ini masih menjalankan v{currentVersion}.\n\nApakah Anda ingin memperbarui sekarang atau nanti?",
@@ -732,20 +732,20 @@
       "adapterError": "Terjadi kesalahan saat mencoba berkomunikasi dengan adaptor Bluetooth. Pastikan adaptor Bluetooth Anda telah diaktifkan dan coba lagi.",
       "noAdapter": "Tidak ada adaptor Bluetooth yang ditemukan di sistem Anda. Pastikan sistem Anda dilengkapi dengan adaptor Bluetooth dan adaptor tersebut diaktifkan."
     },
-    "powerManagementWarning": "Ketika memilih untuk menggunakan otomatisasi OyasumiVR untuk menghidupkan atau mematikan base station Anda, Anda disarankan untuk menonaktifkan manajemen daya dalam pengaturan base station SteamVR.",
+    "powerManagementWarning": "Ketika memilih untuk menggunakan otomatisasi OyasumiVR untuk menghidupkan atau mematikan base station Anda, Anda disarankan untuk menonaktifkan manajemen daya dalam pengaturan base station VR.",
     "tabs": {
       "windowsPowerPolicy": "Kebijakan daya"
     },
     "title": "Otomatisasi Daya",
     "windowsPowerPolicy": {
       "automations": "Otomatisasi",
-      "description": "OyasumiVR dapat secara otomatis mengubah Kebijakan Daya Windows yang aktif ketika Anda tidur atau bangun. Hal ini dapat berguna untuk mengurangi konsumsi daya saat Anda tidur, dan mengembalikan kebijakan kinerja yang lebih tinggi saat Anda bangun kembali.",
+      "description": "OyasumiVR dapat secara otomatis mengubah Kebijakan Daya System yang aktif ketika Anda tidur atau bangun. Hal ini dapat berguna untuk mengurangi konsumsi daya saat Anda tidur, dan mengembalikan kebijakan kinerja yang lebih tinggi saat Anda bangun kembali.",
       "sleepModeDisable": {
-        "description": "Tetapkan Kebijakan Daya Windows berikut ini",
+        "description": "Tetapkan Kebijakan Daya System berikut ini",
         "title": "Ketika mode tidur dimatikan"
       },
       "sleepModeEnable": {
-        "description": "Tetapkan Kebijakan Daya Windows berikut ini",
+        "description": "Tetapkan Kebijakan Daya System berikut ini",
         "title": "Ketika mode tidur dinyalakan"
       }
     }
@@ -759,7 +759,7 @@
     }
   },
   "resolution-automations": {
-    "description": "OyasumiVR dapat secara otomatis menyesuaikan resolusi render SteamVR ketika mode tidur diaktifkan atau dinonaktifkan.",
+    "description": "OyasumiVR dapat secara otomatis menyesuaikan resolusi render VR ketika mode tidur diaktifkan atau dinonaktifkan.",
     "onSleepDisable": {
       "description": "Atur resolusi render saya",
       "title": "Ketika saya bangun"
@@ -872,7 +872,7 @@
         "title": "Bahasa"
       },
       "lighthouseConsole": {
-        "description": "OyasumiVR perlu mengetahui tentang lokasi instalasi SteamVR Anda <strong>lighthouse_console.exe</strong>.\nJika OyasumiVR tidak dapat menemukannya di lokasi default, Anda perlu mengatur di mana ia dapat ditemukan.",
+        "description": "OyasumiVR perlu mengetahui tentang lokasi instalasi VR Anda <strong>lighthouse_console.exe</strong>.\nJika OyasumiVR tidak dapat menemukannya di lokasi default, Anda perlu mengatur di mana ia dapat ditemukan.",
         "status": {
           "CHECKING": "Memeriksa <strong>lighthouse_console.exe</strong> yang valid",
           "INVALID_EXECUTABLE": "<strong>lighthouse_console.exe</strong> di lokasi ini tidak dapat diverifikasi sebagai berfungsi.",
@@ -900,11 +900,11 @@
           },
           "title": "Status daya mati yang diinginkan"
         },
-        "title": "Kontrol Daya Base Station SteamVR"
+        "title": "Kontrol Daya Base Station VR"
       },
       "overlay": {
         "binding": {
-          "description": "Tombol mana yang memicu menu overlay dapat dikonfigurasi dalam menu bindings SteamVR.",
+          "description": "Tombol mana yang memicu menu overlay dapat dikonfigurasi dalam menu bindings VR.",
           "title": "Binding tombol kontroler"
         },
         "overlayMenu": {
@@ -937,14 +937,14 @@
       "startStop": {
         "title": "Mulai & Berhenti"
       },
-      "startWithSteamVR": {
-        "description": "Mulai OyasumiVR saat SteamVR dimulai",
+      "startWithVR": {
+        "description": "Mulai OyasumiVR saat VR dimulai",
         "howTo": "Bagaimana caranya",
-        "label": "Mulai dengan SteamVR"
+        "label": "Mulai dengan VR"
       },
-      "stopWithSteamVR": {
-        "description": "Keluar dari OyasumiVR ketika SteamVR dihentikan selama jangka waktu tertentu",
-        "label": "Keluar dengan SteamVR",
+      "stopWithVR": {
+        "description": "Keluar dari OyasumiVR ketika VR dihentikan selama jangka waktu tertentu",
+        "label": "Keluar dengan VR",
         "options": {
           "AFTERDELAY": "Setelah 2 menit",
           "DISABLED": "Matikan",
@@ -1056,13 +1056,13 @@
     "overlay": {
       "cancel": "Batalkan",
       "stage": {
-        "POWERING_DOWN": "Mematikan Windows...",
-        "QUITTING_STEAMVR": "Mematikan SteamVR..."
+        "POWERING_DOWN": "Mematikan System...",
+        "QUITTING_STEAMVR": "Mematikan VR..."
       },
       "title": "Mematikan"
     },
     "sequence": {
-      "powerDownWindows": {
+      "powerDownSystem": {
         "description": "Mencoba mematikan komputer Anda",
         "options": {
           "HIBERNATE": "Hibernasi",
@@ -1073,16 +1073,16 @@
         },
         "rebootMessage": "OyasumiVR sedang memulai ulang PC Anda",
         "shutdownMessage": "OyasumiVR sedang mematikan PC Anda",
-        "title": "Matikan Windows"
+        "title": "Matikan System"
       },
-      "quitSteamVR": {
+      "quitVR": {
         "conflict": {
-          "description": "Anda telah mengonfigurasi OyasumiVR untuk segera berhenti ketika SteamVR dihentikan. Oleh karena itu, otomatisasi berikutnya mungkin tidak berjalan. Untuk memperbaikinya, nonaktifkan tugas ini, atau konfigurasikan OyasumiVR agar tidak langsung berhenti saat SteamVR dihentikan, di pengaturan umum.",
+          "description": "Anda telah mengonfigurasi OyasumiVR untuk segera berhenti ketika VR dihentikan. Oleh karena itu, otomatisasi berikutnya mungkin tidak berjalan. Untuk memperbaikinya, nonaktifkan tugas ini, atau konfigurasikan OyasumiVR agar tidak langsung berhenti saat VR dihentikan, di pengaturan umum.",
           "goToSettings": "Pengaturan Umum",
           "title": "Peringatan: Menjalankan tugas ini akan menyebabkan OyasumiVR segera berhenti"
         },
         "description": "Ini juga akan menghentikan permainan atau overlay yang sedang Anda jalankan",
-        "title": "Keluar SteamVR"
+        "title": "Keluar VR"
       },
       "run": "Jalankan urutan",
       "turnOffBaseStations": {
@@ -1121,7 +1121,7 @@
       "atTime": "Pada waktu tertentu",
       "description": "Secara otomatis menonaktifkan mode tidur berdasarkan berbagai pemicu",
       "onDevicePowerOn": "Saat perangkat dihidupkan",
-      "onSteamVRStop": "Saat SteamVR dihentikan"
+      "onVRStop": "Saat VR dihentikan"
     },
     "enableAutomations": {
       "atBatteryPercentage": "Ketika persentase baterai perangkat turun di bawah <strong>{value}%</strong>",
@@ -1251,7 +1251,7 @@
           "stepPrefix": "Kalibrasi bekerja sebagai berikut:",
           "stepSuffix": "Selesai! Setelah kalibrasi, OyasumiVR seharusnya dapat mendeteksi jika Anda tertidur berdasarkan pergerakan headset VR Anda."
         },
-        "noSteamVR": "Anda hanya dapat memulai kalibrasi setelah SteamVR berjalan dengan Headset VR yang terpasang.",
+        "noVR": "Anda hanya dapat memulai kalibrasi setelah VR berjalan dengan Headset VR yang terpasang.",
         "prepare": {
           "instruction": "Kenakan headset VR Anda dan berbaringlah.",
           "note": "Setelah Anda siap dan dapat melihat jendela ini dari hamparan Anda, tekan 'Mulai Kalibrasi' untuk memulai."

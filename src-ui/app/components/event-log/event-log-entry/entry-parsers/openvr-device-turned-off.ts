@@ -1,20 +1,20 @@
 import { EventLogEntryParser } from '../event-log-entry-parser';
-import { EventLogTurnedOffOpenVRDevices, EventLogType } from '../../../../models/event-log-entry';
+import { EventLogTurnedOffVRDevices, EventLogType } from '../../../../models/event-log-entry';
 
-export class EventLogTurnedOffOpenVRDevicesEntryParser extends EventLogEntryParser<EventLogTurnedOffOpenVRDevices> {
+export class EventLogTurnedOffVRDevicesEntryParser extends EventLogEntryParser<EventLogTurnedOffVRDevices> {
   entryType(): EventLogType {
-    return 'turnedOffOpenVRDevices';
+    return 'turnedOffVRDevices';
   }
 
-  override headerInfoTitle(entry: EventLogTurnedOffOpenVRDevices): string {
-    return 'comp.event-log-entry.type.turnedOffOpenVRDevices.title.' + entry.devices;
+  override headerInfoTitle(entry: EventLogTurnedOffVRDevices): string {
+    return 'comp.event-log-entry.type.turnedOffVRDevices.title.' + entry.devices;
   }
 
-  override headerInfoSubTitle(entry: EventLogTurnedOffOpenVRDevices): string {
-    return 'comp.event-log-entry.type.turnedOffOpenVRDevices.reason.' + entry.reason;
+  override headerInfoSubTitle(entry: EventLogTurnedOffVRDevices): string {
+    return 'comp.event-log-entry.type.turnedOffVRDevices.reason.' + entry.reason;
   }
 
-  headerInfoSubTitleParams(entry: EventLogTurnedOffOpenVRDevices): { [p: string]: string } {
+  headerInfoSubTitleParams(entry: EventLogTurnedOffVRDevices): { [p: string]: string } {
     return {
       threshold: entry.batteryThreshold?.toString() ?? '',
     };

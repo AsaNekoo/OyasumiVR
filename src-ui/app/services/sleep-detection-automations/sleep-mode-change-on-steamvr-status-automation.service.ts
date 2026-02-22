@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AutomationConfigService } from '../automation-config.service';
-import { OpenVRService } from '../openvr.service';
+import { VRService } from '../openvr.service';
 import {
   AUTOMATION_CONFIGS_DEFAULT,
-  SleepModeChangeOnSteamVRStatusAutomationConfig,
+  SleepModeChangeOnVRStatusAutomationConfig,
 } from '../../models/automations';
 
 import { debounceTime, map, pairwise, tap } from 'rxjs';
@@ -12,14 +12,14 @@ import { SleepService } from '../sleep.service';
 @Injectable({
   providedIn: 'root',
 })
-export class SleepModeChangeOnSteamVRStatusAutomationService {
-  private config: SleepModeChangeOnSteamVRStatusAutomationConfig = structuredClone(
+export class SleepModeChangeOnVRStatusAutomationService {
+  private config: SleepModeChangeOnVRStatusAutomationConfig = structuredClone(
     AUTOMATION_CONFIGS_DEFAULT.SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS
   );
 
   constructor(
     private automationConfig: AutomationConfigService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private sleep: SleepService
   ) {}
 
@@ -34,7 +34,7 @@ export class SleepModeChangeOnSteamVRStatusAutomationService {
         debounceTime(2000),
         pairwise(),
         tap(([initializedBefore, initializedAfter]) => {
-          if (initializedBefore && !initializedAfter && this.config.disableOnSteamVRStop) {
+          if (initializedBefore && !initializedAfter && this.config.disableOnVRStop) {
             this.sleep.disableSleepMode({
               type: 'AUTOMATION',
               automation: 'SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS',

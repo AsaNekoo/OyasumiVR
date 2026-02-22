@@ -11,7 +11,7 @@ import { VRCSleepingAnimationsOscMethod } from './methods/vrc-sleeping-animation
 import { OSCMessage, OSCValue, OSCValueTypeE } from '../../models/osc-message';
 import { AvatarChangeOscMethod } from './methods/avatar-change.osc-method';
 import { CommandOscMethod } from './methods/command.osc-method';
-import { OpenVRService } from '../openvr.service';
+import { VRService } from '../openvr.service';
 import { LighthouseConsoleService } from '../lighthouse-console.service';
 import { LighthouseService } from '../lighthouse.service';
 import { EventLogService } from '../event-log.service';
@@ -29,7 +29,7 @@ export class OscControlService {
     private osc: OscService,
     automationConfig: AutomationConfigService,
     sleep: SleepService,
-    openvr: OpenVRService,
+    openvr: VRService,
     lighthouseConsole: LighthouseConsoleService,
     lighthouse: LighthouseService,
     eventLog: EventLogService,

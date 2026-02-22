@@ -9,7 +9,7 @@ import { fadeUp } from 'src-ui/app/utils/animations';
   animations: [fadeUp()],
   standalone: false,
 })
-export class StartWithSteamVRHowToModalComponent
+export class StartWithVRHowToModalComponent
   extends BaseModalComponent<void, void>
   implements OnInit
 {

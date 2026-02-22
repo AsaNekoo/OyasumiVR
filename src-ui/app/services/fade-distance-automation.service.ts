@@ -11,7 +11,7 @@ import {
   pairwise,
   skip,
 } from 'rxjs';
-import { OpenVRService } from './openvr.service';
+import { VRService } from './openvr.service';
 import { EventLogChaperoneFadeDistanceChanged } from '../models/event-log-entry';
 
 @Injectable({
@@ -21,7 +21,7 @@ export class ChaperoneFadeDistanceAutomationService {
   constructor(
     private automationConfigService: AutomationConfigService,
     private sleepService: SleepService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private eventLog: EventLogService
   ) {}
   //not called

@@ -14,7 +14,7 @@ import {
 } from 'src-ui/app/services/frame-limiter.service';
 import { ModalService } from 'src-ui/app/services/modal.service';
 import { fade, vshrink } from 'src-ui/app/utils/animations';
-import { OpenVRService } from 'src-ui/app/services/openvr.service';
+import { VRService } from 'src-ui/app/services/openvr.service';
 import {
   FrameLimiterAddApplicationModalComponent,
   FrameLimiterAddApplicationModalOutputModel,
@@ -37,7 +37,7 @@ export class FrameLimiterViewComponent implements OnInit {
     private frameLimiterService: FrameLimiterService,
     private modalService: ModalService,
     private destroyRef: DestroyRef,
-    public openvr: OpenVRService
+    public openvr: VRService
   ) {}
 
   ngOnInit(): void {

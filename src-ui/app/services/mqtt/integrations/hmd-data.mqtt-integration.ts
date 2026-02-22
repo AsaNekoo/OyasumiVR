@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MqttDiscoveryService } from '../mqtt-discovery.service';
-import { OpenVRService } from '../../openvr.service';
+import { VRService } from '../../openvr.service';
 import { map } from 'rxjs';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { map } from 'rxjs';
 export class HMDDataMqttIntegrationService {
   constructor(
     private mqtt: MqttDiscoveryService,
-    private openvr: OpenVRService
+    private openvr: VRService
   ) {}
 
   async init() {

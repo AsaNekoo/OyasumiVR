@@ -18,7 +18,7 @@
   <div class="device-list">
     @for (category of deviceCategories; track trackDeviceCategoryBy($index, category)) {
       <div class="device-list-category" [@triggerChildren]>
-        @if (category.type === 'OpenVR') {
+        @if (category.type === 'VR') {
           <div>
             <div class="device-list-category-header" [@vshrink]>
               <div class="device-list-category-header-label">

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { OpenVRService } from './services/openvr.service';
+import { VRService } from './services/openvr.service';
 import { routeAnimations } from './app-routing.module';
 import { TranslateService } from '@ngx-translate/core';
 import { AppSettingsService } from './services/app-settings.service';
@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
   showSnowverlay = false;
 
   constructor(
-    public openvr: OpenVRService,
+    public openvr: VRService,
     translate: TranslateService,
     private settings: AppSettingsService,
   ) {

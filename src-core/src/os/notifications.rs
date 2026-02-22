@@ -17,6 +17,7 @@ pub mod os {
     }
     #[derive(Debug, Clone, Copy, Serialize_repr)]
     #[repr(u8)]
+    #[allow(dead_code)]
     pub enum IsInhibited {
         NO = 0,
         ByOyasumi = 1,
@@ -24,6 +25,7 @@ pub mod os {
         Unknown = 3,
     }
     static mut INHIBIT_TOKEN: u32 = u32::MAX;
+    #[allow(dead_code)]
     pub async fn is_inibited() -> IsInhibited {
         if connect_dbus().await
             && let Some(conn) = DBUS_CONNECTION.lock().await.as_ref()

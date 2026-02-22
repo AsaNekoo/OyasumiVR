@@ -15,7 +15,7 @@ import { LighthouseDevice } from 'src-ui/app/models/lighthouse-device';
 import { OVRDevice } from 'src-ui/app/models/ovr-device';
 import {
   EventLogLighthouseSetPowerState,
-  EventLogTurnedOffOpenVRDevices,
+  EventLogTurnedOffVRDevices,
 } from 'src-ui/app/models/event-log-entry';
 
 @Injectable({
@@ -57,10 +57,10 @@ export class SleepDevicePowerAutomationsService {
 
   private async handleSleepPreparation() {
     this.eventLog.logEvent({
-      type: 'turnedOffOpenVRDevices',
+      type: 'turnedOffVRDevices',
       reason: 'SLEEP_PREPARATION',
       devices: 'VARIOUS',
-    } as EventLogTurnedOffOpenVRDevices);
+    } as EventLogTurnedOffVRDevices);
     await this.turnOffSelectedDevices(this.config.turnOffDevicesOnSleepPreparation);
   }
 
@@ -71,10 +71,10 @@ export class SleepDevicePowerAutomationsService {
     const offDevices = offResult.ovrDevices.length + offResult.lighthouseDevices.length;
     if (offDevices > 0) {
       this.eventLog.logEvent({
-        type: 'turnedOffOpenVRDevices',
+        type: 'turnedOffVRDevices',
         reason: 'SLEEP_MODE_DISABLED',
         devices: offDevices === 1 ? 'SINGLE' : 'VARIOUS',
-      } as EventLogTurnedOffOpenVRDevices);
+      } as EventLogTurnedOffVRDevices);
     }
     const onResult = await this.turnOnSelectedDevices(this.config.turnOnDevicesOnSleepModeDisable);
     const onDevices = onResult.lighthouseDevices.length;
@@ -90,10 +90,10 @@ export class SleepDevicePowerAutomationsService {
 
   private async handleSleepModeEnable() {
     this.eventLog.logEvent({
-      type: 'turnedOffOpenVRDevices',
+      type: 'turnedOffVRDevices',
       reason: 'SLEEP_MODE_ENABLED',
       devices: 'VARIOUS',
-    } as EventLogTurnedOffOpenVRDevices);
+    } as EventLogTurnedOffVRDevices);
     await this.turnOffSelectedDevices(this.config.turnOffDevicesOnSleepModeEnable);
   }
 

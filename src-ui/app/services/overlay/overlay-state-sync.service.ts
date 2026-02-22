@@ -32,7 +32,7 @@ import {
   ShutdownAutomationsService,
   ShutdownSequenceStageOrder,
 } from '../shutdown-automations.service';
-import { OpenVRService } from '../openvr.service';
+import { VRService } from '../openvr.service';
 import { OVRDevice } from '../../models/ovr-device';
 import { APP_SETTINGS_DEFAULT } from '../../models/settings';
 import { SimpleBrightnessControlService } from '../brightness-control/simple-brightness-control.service';
@@ -136,7 +136,7 @@ export class OverlayStateSyncService {
     private cctService: CCTControlService,
     private appSettings: AppSettingsService,
     private shutdownAutomationsService: ShutdownAutomationsService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private simpleBrightness: SimpleBrightnessControlService,
     private hardwareBrightness: HardwareBrightnessControlService,
     private softwareBrightness: SoftwareBrightnessControlService,
@@ -313,7 +313,7 @@ export class OverlayStateSyncService {
         };
         for (const device of devices) {
           const knownDevice = this.deviceManager.getKnownDeviceById(
-            this.deviceManager.getIdForOpenVRDevice(device)
+            this.deviceManager.getIdForVRDevice(device)
           );
           if (knownDevice?.disabled) continue;
           switch (device.class) {

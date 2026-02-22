@@ -169,8 +169,8 @@
             "SLEEP_MODE_ENABLED": "Car le mode sommeil a été activé"
           },
           "title": {
-            "auto": "Résolution d'affichage de SteamVR passée à 'auto'",
-            "custom": "Résolution d'affichage de SteamVR passée à {value}"
+            "auto": "Résolution d'affichage de VR passée à 'auto'",
+            "custom": "Résolution d'affichage de VR passée à {value}"
           }
         },
         "runAutomationExecuted": {
@@ -192,7 +192,7 @@
         "sleepModeDisabled": {
           "reason": {
             "automation": {
-              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "À la fermeture de SteamVR",
+              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "À la fermeture de VR",
               "SLEEP_MODE_DISABLE_AT_TIME": "À une heure prédéfinie",
               "SLEEP_MODE_DISABLE_ON_DEVICE_POWER_ON": "Car un appareil a été mis sous tension",
               "unknown": "Par une automatisation inconnue"
@@ -236,7 +236,7 @@
           },
           "title": "Votre statut VRChat a été changé de {oldStatus} pour {newStatus}"
         },
-        "turnedOffOpenVRDevices": {
+        "turnedOffVRDevices": {
           "reason": {
             "CHARGING": "À la mise en charge",
             "MANUAL": "Éteint manuellement",
@@ -766,7 +766,7 @@
         "title": "Langue"
       },
       "lighthouseConsole": {
-        "description": "OyasumiVR a besoin de l'emplacement de <strong>lighthouse_console.exe</strong>, dans le dossier d'installation de SteamVR.\nSi OyasumiVR ne peut pas trouver l'emplacement par défaut, vous devrez le spécifier manuellement.",
+        "description": "OyasumiVR a besoin de l'emplacement de <strong>lighthouse_console.exe</strong>, dans le dossier d'installation de VR.\nSi OyasumiVR ne peut pas trouver l'emplacement par défaut, vous devrez le spécifier manuellement.",
         "status": {
           "CHECKING": "Vérification de <strong>lighthouse_console.exe</strong>",
           "INVALID_EXECUTABLE": "Le fonctionnement du fichier <strong>lighthouse_console.exe</strong> de cet emplacement n'a pas pu être vérifié.",
@@ -798,7 +798,7 @@
         },
         "title": "Mode sommeil"
       },
-      "stopWithSteamVR": {
+      "stopWithVR": {
         "options": {
           "DISABLED": "Désactivé"
         }
@@ -875,7 +875,7 @@
   },
   "shutdown-automations": {
     "sequence": {
-      "powerDownWindows": {
+      "powerDownSystem": {
         "options": {
           "LOGOUT": "Se déconnecter",
           "SLEEP": "Sommeil"
@@ -888,7 +888,7 @@
       "atTime": "À une heure prédéfinie",
       "description": "Désactive automatiquement le mode sommeil selon plusieurs critères",
       "onDevicePowerOn": "Lorsqu'un appareil est allumé",
-      "onSteamVRStop": "Lorsque SteamVR est stoppé"
+      "onVRStop": "Lorsque VR est stoppé"
     },
     "enableAutomations": {
       "atBatteryPercentage": "Lorsque la charge d'un appareil est en dessous de <strong>{value}%</strong>",
@@ -985,7 +985,7 @@
           "stepPrefix": "La calibration consiste en:",
           "stepSuffix": "Et voilà! Après calibration, OyasumiVR devrait détecter si vous vous êtes endormi grâce aux mouvement du casque VR."
         },
-        "noSteamVR": "SteamVR doit être démarré et un casque connecté pour débuter la calibration.",
+        "noVR": "VR doit être démarré et un casque connecté pour débuter la calibration.",
         "prepare": {
           "instruction": "Mettez votre casque VR et allongez-vous.",
           "note": "Lorsque vous êtes prêt(e) et que cette fenêtre est visible depuis votre overlay, appuyez sur 'Débuter la calibration' pour commencer."

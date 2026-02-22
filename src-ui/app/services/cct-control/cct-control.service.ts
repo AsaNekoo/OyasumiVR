@@ -16,7 +16,7 @@ import { CancellableTask } from '../../utils/cancellable-task';
 import { info } from '@tauri-apps/plugin-log';
 import { invoke } from '@tauri-apps/api/core';
 import { getCSSColorForCCT } from 'src-shared-ts/src/cct-utils';
-import { OpenVRService } from '../openvr.service';
+import { VRService } from '../openvr.service';
 import { clamp } from '../../utils/number-utils';
 import { AppSettingsService } from '../app-settings.service';
 
@@ -39,7 +39,7 @@ export class CCTControlService {
   public readonly cctStream: Observable<number> = this._cct.asObservable();
 
   constructor(
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private appSettingsService: AppSettingsService
   ) {}
   //not used

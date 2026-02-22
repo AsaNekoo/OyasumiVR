@@ -9,11 +9,11 @@ use winreg::RegKey;
 pub async fn run() {
     let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
     let uninstall = match hklm
-        .open_subkey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall")
+        .open_subkey("SOFTWARE\\Microsoft\\System\\CurrentVersion\\Uninstall")
     {
         Ok(key) => key,
         Err(e) => {
-            warn!("[Core] Failed to open read uninstall key from Windows registry for migrating old versions: {}", e);
+            warn!("[Core] Failed to open read uninstall key from System registry for migrating old versions: {}", e);
             return;
         }
     };

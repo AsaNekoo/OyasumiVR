@@ -30,7 +30,7 @@ OyasumiVR dapat **mendeteksi saat Anda tertidur**, dan membantu Anda dalam berba
 - 📩 Menangani permintaan undangan secara otomatis
 - 🔵 Automating your VRChat status
 - 🎤 Membisukan mikrofon saat Anda tertidur
-- 🛠 Mengotomatiskan berbagai pengaturan SteamVR
+- 🛠 Mengotomatiskan berbagai pengaturan VR
 
 ...dan masih banyak lagi! Silakan lihat bagian "Fitur" yang akan datang untuk membaca lebih lanjut tentang fungsionalitas yang ditawarkan OyasumiVR.
 
@@ -62,17 +62,17 @@ Jika deteksi otomatis bukan yang Anda cari, ada berbagai otomatisasi alternatif 
   <li>Jadwal waktu</li>
   <li>Tingkat baterai kontroler & tracker</li>
   <li>Status daya kontroler & tracker</li>
-  <li>Status SteamVR</li>
+  <li>Status VR</li>
   <li>Heart Rate</li>
   <li>Sitting Upright</li>
   <li>VRChat players joining or leaving</li>
 </ul>
 
 {{STEAMVR_OVERLAY_HEADER}}
-📲 Overlay SteamVR
+📲 Overlay VR
 
 {{STEAMVR_OVERLAY_BODY}}
-OyasumiVR hadir dengan overlay SteamVR-nya sendiri, yang memungkinkan Anda mengontrol beberapa fiturnya dari dalam VR!
+OyasumiVR hadir dengan overlay VR-nya sendiri, yang memungkinkan Anda mengontrol beberapa fiturnya dari dalam VR!
 <br><br>
 Secara default, tekan dua kali tombol A pada kontroler kanan Anda, dan tombol ini akan muncul di depan Anda.
 
@@ -88,14 +88,14 @@ Secara otomatis, kontroler dan/atau tracker Anda akan mati ketika Anda tidur, da
 Selain itu, Anda dapat membuat kontroler dan/atau tracker Anda mati pada level baterai tertentu, atau ketika Anda meletakkannya pada pengisi daya. Ideal untuk hotswapping kontroler!
 
 {{POWER_AUTOMATIONS_BODY_WINDOWS_POWER_POLICY}}
-<b>Kebijakan Daya Windows</b>
+<b>Kebijakan Daya System</b>
 <br>
-Hemat listrik dengan mengatur Kebijakan Daya Windows secara otomatis saat Anda tidur dan bangun! Cukup setel kebijakan yang lebih konservatif (seperti "Penghemat Daya") saat Anda tidur, lalu kembalikan kebijakan kinerja yang lebih tinggi saat Anda bangun lagi.
+Hemat listrik dengan mengatur Kebijakan Daya System secara otomatis saat Anda tidur dan bangun! Cukup setel kebijakan yang lebih konservatif (seperti "Penghemat Daya") saat Anda tidur, lalu kembalikan kebijakan kinerja yang lebih tinggi saat Anda bangun lagi.
 
 {{POWER_AUTOMATIONS_BODY_BASE_STATIONS}}
 <b>Base Station</b>
 <br>
-Mintalah OyasumiVR untuk menghidupkan dan mematikan base station Anda bersama dengan SteamVR. Sedikit mirip dengan manajemen daya stasiun pangkalan SteamVR sendiri, tetapi <b>kompatibel dengan HMD apa pun!</b> Selama PC Anda mendukung Bluetooth dan berada dalam jangkauan base station, Anda siap menggunakannya.
+Mintalah OyasumiVR untuk menghidupkan dan mematikan base station Anda bersama dengan VR. Sedikit mirip dengan manajemen daya stasiun pangkalan VR sendiri, tetapi <b>kompatibel dengan HMD apa pun!</b> Selama PC Anda mendukung Bluetooth dan berada dalam jangkauan base station, Anda siap menggunakannya.
 
 {{GPU_AUTOMATIONS_HEADER}}
 🔌 Otomatisasi GPU
@@ -173,13 +173,13 @@ OyasumiVR dapat mendeteksi ketika detak jantung Anda meningkat dalam waktu lama,
 👓 Otomatisasi Resolusi
 
 {{RESOLUTION_AUTOMATIONS_BODY}}
-Secara otomatis menyesuaikan resolusi render SteamVR Anda saat Anda tidur dan bangun! Memiliki OyasumiVR yang menurunkan resolusi render Anda membantu Anda mengurangi beban pada perangkat keras Anda pada saat Anda tidak membutuhkannya.
+Secara otomatis menyesuaikan resolusi render VR Anda saat Anda tidur dan bangun! Memiliki OyasumiVR yang menurunkan resolusi render Anda membantu Anda mengurangi beban pada perangkat keras Anda pada saat Anda tidak membutuhkannya.
 
 {{CHAPERONE_AUTOMATIONS_HEADER}}
 🔳 Otomatisasi Chaperone
 
 {{CHAPERONE_AUTOMATIONS_BODY}}
-Secara otomatis menyesuaikan jarak pudar chaperone SteamVR saat Anda tidur. Jika Anda memiliki area bermain yang kecil, Anda dapat menggunakan ini untuk memastikan pendamping tetap tersembunyi saat Anda tidur, dan mengaktifkannya kembali saat Anda bangun!
+Secara otomatis menyesuaikan jarak pudar chaperone VR saat Anda tidur. Jika Anda memiliki area bermain yang kecil, Anda dapat menggunakan ini untuk memastikan pendamping tetap tersembunyi saat Anda tidur, dan mengaktifkannya kembali saat Anda bangun!
 
 {{TRANSLATION_AND_LOCALIZATION_HEADER}}
 Translasi & Lokalisasi
@@ -202,10 +202,10 @@ Perangkat Keras yang Didukung
 Otomatisasi Baterai
 
 {{SUPPORTED_HARDWARE_BATTERY_AUTOMATIONS_BODY}}
-Saat ini OyasumiVR mendukung mematikan perangkat menggunakan otomatisasi baterainya untuk semua perangkat SteamVR yang:
+Saat ini OyasumiVR mendukung mematikan perangkat menggunakan otomatisasi baterainya untuk semua perangkat VR yang:
 
 1. Mendukung pelaporan untuk level baterai dan status pengisian daya
-2. Dukungan dimatikan melalui SteamVR.
+2. Dukungan dimatikan melalui VR.
 
 Ini termasuk, namun tidak terbatas pada perangkat berikut ini:
 

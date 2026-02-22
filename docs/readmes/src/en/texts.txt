@@ -30,7 +30,7 @@ OyasumiVR can **detect when you are asleep**, and help you in various ways such 
 - 📩 Automatically handling invite requests
 - 🔵 Automating your VRChat status
 - 🎤 Muting your microphone when you fall asleep
-- 🛠️ Automating various SteamVR settings
+- 🛠️ Automating various VR settings
 
 ...and many more! Please see the upcoming "Features" section to read more about what functionality OyasumiVR has to offer.
 
@@ -62,17 +62,17 @@ If automatic detection is not what you're looking for, there's various alternati
   <li>A time schedule</li>
   <li>Controller & tracker battery levels</li>
   <li>Controller & tracker power states</li>
-  <li>SteamVR status</li>
+  <li>VR status</li>
   <li>Heart Rate</li>
   <li>Sitting Upright</li>
   <li>VRChat players joining or leaving</li>
 </ul>
 
 {{STEAMVR_OVERLAY_HEADER}}
-📲 SteamVR Overlay
+📲 VR Overlay
 
 {{STEAMVR_OVERLAY_BODY}}
-OyasumiVR comes with its own SteamVR overlay, which allows you control some of its features from within VR!
+OyasumiVR comes with its own VR overlay, which allows you control some of its features from within VR!
 <br><br>
 By default, double press the A button on your right controller, and it should pop up in front of you.
 
@@ -88,20 +88,20 @@ Automatically have your controllers and/or trackers turn off when you sleep, and
 Additionally, you can have your controllers and/or trackers turn off at certain battery levels, or when you put them on the charger. Ideal for hotswapping controllers!
 
 {{POWER_AUTOMATIONS_BODY_WINDOWS_POWER_POLICY}}
-<b>Windows Power Policy</b>
+<b>System Power Policy</b>
 <br>
-Save some electricity by automatically setting Windows' Power Policy when you go to sleep and wake up! Simply have it set a more conservative policy (like "Power Saver") when you go to sleep, and then restore a higher performance policy when you wake up again.
+Save some electricity by automatically setting System' Power Policy when you go to sleep and wake up! Simply have it set a more conservative policy (like "Power Saver") when you go to sleep, and then restore a higher performance policy when you wake up again.
 
 {{POWER_AUTOMATIONS_BODY_BASE_STATIONS}}
 <b>Base Stations</b>
 <br>
-Have OyasumiVR turn your base stations on and off together with SteamVR. A bit like SteamVR's own base station power management, but <b>compatible with any HMD!</b> As long as your PC supports Bluetooth and is in range of the base stations, you're good to go.
+Have OyasumiVR turn your base stations on and off together with VR. A bit like VR's own base station power management, but <b>compatible with any HMD!</b> As long as your PC supports Bluetooth and is in range of the base stations, you're good to go.
 
 {{DEVICE_CONTROL_HEADER}}
 🎮 Device Control
 
 {{DEVICE_CONTROL_BODY}}
-OyasumiVR can allow you to easily control many of your SteamVR devices, from controllers, to trackers, to base stations.
+OyasumiVR can allow you to easily control many of your VR devices, from controllers, to trackers, to base stations.
 <br><br>
 Easily read detailed battery level and charge status for your controllers and trackers, or turn your base stations on and off with a single click!
 
@@ -201,8 +201,8 @@ Depending on which actions you configure, it will do any of the following:
 <ul>
   <li>Turn off your controllers and/or Trackers</li>
   <li>Turn off your Base Stations</li>
-  <li>Quit SteamVR <i>(And any running game or overlay along with it)</i></li>
-  <li>Shut down Windows</li>
+  <li>Quit VR <i>(And any running game or overlay along with it)</i></li>
+  <li>Shut down System</li>
 </ul>
 <br>
 With the shutdown sequence configured, you can fall asleep soundly in VR, knowing that everything will shut down when you don't need to be in VR anymore!
@@ -215,7 +215,7 @@ With the shutdown sequence configured, you can fall asleep soundly in VR, knowin
 <br>
 Automate your brightness for when you sleep and wake up. OyasumiVR can smoothly transition your VR headset's brightness, so it falls down gradually as you sleep without waking you up.
 <br><br>
-It allows you to control both software brightness, as well as hardware brightness if your headset supports it (e.g. Valve Index or Bigscreen Beyond). In addition to providing you with several automations, you can easily control your brightness levels right from the SteamVR overlay menu!
+It allows you to control both software brightness, as well as hardware brightness if your headset supports it (e.g. Valve Index or Bigscreen Beyond). In addition to providing you with several automations, you can easily control your brightness levels right from the VR overlay menu!
 <br><br>
 🌡️ <b>Color Temperature</b>
 <br>
@@ -223,7 +223,7 @@ OyasumiVR can also control the color temperature of your VR headset's display. B
 <br><br>
 With the sunset and sunrise triggers, you can have OyasumiVR automatically adjust the color temperature of your display to match the time of day.
 <br><br>
-<i>Note that this feature is only supported on some native SteamVR headsets, such as the Valve Index, Bigscreen Beyond, and HTC Vive (Pro).</i>
+<i>Note that this feature is only supported on some native VR headsets, such as the Valve Index, Bigscreen Beyond, and HTC Vive (Pro).</i>
 
 {{MICROPHONE_MUTE_AUTOMATIONS_HEADER}}
 🎤 Microphone Mute Automations
@@ -280,19 +280,19 @@ OyasumiVR has various automations for controlling certain features specific to c
 👓 Resolution Automations
 
 {{RESOLUTION_AUTOMATIONS_BODY}}
-Automatically adjust your SteamVR render resolution when you sleep and wake up! Having OyasumiVR lower your render resolution helps you reduce the load on your hardware at times when you don't need it.
+Automatically adjust your VR render resolution when you sleep and wake up! Having OyasumiVR lower your render resolution helps you reduce the load on your hardware at times when you don't need it.
 
 {{CHAPERONE_AUTOMATIONS_HEADER}}
 🔳 Chaperone Automations
 
 {{CHAPERONE_AUTOMATIONS_BODY}}
-Automatically adjust the fade distance of SteamVR's chaperone when you sleep. If you have a small play area, you can use this to make sure the chaperone stays hidden while you are asleep, and re-enable it when you wake up!
+Automatically adjust the fade distance of VR's chaperone when you sleep. If you have a small play area, you can use this to make sure the chaperone stays hidden while you are asleep, and re-enable it when you wake up!
 
 {{MQTT_CONTROL_HEADER}}
 🏠 Home Assistant Integration
 
 {{MQTT_CONTROL_BODY}}
-OyasumiVR can expose many of its own features, as well as SteamVR's, to Home Assistant over MQTT! This allows you to integrate OyasumiVR with various smart devices you might have in your home, as well as enable you to build your own powerful automations within Home Assistant.
+OyasumiVR can expose many of its own features, as well as VR's, to Home Assistant over MQTT! This allows you to integrate OyasumiVR with various smart devices you might have in your home, as well as enable you to build your own powerful automations within Home Assistant.
 For example, you can use this to automatically turn off your smart lights when you fall asleep, or turn them back on when needed!
 <br><br>
 Here is a list of features exposed that you'll be able to read, or control, through Home Assistant:
@@ -338,10 +338,10 @@ Here is a list of features exposed that you'll be able to read, or control, thro
 </tr>
 <tr>
   <td>
-    <b>SteamVR Features</b>
+    <b>VR Features</b>
     <ul>
       <li>VR Headset Model (Sensor)</li>
-      <li>SteamVR Running (Sensor)</li>
+      <li>VR Running (Sensor)</li>
       <li>
         Controller & Tracker
         <ul>
@@ -386,10 +386,10 @@ Supported Hardware
 Battery Automations
 
 {{SUPPORTED_HARDWARE_BATTERY_AUTOMATIONS_BODY}}
-Currently OyasumiVR supports turning off devices using its battery automations for all SteamVR devices that:
+Currently OyasumiVR supports turning off devices using its battery automations for all VR devices that:
 
 1. Support reporting for battery levels and charging status
-2. Support being turned off via SteamVR.
+2. Support being turned off via VR.
 
 This includes, but is not limited to the following devices:
 
@@ -422,7 +422,7 @@ Image brightness control is available on all headsets.
 Color Temperature Automations
 
 {{SUPPORTED_HARDWARE_CCT_BODY}}
-Controlling the color temperature of the VR headset's display is currently only supported on some native SteamVR headsets, such as the Valve Index, Bigscreen Beyond, and HTC Vive (Pro).
+Controlling the color temperature of the VR headset's display is currently only supported on some native VR headsets, such as the Valve Index, Bigscreen Beyond, and HTC Vive (Pro).
 It might work on other headsets, but your mileage may vary.
 
 {{SUPPORTED_HARDWARE_MICROPHONE_MUTE_AUTOMATIONS_HEADER}}

@@ -75,7 +75,7 @@
       "title": "在日落时"
     },
     "HMD_CONNECT": {
-      "title": "当我的头戴设备连接到 SteamVR 时"
+      "title": "当我的头戴设备连接到 VR 时"
     },
     "SLEEP_MODE_DISABLE": {
       "title": "当我醒来时"
@@ -121,8 +121,8 @@
       "description": "调整显示屏本身的亮度",
       "title": "将硬件亮度更改为"
     },
-    "hmdConnectEventTooltip": "这些设置将在你的头显连接到 SteamVR 时应用",
-    "hmdConnectPotentialEventTooltip": "如果满足条件，这些设置将在你的头显连接到 SteamVR 时应用",
+    "hmdConnectEventTooltip": "这些设置将在你的头显连接到 VR 时应用",
+    "hmdConnectPotentialEventTooltip": "如果满足条件，这些设置将在你的头显连接到 VR 时应用",
     "miscConfig": "其他选项",
     "mode": {
       "advanced": "高级模式",
@@ -154,7 +154,7 @@
     }
   },
   "chaperone-automations": {
-    "description": "在开启（或关闭）睡眠模式时，OyasumiVR 可以自动调整 SteamVR 的保护墙的淡出距离。",
+    "description": "在开启（或关闭）睡眠模式时，OyasumiVR 可以自动调整 VR 的保护墙的淡出距离。",
     "fadeDistance": {
       "title": "将保护墙的淡化距离改为"
     },
@@ -190,19 +190,19 @@
       "dropdown": {
         "description": "打开按键绑定设置",
         "desktop": "桌面模式",
-        "vr": "SteamVR 模式"
+        "vr": "VR 模式"
       },
       "errors": {
         "DASHBOARD_OPEN": {
-          "message": "打开 SteamVR 的控制面板",
-          "tooltip": "关闭 SteamVR 控制面板以查看按键绑定信息"
+          "message": "打开 VR 的控制面板",
+          "tooltip": "关闭 VR 控制面板以查看按键绑定信息"
         },
         "MISSING_CONTROLLER": {
           "tooltip": "确保你的左右两个控制器都已连接到电脑上"
         },
         "STEAMVR_INACTIVE": {
-          "message": "SteamVR 未启动",
-          "tooltip": "要查看或更改按键绑定设置，必须运行 SteamVR"
+          "message": "VR 未启动",
+          "tooltip": "要查看或更改按键绑定设置，必须运行 VR"
         },
         "UNKNOWN": {
           "message": "配置按键绑定"
@@ -221,7 +221,7 @@
       "audioVolumeAutomations": "音量",
       "autoInviteRequestAccept": "邀请与加入请求",
       "brightnessAutomations": "亮度",
-      "chaperoneAutomations": "SteamVR 保护墙",
+      "chaperoneAutomations": "VR 保护墙",
       "deviceManager": "设备管理",
       "frameLimiter": "帧率限制",
       "gpuAutomations": "显卡",
@@ -470,8 +470,8 @@
             "MANUAL": "手动设置",
             "OYASUMI_START": "由于 OyasumiVR 启动",
             "SLEEP_MODE_DISABLED": "因为已关闭睡眠模式",
-            "STEAMVR_START": "由于 SteamVR 开启",
-            "STEAMVR_STOP": "由于 SteamVR 关闭"
+            "STEAMVR_START": "由于 VR 开启",
+            "STEAMVR_STOP": "由于 VR 关闭"
           }
         },
         "msiAfterburnerProfileSet": {
@@ -495,8 +495,8 @@
             "SLEEP_MODE_ENABLED": "因为已开启睡眠模式"
           },
           "title": {
-            "auto": "SteamVR 渲染分辨率设置为'自动'",
-            "custom": "SteamVR 的渲染分辨率设置为 {value}"
+            "auto": "VR 渲染分辨率设置为'自动'",
+            "custom": "VR 的渲染分辨率设置为 {value}"
           }
         },
         "runAutomationExecuted": {
@@ -542,7 +542,7 @@
           "reason": {
             "automation": {
               "NIGHTMARE_DETECTION": "检测到你可能正在做噩梦",
-              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "SteamVR 退出了",
+              "SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS": "VR 退出了",
               "SLEEP_MODE_DISABLE_AFTER_TIME": "睡眠模式启用的时间已经足够长了",
               "SLEEP_MODE_DISABLE_AT_TIME": "由于到达预定时间，睡眠模式已关闭",
               "SLEEP_MODE_DISABLE_ON_DEVICE_POWER_ON": "一个设备被打开了",
@@ -605,7 +605,7 @@
           },
           "title": "将你的 VRChat 状态从 {oldStatus} 改为 {newStatus}"
         },
-        "turnedOffOpenVRDevices": {
+        "turnedOffVRDevices": {
           "reason": {
             "BATTERY_LEVEL": "当电池电量低于 {threshold}% 时",
             "CHARGING": "当设备正在充电的时候",
@@ -657,7 +657,7 @@
             "SLEEP_MODE_DISABLED": "因为已关闭睡眠模式",
             "SLEEP_MODE_ENABLED": "因为已开启睡眠模式"
           },
-          "title": "Windows 电源策略已设置为''{policy}''方案"
+          "title": "System 电源策略已设置为''{policy}''方案"
         }
       }
     },
@@ -700,8 +700,8 @@
           "title": "睡眠模式"
         },
         "STEAMVR_SETTINGS": {
-          "description": "与 SteamVR 设置（如渲染分辨率和淡入淡出）变化相关的事件",
-          "title": "SteamVR 相关"
+          "description": "与 VR 设置（如渲染分辨率和淡入淡出）变化相关的事件",
+          "title": "VR 相关"
         },
         "VRCHAT_AVATAR": {
           "description": "与 VRChat 模型切换相关的事件",
@@ -720,8 +720,8 @@
           "title": "VRChat 状态变更"
         },
         "WINDOWS_POWER_POLICY": {
-          "description": "与 Windows 电源策略变化相关的事件",
-          "title": "Windows 电源策略"
+          "description": "与 System 电源策略变化相关的事件",
+          "title": "System 电源策略"
         }
       },
       "selectAll": "全选",
@@ -768,8 +768,8 @@
           "detectBasestationDesc": "确保头戴设备、控制器或追踪器能够看到基站",
           "deviceDetected": "设备已检测",
           "running": "正在运行",
-          "startSteamVR": "启动 SteamVR",
-          "waitingForSteamVR": "正在等待 SteamVR 启动..."
+          "startVR": "启动 VR",
+          "waitingForVR": "正在等待 VR 启动..."
         }
       },
       "detectAutomatically": "自动检测",
@@ -958,8 +958,8 @@
       "defaultPlaceholder": "选择..."
     },
     "start-with-steamvr-how-to-modal": {
-      "description": "你可以在 SteamVR 自己的设置中将 OyasumiVR 配置为与 SteamVR 一起启动。可以在以下位置找到这些设置：\n\nSteamVR -> 设置 -> 启动 / 关闭 -> 选择应用程序",
-      "title": "通过 SteamVR 启动 OyasumiVR"
+      "description": "你可以在 VR 自己的设置中将 OyasumiVR 配置为与 VR 一起启动。可以在以下位置找到这些设置：\n\nVR -> 设置 -> 启动 / 关闭 -> 选择应用程序",
+      "title": "通过 VR 启动 OyasumiVR"
     },
     "update-modal": {
       "message": "我们找到了 OyasumiVR 的新版本：版本号 v{newVersion}\n\n 你当前仍在使用版本 v{currentVersion}\n\n 现在要立刻更新吗？",
@@ -1127,7 +1127,7 @@
     },
     "addLimiter": "添加应用",
     "description": "OyasumiVR 可自动限制多款游戏的帧率。当你不需要高性能（如睡觉时），可用来降低系统功耗。",
-    "directControlRequiresSteamVR": "启动 SteamVR 来控制帧率限制",
+    "directControlRequiresVR": "启动 VR 来控制帧率限制",
     "frameLimits": "帧率限制",
     "noLimits": "你尚未配置任何应用的帧率限制！",
     "onSleepDisable": "当我醒来时",
@@ -1136,12 +1136,12 @@
     "removeLimiter": "移除应用",
     "selector": {
       "auto": "自动",
-      "autoDescription": "在自动模式下，SteamVR 会自动判断最佳帧率限制。",
+      "autoDescription": "在自动模式下，VR 会自动判断最佳帧率限制。",
       "disabled": "保持原样",
       "noLimit": "无限制"
     },
-    "steamvrRequired": "仅在 SteamVR 运行时可直接更改帧率限制及查看估算帧率。你仍可配置下方的自动化设置。",
-    "supportedHardwareWarning": "SteamVR 仅支持在原生头显（如 Valve Index、Vive Pro、Bigscreen Beyond）上限制帧率。非原生头显（如 Quest）不支持此功能。",
+    "steamvrRequired": "仅在 VR 运行时可直接更改帧率限制及查看估算帧率。你仍可配置下方的自动化设置。",
+    "supportedHardwareWarning": "VR 仅支持在原生头显（如 Valve Index、Vive Pro、Bigscreen Beyond）上限制帧率。非原生头显（如 Quest）不支持此功能。",
     "title": "帧率限制"
   },
   "gpu-automations": {
@@ -1525,7 +1525,7 @@
     "GORONE_LEGACY_PRESET_WARNING": "此预设中的 v4.0 及以上版本已经包含了转向功能，并且与此预设不兼容。如果你的模型使用了此预设的旧版本，它仍然可用",
     "oneTimeFlagDialogs": {
       "CCT_CONTROL_WARNING_DIALOG": {
-        "message": "请注意，色温控制仅适用于某些原生的 SteamVR 头显，例如Valve Index、Bigscreen Beyond 或 HTC Vive（Pro）。\n\n如果你不使用这些头显，这个功能可能对你来说没什么效果。\n\n因此，如果你觉得这比较多余，那么可以在设置中禁用色温控制。",
+        "message": "请注意，色温控制仅适用于某些原生的 VR 头显，例如Valve Index、Bigscreen Beyond 或 HTC Vive（Pro）。\n\n如果你不使用这些头显，这个功能可能对你来说没什么效果。\n\n因此，如果你觉得这比较多余，那么可以在设置中禁用色温控制。",
         "title": "功能可用性"
       },
       "OSC_SCRIPT_SIMPLE_EDITOR_VRCHAT_AUTOCOMPLETE_INFO": {
@@ -1777,7 +1777,7 @@
           "onSleepModeDisable": "当我醒来时",
           "onSleepModeEnable": "当我入睡时",
           "onSleepPreparation": "当我准备入睡时",
-          "onSteamVRStop": "当 SteamVR 停止运行时",
+          "onVRStop": "当 VR 停止运行时",
           "onlyWhileSleepModeEnabled": "仅在睡眠模式启用时"
         }
       },
@@ -1788,7 +1788,7 @@
         "triggers": {
           "onOyasumiStart": "当 OyasumiVR 启动时",
           "onSleepModeDisable": "当我醒来时",
-          "onSteamVRStart": "当 SteamVR 启动时"
+          "onVRStart": "当 VR 启动时"
         }
       }
     },
@@ -1796,7 +1796,7 @@
       "adapterError": "在试图与你的蓝牙适配器进行通信时发生了错误。请确保你的蓝牙适配器已启用，然后再试一次。",
       "noAdapter": "在你的系统中找不到蓝牙适配器。请确认你的系统配备了蓝牙适配器，并且已经启用。"
     },
-    "powerManagementWarning": "当选择使用 OyasumiVR 的自动化操作来打开或关闭你的基站时，建议你在 SteamVR 的基站设置中禁用电源管理。",
+    "powerManagementWarning": "当选择使用 OyasumiVR 的自动化操作来打开或关闭你的基站时，建议你在 VR 的基站设置中禁用电源管理。",
     "tabs": {
       "devices": "设备",
       "windowsPowerPolicy": "电源计划"
@@ -1804,13 +1804,13 @@
     "title": "电源",
     "windowsPowerPolicy": {
       "automations": "自动化功能",
-      "description": "OyasumiVR 可以在你进入睡眠或醒来时自动更改 Windows 的电源计划。这对于在你睡觉时降低能耗并在你醒来后恢复高性能策略时非常有用。",
+      "description": "OyasumiVR 可以在你进入睡眠或醒来时自动更改 System 的电源计划。这对于在你睡觉时降低能耗并在你醒来后恢复高性能策略时非常有用。",
       "sleepModeDisable": {
-        "description": "将 Windows 电源计划设置为",
+        "description": "将 System 电源计划设置为",
         "title": "当睡眠模式关闭时"
       },
       "sleepModeEnable": {
-        "description": "将 Windows 电源计划设置为",
+        "description": "将 System 电源计划设置为",
         "title": "当睡眠模式开启时"
       }
     }
@@ -1824,7 +1824,7 @@
     }
   },
   "resolution-automations": {
-    "description": "当开启（或关闭）睡眠模式时，OyasumiVR 可以自动调整 SteamVR 的渲染分辨率",
+    "description": "当开启（或关闭）睡眠模式时，OyasumiVR 可以自动调整 VR 的渲染分辨率",
     "onSleepDisable": {
       "description": "调整我的渲染分辨率",
       "title": "当我醒来时"
@@ -1842,7 +1842,7 @@
   },
   "runAutomations": {
     "commandsToRun": "要运行的命令",
-    "description": "你可以设置 OyasumiVR 在你入睡、醒来或准备入睡时，通过 Windows 命令提示符自动执行命令。\n\n所有命令均通过 cmd.exe 运行。",
+    "description": "你可以设置 OyasumiVR 在你入睡、醒来或准备入睡时，通过 System 命令提示符自动执行命令。\n\n所有命令均通过 cmd.exe 运行。",
     "onSleepDisable": {
       "description": "运行命令",
       "title": "当我醒来时"
@@ -1862,8 +1862,8 @@
     "advanced": {
       "application": {
         "openVrInitDelayFix": {
-          "description": "启用此选项后，OyasumiVR 将在检测到 SteamVR 后稍作等待再进行交互，从而给予 SteamVR 额外的启动时间。如果你在 OyasumiVR 运行时遇到 SteamVR 启动问题，开启此选项可能有所帮助。",
-          "title": "延迟初始化 OpenVR"
+          "description": "启用此选项后，OyasumiVR 将在检测到 VR 后稍作等待再进行交互，从而给予 VR 额外的启动时间。如果你在 OyasumiVR 运行时遇到 VR 启动问题，开启此选项可能有所帮助。",
+          "title": "延迟初始化 VR"
         },
         "overlayGpuAcceleration": {
           "description": "如果你遇到叠加层渲染异常的问题，禁用此选项可能能在某些系统（如使用混合输出的笔记本）上解决问题。",
@@ -1965,7 +1965,7 @@
         "title": "故障排查",
         "vrManifestReregister": {
           "action": "重新注册",
-          "description": "在 SteamVR 上重新注册程序的清单数据",
+          "description": "在 VR 上重新注册程序的清单数据",
           "modal": {
             "FLAVOUR_NOT_ELIGIBLE": {
               "message": "由于你使用的是 OyasumiVR 的非合格版本（例如 Steam 版本），程序清单数据已被取消注册，这并不是错误！请重启 OyasumiVR。",
@@ -1976,11 +1976,11 @@
               "title": "未能成功注册程序的清单数据"
             },
             "MANIFEST_CHECK_FAILED": {
-              "message": "无法检查 OyasumiVR 的清单数据是否已在 SteamVR 中注册。请重启 OyasumiVR 并查看日志。",
+              "message": "无法检查 OyasumiVR 的清单数据是否已在 VR 中注册。请重启 OyasumiVR 并查看日志。",
               "title": "未能成功注册程序的清单数据"
             },
             "MANIFEST_NOT_REGISTERED": {
-              "message": "OyasumiVR 没有在 SteamVR 上注册过，请重新启动 OyasumiVR。",
+              "message": "OyasumiVR 没有在 VR 上注册过，请重新启动 OyasumiVR。",
               "title": "未能成功注册程序的清单数据"
             },
             "MANIFEST_REMOVE_FAILED": {
@@ -1988,15 +1988,15 @@
               "title": "未能成功注册程序的清单数据"
             },
             "UNKNOWN": {
-              "message": "由于未知错误，OyasumiVR 的清单数据无法在 SteamVR 中重新注册。请重启 OyasumiVR 并查看日志。",
+              "message": "由于未知错误，OyasumiVR 的清单数据无法在 VR 中重新注册。请重启 OyasumiVR 并查看日志。",
               "title": "未能成功注册程序的清单数据"
             },
             "success": {
-              "message": "OyasumiVR 的清单数据已成功在 SteamVR 重新注册。",
+              "message": "OyasumiVR 的清单数据已成功在 VR 重新注册。",
               "title": "已重新注册程序的清单数据"
             }
           },
-          "title": "重新注册 SteamVR 的应用程序清单"
+          "title": "重新注册 VR 的应用程序清单"
         }
       }
     },
@@ -2046,7 +2046,7 @@
         "title": "语言"
       },
       "lighthouseConsole": {
-        "description": "OyasumiVR 需要知道你的 SteamVR 安装的 <strong>lighthouse_console.exe</strong> 的位置 \n 如果 OyasumiVR 在默认位置找不到它，你需要自行设置它的位置",
+        "description": "OyasumiVR 需要知道你的 VR 安装的 <strong>lighthouse_console.exe</strong> 的位置 \n 如果 OyasumiVR 在默认位置找不到它，你需要自行设置它的位置",
         "status": {
           "CHECKING": "正在验证 <strong>lighthouse_console.exe 的有效性 </strong>",
           "INVALID_EXECUTABLE": "无法验证此位置的 <strong>lighthouse_console.exe</strong> 这个文件可能有问题",
@@ -2075,11 +2075,11 @@
           },
           "title": "首选的断电状态"
         },
-        "title": "SteamVR 基站电源控制"
+        "title": "VR 基站电源控制"
       },
       "overlay": {
         "binding": {
-          "description": "叠加层界面的触发按钮，可以在 SteamVR 的按键绑定菜单中进行配置。",
+          "description": "叠加层界面的触发按钮，可以在 VR 的按键绑定菜单中进行配置。",
           "title": "控制器按键绑定"
         },
         "onlyOpenMenuWhenVRChatRunning": {
@@ -2116,14 +2116,14 @@
       "startStop": {
         "title": "启动与停止"
       },
-      "startWithSteamVR": {
-        "description": "在 SteamVR 启动时一并启动 OyasumiVR",
+      "startWithVR": {
+        "description": "在 VR 启动时一并启动 OyasumiVR",
         "howTo": "如何设置？",
-        "label": "与 SteamVR 一起启动"
+        "label": "与 VR 一起启动"
       },
-      "stopWithSteamVR": {
-        "description": "在 SteamVR 关闭一段时间后退出 OyasumiVR",
-        "label": "与 SteamVR 一起关闭",
+      "stopWithVR": {
+        "description": "在 VR 关闭一段时间后退出 OyasumiVR",
+        "label": "与 VR 一起关闭",
         "options": {
           "AFTERDELAY": "等待两分钟后",
           "DISABLED": "禁用",
@@ -2303,13 +2303,13 @@
       "cancel": "立即取消",
       "stage": {
         "POWERING_DOWN": "正在关闭",
-        "QUITTING_STEAMVR": "退出 SteamVR...",
+        "QUITTING_STEAMVR": "退出 VR...",
         "TURNING_OFF_DEVICES": "正在关闭设备…"
       },
       "title": "正在关闭"
     },
     "sequence": {
-      "powerDownWindows": {
+      "powerDownSystem": {
         "description": "尝试关闭计算机",
         "options": {
           "HIBERNATE": "休眠",
@@ -2322,14 +2322,14 @@
         "shutdownMessage": "OyasumiVR 正在关闭你的电脑",
         "title": "关闭计算机"
       },
-      "quitSteamVR": {
+      "quitVR": {
         "conflict": {
-          "description": "你已将 OyasumiVR 配置为在 SteamVR 停止时立即退出。因此，任何后续自动操作都可能无法运行。要解决这个问题，请禁用此任务，或者在设置中将 OyasumiVR 配置为在 SteamVR 停止时不立即退出。",
+          "description": "你已将 OyasumiVR 配置为在 VR 停止时立即退出。因此，任何后续自动操作都可能无法运行。要解决这个问题，请禁用此任务，或者在设置中将 OyasumiVR 配置为在 VR 停止时不立即退出。",
           "goToSettings": "设置",
           "title": "警告： 运行此任务将导致 OyasumiVR 立即退出"
         },
         "description": "这也将会退出你正在运行的任何游戏或叠加层界面。",
-        "title": "退出 SteamVR"
+        "title": "退出 VR"
       },
       "run": "运行序列",
       "title": "配置关机序列",
@@ -2404,7 +2404,7 @@
       "description": "根据各种触发器自动关闭睡眠模式",
       "onDevicePowerOn": "当设备启动时",
       "onPlayerJoinOrLeave": "当有玩家加入或离开你的世界时",
-      "onSteamVRStop": "当 SteamVR 停止时",
+      "onVRStop": "当 VR 停止时",
       "onUprightPose": "当你坐起来之后"
     },
     "enableAutomations": {
@@ -2582,7 +2582,7 @@
           "stepPrefix": "校准步骤如下：",
           "stepSuffix": "就是这样！ 校准后，OyasumiVR 应该能够根据 VR 头显的移动来检测你是否进入睡眠"
         },
-        "noSteamVR": "你只能在 SteamVR 正确启动并且识别到头显的情况下才能开始校准",
+        "noVR": "你只能在 VR 正确启动并且识别到头显的情况下才能开始校准",
         "prepare": {
           "instruction": "戴上你的 VR 头显并躺下",
           "note": "当你准备好后你会在叠加层界面看到这个窗口，点击「开始校准」来进行校准"

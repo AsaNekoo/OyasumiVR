@@ -3,10 +3,10 @@ import { flatten, groupBy, uniq } from 'lodash';
 import { fade, hshrink, triggerChildren, vshrink } from 'src-ui/app/utils/animations';
 import { OVRDevice, OVRDeviceClass } from 'src-ui/app/models/ovr-device';
 import { LighthouseConsoleService } from '../../services/lighthouse-console.service';
-import { OpenVRService } from '../../services/openvr.service';
+import { VRService } from '../../services/openvr.service';
 import {
   EventLogLighthouseSetPowerState,
-  EventLogTurnedOffOpenVRDevices,
+  EventLogTurnedOffVRDevices,
 } from '../../models/event-log-entry';
 import { EventLogService } from '../../services/event-log.service';
 import { error } from '@tauri-apps/plugin-log';
@@ -22,16 +22,16 @@ import {
 } from '../device-power-button/device-power-button.component';
 import { DeviceManagerService } from '../../services/device-manager.service';
 
-type DisplayCategory = OpenVRDisplayCategory | LighthouseDisplayCategory;
+type DisplayCategory = VRDisplayCategory | LighthouseDisplayCategory;
 
 interface BaseDisplayCategory {
-  type: 'OpenVR' | 'Lighthouse';
+  type: 'VR' | 'Lighthouse';
   label: string;
   icon?: string;
 }
 
-interface OpenVRDisplayCategory extends BaseDisplayCategory {
-  type: 'OpenVR';
+interface VRDisplayCategory extends BaseDisplayCategory {
+  type: 'VR';
   devices: OVRDevice[];
   canBulkPowerOff: boolean;
   class: OVRDeviceClass;
@@ -59,7 +59,7 @@ export class DeviceListComponent implements OnInit {
   showLHStatePopover = false;
 
   constructor(
-    protected openvr: OpenVRService,
+    protected openvr: VRService,
     private cdr: ChangeDetectorRef,
     private lighthouseConsole: LighthouseConsoleService,
     private lighthouse: LighthouseService,
@@ -73,7 +73,7 @@ export class DeviceListComponent implements OnInit {
     combineLatest([
       this.openvr.devices.pipe(
         takeUntilDestroyed(this.destroyRef),
-        tap((devices) => this.processOpenVRDevices(devices))
+        tap((devices) => this.processVRDevices(devices))
       ),
       this.lighthouse.devices.pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -90,41 +90,41 @@ export class DeviceListComponent implements OnInit {
       .subscribe((settings) => (this.lighthousePowerControl = settings.lighthousePowerControl));
   }
 
-  processOpenVRDevices(devices: OVRDevice[]) {
+  processVRDevices(devices: OVRDevice[]) {
     // Filter out non-hmd, non-controller and non-tracker devices
     devices = devices.filter((device) =>
       ['HMD', 'Controller', 'GenericTracker'].includes(device.class)
     );
     // Filter out hidden devices
-    devices = devices.filter((device) => !this.isOpenVRDeviceHidden(device));
+    devices = devices.filter((device) => !this.isVRDeviceHidden(device));
     // Add missing device categories
     uniq(devices.map((device) => device.class))
       .filter(
         (deviceClass) =>
-          !this.deviceCategories.some((c) => c.type === 'OpenVR' && c.class === deviceClass)
+          !this.deviceCategories.some((c) => c.type === 'VR' && c.class === deviceClass)
       )
       .forEach((deviceClass) => {
         this.deviceCategories.push({
-          type: 'OpenVR',
-          label: this.getCategoryLabelForOpenVRDeviceClass(deviceClass),
+          type: 'VR',
+          label: this.getCategoryLabelForVRDeviceClass(deviceClass),
           devices: [],
           class: deviceClass,
           canBulkPowerOff: false,
-          icon: this.getIconForOpenVRDeviceClass(deviceClass),
+          icon: this.getIconForVRDeviceClass(deviceClass),
         });
       });
     // Remove obsolete device categories
     filterInPlace(
       this.deviceCategories,
-      (c) => c.type !== 'OpenVR' || devices.some((d) => d.class === c.class)
+      (c) => c.type !== 'VR' || devices.some((d) => d.class === c.class)
     );
     // Group devices by their class
     const devicesByClass = groupBy(devices, (device) => device.class);
     for (const [deviceClass, devices] of Object.entries(devicesByClass)) {
       // Add missing devices
       const category = this.deviceCategories.find(
-        (c) => c.type === 'OpenVR' && c.class === deviceClass
-      ) as OpenVRDisplayCategory;
+        (c) => c.type === 'VR' && c.class === deviceClass
+      ) as VRDisplayCategory;
       devices
         .filter((device) => !category.devices.some((d) => d.index === device.index))
         .forEach((device) => {
@@ -147,7 +147,7 @@ export class DeviceListComponent implements OnInit {
     this.devicesCanPowerOff = devices.some((d) => d.canPowerOff);
   }
 
-  getIconForOpenVRDeviceClass(deviceClass: OVRDeviceClass): string | undefined {
+  getIconForVRDeviceClass(deviceClass: OVRDeviceClass): string | undefined {
     switch (deviceClass) {
       case 'Controller':
         return 'controller';
@@ -214,11 +214,11 @@ export class DeviceListComponent implements OnInit {
   }
 
   sortDeviceCategories() {
-    const sortKeys = ['OpenVR-HMD', 'OpenVR-Controller', 'OpenVR-GenericTracker', 'Lighthouse'];
+    const sortKeys = ['VR-HMD', 'VR-Controller', 'VR-GenericTracker', 'Lighthouse'];
     const getKey = (category: DisplayCategory) => {
       switch (category.type) {
-        case 'OpenVR':
-          return `OpenVR-${category.class}`;
+        case 'VR':
+          return `VR-${category.class}`;
         case 'Lighthouse':
           return 'Lighthouse';
       }
@@ -227,7 +227,7 @@ export class DeviceListComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  getCategoryLabelForOpenVRDeviceClass(deviceClass: OVRDeviceClass): string {
+  getCategoryLabelForVRDeviceClass(deviceClass: OVRDeviceClass): string {
     switch (deviceClass) {
       case 'HMD':
         return 'comp.device-list.category.HMD';
@@ -244,12 +244,12 @@ export class DeviceListComponent implements OnInit {
     return category.label;
   }
 
-  async turnOffOVRDevices(category: OpenVRDisplayCategory) {
-    const devices = category.devices.filter((d) => d.canPowerOff && !this.isOpenVRDeviceHidden(d));
+  async turnOffOVRDevices(category: VRDisplayCategory) {
+    const devices = category.devices.filter((d) => d.canPowerOff && !this.isVRDeviceHidden(d));
     if (!devices.length) return;
     await this.lighthouseConsole.turnOffDevices(devices);
     this.eventLog.logEvent({
-      type: 'turnedOffOpenVRDevices',
+      type: 'turnedOffVRDevices',
       reason: 'MANUAL',
       devices: (() => {
         switch (category.class) {
@@ -264,7 +264,7 @@ export class DeviceListComponent implements OnInit {
             return 'VARIOUS';
         }
       })(),
-    } as EventLogTurnedOffOpenVRDevices);
+    } as EventLogTurnedOffVRDevices);
   }
 
   async clickBulkPowerLighthouseDevices(category: LighthouseDisplayCategory) {
@@ -314,16 +314,16 @@ export class DeviceListComponent implements OnInit {
   async turnOffAllOVRDevices() {
     const devices = flatten(
       this.deviceCategories
-        .filter((c) => c.type === 'OpenVR')
-        .map((c) => (c as OpenVRDisplayCategory).devices)
-    ).filter((d) => d.canPowerOff && !this.isOpenVRDeviceHidden(d));
+        .filter((c) => c.type === 'VR')
+        .map((c) => (c as VRDisplayCategory).devices)
+    ).filter((d) => d.canPowerOff && !this.isVRDeviceHidden(d));
     if (!devices.length) return;
     await this.lighthouseConsole.turnOffDevices(devices);
     this.eventLog.logEvent({
-      type: 'turnedOffOpenVRDevices',
+      type: 'turnedOffVRDevices',
       reason: 'MANUAL',
       devices: 'ALL',
-    } as EventLogTurnedOffOpenVRDevices);
+    } as EventLogTurnedOffVRDevices);
   }
 
   onClickOutsideLHStatePopover($event: MouseEvent) {
@@ -354,8 +354,8 @@ export class DeviceListComponent implements OnInit {
   }
 
   // Helper methods for checking if devices are hidden
-  private isOpenVRDeviceHidden(device: OVRDevice): boolean {
-    const deviceId = this.deviceManager.getIdForOpenVRDevice(device);
+  private isVRDeviceHidden(device: OVRDevice): boolean {
+    const deviceId = this.deviceManager.getIdForVRDevice(device);
     const knownDevice = this.deviceManager.getKnownDeviceById(deviceId);
     return knownDevice?.disabled ?? false;
   }

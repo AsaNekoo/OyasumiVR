@@ -3,8 +3,8 @@ import { OSCIntValue, OSCMessage, OSCValueTypeE } from '../../../models/osc-mess
 import { OscService } from '../../osc.service';
 import { OscControlService } from '../osc-control.service';
 import { firstValueFrom } from 'rxjs';
-import { EventLogTurnedOffOpenVRDevices } from '../../../models/event-log-entry';
-import { OpenVRService } from '../../openvr.service';
+import { EventLogTurnedOffVRDevices } from '../../../models/event-log-entry';
+import { VRService } from '../../openvr.service';
 import { LighthouseConsoleService } from '../../lighthouse-console.service';
 import { LighthouseService } from '../../lighthouse.service';
 import { EventLogService } from '../../event-log.service';
@@ -14,7 +14,7 @@ export class CommandOscMethod extends OscMethod<number> {
   constructor(
     osc: OscService,
     private oscControl: OscControlService,
-    private openvr: OpenVRService,
+    private openvr: VRService,
     private lighthouseConsole: LighthouseConsoleService,
     private lighthouse: LighthouseService,
     private eventLog: EventLogService,
@@ -68,10 +68,10 @@ export class CommandOscMethod extends OscMethod<number> {
     );
     await this.lighthouseConsole.turnOffDevices(devices);
     this.eventLog.logEvent({
-      type: 'turnedOffOpenVRDevices',
+      type: 'turnedOffVRDevices',
       reason: 'OSC_CONTROL',
       devices: devices.length > 1 ? 'TRACKERS' : 'TRACKER',
-    } as EventLogTurnedOffOpenVRDevices);
+    } as EventLogTurnedOffVRDevices);
   }
 
   private async handleTurnOffAllControllers() {
@@ -81,10 +81,10 @@ export class CommandOscMethod extends OscMethod<number> {
       );
       await this.lighthouseConsole.turnOffDevices(devices);
       this.eventLog.logEvent({
-        type: 'turnedOffOpenVRDevices',
+        type: 'turnedOffVRDevices',
         reason: 'OSC_CONTROL',
         devices: devices.length > 1 ? 'CONTROLLERS' : 'CONTROLLER',
-      } as EventLogTurnedOffOpenVRDevices);
+      } as EventLogTurnedOffVRDevices);
     }, 2000);
   }
 
@@ -92,10 +92,10 @@ export class CommandOscMethod extends OscMethod<number> {
     setTimeout(async () => {
       await this.lighthouseConsole.turnOffDevices(await firstValueFrom(this.openvr.devices));
       this.eventLog.logEvent({
-        type: 'turnedOffOpenVRDevices',
+        type: 'turnedOffVRDevices',
         reason: 'OSC_CONTROL',
         devices: 'ALL',
-      } as EventLogTurnedOffOpenVRDevices);
+      } as EventLogTurnedOffVRDevices);
     }, 2000);
   }
 

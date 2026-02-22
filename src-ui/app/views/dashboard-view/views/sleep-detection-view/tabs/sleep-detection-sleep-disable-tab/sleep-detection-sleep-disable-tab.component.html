@@ -95,16 +95,16 @@
 
     <div class="setting-row">
       <div class="setting-row-label" translate>
-        <span translate>sleep-detection.disableAutomations.onSteamVRStop</span>
+        <span translate>sleep-detection.disableAutomations.onVRStop</span>
         <span> </span>
       </div>
       <div class="setting-row-action">
         <label class="switch-toggle">
           <input
             type="checkbox"
-            [checked]="automationConfigs.SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS.disableOnSteamVRStop"
+            [checked]="automationConfigs.SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS.disableOnVRStop"
             (change)="
-              toggleAutomation('SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS', 'disableOnSteamVRStop')
+              toggleAutomation('SLEEP_MODE_CHANGE_ON_STEAMVR_STATUS', 'disableOnVRStop')
             "
           />
           <span class="switch-toggle-slider"></span>

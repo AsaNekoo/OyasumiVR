@@ -30,7 +30,7 @@ OyasumiVR은 **가상현실 헤드셋을 착용하고 잠을 잘 수 있도록 �
 - 📩 초대 요청을 자동으로 처리하기
 - 🔵 Automating your VRChat status
 - 🎤 잠들었을 때 마이크를 음소거하기
-- 🛠️ 다양한 SteamVR 설정을 자동화하기
+- 🛠️ 다양한 VR 설정을 자동화하기
 
 ...그리고 더 많은 기능을 제공하죠! OyasumiVR이 제공하는 기능에 대해 자세히 알아보려면 아래 '기능' 섹션을 참조하세요.
 
@@ -62,17 +62,17 @@ OyasumiVR 자체는 완전 무료이고, 항상 무료일 것이에요. 하지�
   <li>시간 계획</li>
   <li>컨트롤러 및 트래커 배터리 잔량</li>
   <li>컨트롤러 및 트래커 전원 상태</li>
-  <li>SteamVR 상태</li>
+  <li>VR 상태</li>
   <li>Heart Rate</li>
   <li>Sitting Upright</li>
   <li>VRChat players joining or leaving</li>
 </ul>
 
 {{STEAMVR_OVERLAY_HEADER}}
-📲 SteamVR 오버레이
+📲 VR 오버레이
 
 {{STEAMVR_OVERLAY_BODY}}
-OyasumiVR에는 자체 SteamVR 오버레이가 제공되어 VR 내에서 일부 기능을 제어할 수 있어요!
+OyasumiVR에는 자체 VR 오버레이가 제공되어 VR 내에서 일부 기능을 제어할 수 있어요!
 <br><br>
 기본적으로 오른쪽 컨트롤러의 A 버튼을 두 번 누르면 눈앞에 팝업이 나타납니다.
 
@@ -88,14 +88,14 @@ OyasumiVR에는 자체 SteamVR 오버레이가 제공되어 VR 내에서 일부 
 또한 배터리 잔량이 일정 수준 이하로 떨어졌거나 충전기에 올려놓았을 때 컨트롤러 및 트래커가 꺼지도록 설정할 수도 있어요. 컨트롤러 교체 시에 유용합니다!
 
 {{POWER_AUTOMATIONS_BODY_WINDOWS_POWER_POLICY}}
-<b>Windows 전력 정책</b>
+<b>System 전력 정책</b>
 <br>
-잠을 자거나 깨어날 때 Windows의 전원 정책을 자동으로 설정하여 전기를 절약하세요! 잠을 잘 때는 더 엄격한 정책(예: "절전")을 설정했다가 다시 깨어나면 더 높은 성능의 정책으로 복원하기만 하면 됩니다.
+잠을 자거나 깨어날 때 System의 전원 정책을 자동으로 설정하여 전기를 절약하세요! 잠을 잘 때는 더 엄격한 정책(예: "절전")을 설정했다가 다시 깨어나면 더 높은 성능의 정책으로 복원하기만 하면 됩니다.
 
 {{POWER_AUTOMATIONS_BODY_BASE_STATIONS}}
 <b>베이스스테이션</b>
 <br>
-OyasumiVR이 SteamVR과 함께 베이스 스테이션을 키거나 끄도록 할 수 있어요. SteamVR의 자체 베이스스테이션 전원 관리와 비슷하지만 <b>모든 HMD에 호환됩니다. </b> PC가 블루투스를 지원하고 베이스스테이션의 범위 내에 있으면 바로 사용할 수 있습니다.
+OyasumiVR이 VR과 함께 베이스 스테이션을 키거나 끄도록 할 수 있어요. VR의 자체 베이스스테이션 전원 관리와 비슷하지만 <b>모든 HMD에 호환됩니다. </b> PC가 블루투스를 지원하고 베이스스테이션의 범위 내에 있으면 바로 사용할 수 있습니다.
 
 {{GPU_AUTOMATIONS_HEADER}}
 🔌 GPU 자동화
@@ -173,13 +173,13 @@ OyasumiVR은 악몽을 꾸고 있다는 신호일 수 있는 심박수가 장시
 👓 해상도 자동화
 
 {{RESOLUTION_AUTOMATIONS_BODY}}
-잠을 자거나 깨어날 때 SteamVR 렌더링 해상도를 자동으로 조절해보세요! OyasumiVR이 렌더링 해상도를 낮추면 필요하지 않을 때 하드웨어에 가해지는 부하를 줄일 수 있습니다.
+잠을 자거나 깨어날 때 VR 렌더링 해상도를 자동으로 조절해보세요! OyasumiVR이 렌더링 해상도를 낮추면 필요하지 않을 때 하드웨어에 가해지는 부하를 줄일 수 있습니다.
 
 {{CHAPERONE_AUTOMATIONS_HEADER}}
 🔳 경계 자동화
 
 {{CHAPERONE_AUTOMATIONS_BODY}}
-잠을 자는 동안 SteamVR 경계선의 페이드 거리를 자동으로 조절해보세요. 좁은 플레이스페이스에 있는 경우, 이 기능을 사용하여 경계선을 숨기고 일어날 때 다시 보이도록 할 수 있어요.
+잠을 자는 동안 VR 경계선의 페이드 거리를 자동으로 조절해보세요. 좁은 플레이스페이스에 있는 경우, 이 기능을 사용하여 경계선을 숨기고 일어날 때 다시 보이도록 할 수 있어요.
 
 {{TRANSLATION_AND_LOCALIZATION_HEADER}}
 번역 및 현지화
@@ -202,10 +202,10 @@ OyasumiVR은 현재 다음 언어를 지원하고 있어요:
 배터리 자동화
 
 {{SUPPORTED_HARDWARE_BATTERY_AUTOMATIONS_BODY}}
-현재 OyasumiVR은 다음 기능을 지원하는 모든 SteamVR 기기에서 배터리 자동화를 사용하여 기기를 끄는 기능을 지원하고 있어요:
+현재 OyasumiVR은 다음 기능을 지원하는 모든 VR 기기에서 배터리 자동화를 사용하여 기기를 끄는 기능을 지원하고 있어요:
 
 1. 배터리 잔량 및 충전 상태 보고
-2. SteamVR을 통해 끄기
+2. VR을 통해 끄기
 
 다음 장치가 포함되지만 이에 한정되지는 않습니다:
 
