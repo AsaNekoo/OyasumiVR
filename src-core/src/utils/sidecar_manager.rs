@@ -177,7 +177,9 @@ impl SidecarManager {
                             *self_.active.get() = false;
                         }
                         drop(guard);
-                        OXR_HANDLE.get().unwrap().lock().await.run();
+                        if let Some(xr)=OXR_HANDLE.get(){
+                            xr.lock().await.run();
+                        }
                         break;
                     }
                 }
