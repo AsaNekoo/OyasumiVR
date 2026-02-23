@@ -34,7 +34,7 @@ pub static RESOURCES_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     }
     if let Some(mut path) = BASE_DIRS.get_data_home() {
         path = path.join("co.raphii.oyasumi/resources");
-        if path.exists() {
+        if path.join("sidecars/cef/libcef.so").exists() {
             log::info!("using resource path: {:#?}", path);
             return path;
         }
@@ -44,8 +44,13 @@ pub static RESOURCES_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
         log::info!("using resource path: {:#?}", path);
         return path;
     }
+    if PathBuf::from("/usr/share/oyasumivr/sidecars/cef/libcef.so").exists() {
+        let path = PathBuf::from("/usr/share/oyasumivr");
+        log::info!("using resource path: {:#?}", path);
+        return path;
+    }
 
     panic!(
-        "can not find the resources folder it has to be either next to executable or /usr/share/oyasumi or $XDG_DATA_HOME/co.raphii.oyasumi/resources"
+        "can not find the resources folder it has to be either next to executable or /usr/share/oyasumivr or $XDG_DATA_HOME/co.raphii.oyasumi/resources"
     );
 });
