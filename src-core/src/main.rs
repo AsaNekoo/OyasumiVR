@@ -21,16 +21,15 @@ mod vr;
 mod vrc_log_parser;
 mod vrcx;
 
-
 use config::Config;
 pub use flavour::BUILD_FLAVOUR;
 pub use grpc::models as Models;
 
 use globals::{FLAGS, TAURI_APP_HANDLE};
-use log::{error, info, warn, LevelFilter};
+use log::{LevelFilter, error, info, warn};
 
 use oyasumi_shared::get_log_path;
-use tauri::{plugin::TauriPlugin, Manager, Wry};
+use tauri::{Manager, Wry, plugin::TauriPlugin};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::RotationStrategy;
 
@@ -48,6 +47,16 @@ async fn main() {
     unsafe { std::env::set_var("RUST_BACKTRACE", "1") };
     //workaround for webkit bug https://github.com/tauri-apps/tauri/issues/9394
     unsafe { std::env::set_var("__NV_DISABLE_EXPLICIT_SYNC", "1") };
+
+    if let Ok(tz) = tz::TimeZone::local()
+        && let Ok(tz_name) = tz.find_current_local_time_type()
+    {
+        unsafe { std::env::set_var("TZ", tz_name.time_zone_designation()) };
+    } else {
+        eprintln!(
+            "failed to set TZ enviroment variable, this may cause execsive cpu usage by webkit"
+        );
+    }
     //tell oom killer that oyasumi can be killed as one of the first
     std::fs::write("/proc/self/oom_score_adj", "1000").ok();
     let log_path = Box::new(get_log_path());
@@ -58,13 +67,22 @@ async fn main() {
             .location()
             .map(|loc| format!("{}:{}:{}", loc.file(), loc.line(), loc.column()))
             .unwrap_or_default();
-        let panic_log_path=log_path.join("panic.log");
-        let base_log_path=log_path.join("OyasumiVR.log");
+        let panic_log_path = log_path.join("panic.log");
+        let base_log_path = log_path.join("OyasumiVR.log");
         // Write msg and location to file
         eprintln!("Writing panic log to {:#?}", panic_log_path);
-        eprintln!("\n{}","#".repeat(term_size::dimensions().unwrap_or_default().0));
-        eprintln!("please open an issue https://github.com/sofoxe1/OyasumiVR/issues and include: {:#?} and {:#?}",panic_log_path, base_log_path);
-        eprintln!("{}\n","#".repeat(term_size::dimensions().unwrap_or_default().0));
+        eprintln!(
+            "\n{}",
+            "#".repeat(term_size::dimensions().unwrap_or_default().0)
+        );
+        eprintln!(
+            "please open an issue https://github.com/sofoxe1/OyasumiVR/issues and include: {:#?} and {:#?}",
+            panic_log_path, base_log_path
+        );
+        eprintln!(
+            "{}\n",
+            "#".repeat(term_size::dimensions().unwrap_or_default().0)
+        );
         let _ = std::fs::write(&*panic_log_path, format!("{} ({})\n", msg, location));
         error!("PANIC: {} ({})", msg, location);
         hook(info);
