@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { invoke } from '@tauri-apps/api/core';
 import { NvmlDevice as NvmlDevice } from '../models/nvml-device';
-import { BehaviorSubject, delay, filter, interval, Observable, startWith, switchMap } from 'rxjs';
+import { BehaviorSubject, delay, filter, Observable } from 'rxjs';
 import { ElevatedSidecarService } from './elevated-sidecar.service';
 import { error, info } from '@tauri-apps/plugin-log';
 
@@ -30,7 +30,7 @@ export class NvmlService {
     this.sidecar.sidecarStarted
       .pipe(
         filter((running) => running),
-        switchMap(() => interval(5000).pipe(startWith(null))),
+        // switchMap(() => interval(5000).pipe(startWith(null))),
         delay(1000)
       )
       .subscribe(() => this.handleNvmlStatusUpdate());
@@ -61,7 +61,7 @@ export class NvmlService {
     return success;
   }
 
-  private getNvmlStatus(): Promise<NvmlStatus> {
-    return invoke<NvmlStatus>('nvml_status');
+  private getNvmlStatus(): NvmlStatus {
+    return "InitComplete";
   }
 }
