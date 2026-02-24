@@ -6,7 +6,7 @@ import { LighthouseService } from '../../services/lighthouse.service';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { VRService } from '../../services/openvr.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { combineLatest, debounceTime, delay, filter, firstValueFrom, interval } from 'rxjs';
+import { combineLatest, debounceTime, filter, firstValueFrom, interval } from 'rxjs';
 import { AppSettingsService } from '../../services/app-settings.service';
 
 export interface LighthouseV1IdWizardModalInputModel {
@@ -91,18 +91,21 @@ export class LighthouseV1IdWizardModalComponent
   }
 
   ngOnInit(): void {
-    interval(1000)
+    interval(30000)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         filter(() => this.step === 'AUTOMATIC_DETECTION'),
-        delay(1500),
-        filter(() => this.step === 'AUTOMATIC_DETECTION')
+        // delay(1500),
+        // filter(() => this.step === 'AUTOMATIC_DETECTION')
       )
       .subscribe(() => this.attemptAutomaticDetection());
-    combineLatest([this.openvr.status, this.openvr.devices])
+    combineLatest([this.openvr.status,this.openvr.devices])
       .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(1))
-      .subscribe(([status, devices]) => {
+      .subscribe(([status,devices]) => {
         const openVrInitialized = status === 'INITIALIZED';
+         if (!openVrInitialized) {
+          return
+         }
         const trackedDeviceDetected = devices.some(
           (d) =>
             (d.class === 'HMD' || d.class === 'Controller' || d.class === 'GenericTracker') &&
@@ -116,13 +119,10 @@ export class LighthouseV1IdWizardModalComponent
           loader: true,
         };
         this.automaticDetectionSteps.push(stepSteam);
-        if (openVrInitialized) {
           stepSteam.loader = false;
           stepSteam.icon = 'check_circle';
           stepSteam.subtitle = 'comp.lv1-id-wizard-modal.automaticDetection.steps.running';
-        } else {
-          return;
-        }
+       
         const connectDeviceStep = {
           title: 'comp.lv1-id-wizard-modal.automaticDetection.steps.connectDevice',
           subtitle: 'comp.lv1-id-wizard-modal.automaticDetection.steps.connectDeviceDesc',

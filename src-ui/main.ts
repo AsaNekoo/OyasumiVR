@@ -7,9 +7,9 @@ import { attachConsole, error, info } from '@tauri-apps/plugin-log';
 import { getVersion } from './app/utils/app-utils';
 import { FLAVOUR } from './build';
 import { disableDefaultContextMenu } from './app/utils/browser-utils';
-if (environment.production) {
+// if (environment.production) {
   enableProdMode();
-}
+// }
 
 if (isDevMode()) {
   attachConsole();

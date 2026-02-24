@@ -121,7 +121,7 @@ export class VRChatMicMuteAutomationService {
     });
     // In case the muted state is not known (This happens when OyasumiVR is launched after VRChat is already active)
     // We poll the muted state through OSCQuery every 3 seconds, until it is known.
-    merge(interval(3000))
+    merge(interval(10000))
       .pipe(
         filter(() => this._muted.value === null),
         switchMap(() => this.fetchMutedState())

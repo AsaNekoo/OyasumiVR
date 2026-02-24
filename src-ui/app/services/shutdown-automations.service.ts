@@ -208,7 +208,8 @@ export class ShutdownAutomationsService {
   }
 
   private async handleTriggerOnSleep() {
-    interval(1000)
+    this.sleepService.onSleepModeChange
+      .pipe(filter((mode) => mode.mode))
       .pipe(
         // Only trigger if this trigger is enabled
         filter(() => this.config.triggersEnabled),
@@ -238,11 +239,11 @@ export class ShutdownAutomationsService {
   }
 
   private async handleTriggerWhenAlone() {
-    interval(1000)
+    interval(30000)
       .pipe(
-        filter(() => this._stage.value === 'IDLE'),
         filter(() => this.config.triggersEnabled),
         filter(() => this.config.triggerWhenAlone),
+        filter(() => this._stage.value === 'IDLE'),
         filter(() => this.isAlone),
         filter(() => Date.now() - this.aloneSince >= this.config.triggerWhenAloneDuration),
         filter(

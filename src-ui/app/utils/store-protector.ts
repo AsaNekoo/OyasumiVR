@@ -18,7 +18,7 @@ import { LazyStore } from '@tauri-apps/plugin-store';
 import { interval } from 'rxjs';
 
 const PROTECTOR_STORES: Record<string, StoreProtector> = {};
-const SNAPSHOT_INTERVAL = 30000;
+const SNAPSHOT_INTERVAL = 60000*5;
 
 export class StoreProtector {
   private lastSavedHash?: string;

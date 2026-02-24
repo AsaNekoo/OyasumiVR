@@ -77,7 +77,7 @@ export class BrightnessAutomationsListComponent implements OnInit {
     // Update HMD connect automation indicators based on sleep mode changes and timer
     combineLatest([
       this.sleepService.mode,
-      interval(5000).pipe(startWith(0)), // Update every 5 seconds and initially
+      interval(20000).pipe(startWith(0)), // Update every 5 seconds and initially
     ])
       .pipe(
         takeUntilDestroyed(this.destroyRef),

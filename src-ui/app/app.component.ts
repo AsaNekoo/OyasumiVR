@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { VRService } from './services/openvr.service';
 import { routeAnimations } from './app-routing.module';
 import { TranslateService } from '@ngx-translate/core';
@@ -14,6 +14,7 @@ import { isHolidaysEventActive } from './utils/event-utils';
   styleUrls: ['./app.component.scss'],
   animations: [routeAnimations, fade()],
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   showSnowverlay = false;
@@ -21,7 +22,7 @@ export class AppComponent implements OnInit {
   constructor(
     public openvr: VRService,
     translate: TranslateService,
-    private settings: AppSettingsService,
+    private settings: AppSettingsService
   ) {
     this.settings.settings
       .pipe(
@@ -29,7 +30,7 @@ export class AppComponent implements OnInit {
         map((settings) => settings.userLanguage),
         distinctUntilChanged(),
         tap((userLanguage) => translate.use(userLanguage)),
-        debounceTime(10000),
+        debounceTime(10000)
       )
       .subscribe();
     // Snowverlay
@@ -45,6 +46,5 @@ export class AppComponent implements OnInit {
       });
   }
 
-  async ngOnInit(): Promise<void> {
-  }
+  async ngOnInit(): Promise<void> {}
 }
