@@ -25,3 +25,9 @@ pub struct AudioDeviceDto {
     pub mute: bool,
     pub default: bool,
 }
+#[derive(Serialize,Clone,Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct NewSound {
+    pub name: String,
+    pub duration_ms: u32,
+}

@@ -96,6 +96,7 @@ dbus = "0.9.10"
 term_size = "0.3.2"
 ppd = { version = "0.1.7", features = ["async-io"] }
 zbus = "5.14.0"
+notify = "8.2.0"
 
 
 
