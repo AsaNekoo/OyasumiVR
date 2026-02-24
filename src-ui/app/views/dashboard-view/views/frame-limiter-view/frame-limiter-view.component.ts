@@ -111,6 +111,7 @@ export class FrameLimiterViewComponent implements OnInit {
   }
 
   onFrameLimitRequested(appId: number, value: FrameLimitConfigOption) {
+    this.activeFrameLimits[appId]=value;
     this.frameLimiterService.setFrameLimitForAppId(appId, value);
   }
 

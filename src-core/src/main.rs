@@ -297,7 +297,7 @@ fn configure_command_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         vr::commands::openvr_set_init_delay_fix,
         vr::commands::vr_set_analog_color_temp,
         vr::commands::vr_set_app_framelimit,
-        vr::commands::vr_get_app_framelimit,
+        // vr::commands::vr_get_app_framelimit,
         vr::commands::vr_sleep_mode_check,
         vr::commands::vr_sleep_detection_enabled,
         vr::commands::set_sleep_state,

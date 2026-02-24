@@ -109,7 +109,7 @@ pub async fn limit_frame_rate(
         .lock()
         .await
         .current_refresh_rate() as u8;
-    log::info!("setting fps limit for: {} at:{}", app_id, target_fps);
+    
     if let Some(limits) = &limits {
         //im guesing how it works
         debug_assert_eq!(
@@ -118,6 +118,7 @@ pub async fn limit_frame_rate(
         );
         target_fps /= limits.additional_frames_to_predict + 1;
     }
+    log::info!("setting fps limit for: {} at:{}", app_id, target_fps);
     let mangohud_conf_name = match GameAppId::from(app_id) {
         GameAppId::VRChat => "wine-VRChat.conf",
         GameAppId::Resonite => "wine-Resonite.conf",

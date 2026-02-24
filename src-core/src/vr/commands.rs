@@ -21,7 +21,7 @@ pub async fn vr_set_app_framelimit(app_id: u32, limits: Option<OVRFrameLimits>) 
         log::error!("failed to set frame limit with: {:?}", err);
     }
 }
-
+#[allow(dead_code)]
 #[tauri::command]
 #[oyasumivr_macros::command_profiling]
 pub async fn vr_get_app_framelimit(app_id: u32) -> Result<Option<OVRFrameLimits>, String> {

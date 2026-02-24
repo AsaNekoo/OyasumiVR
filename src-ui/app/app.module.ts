@@ -609,7 +609,6 @@ export class AppModule {
             this.logInit('Initializing fonts', this.fontLoaderService.init()),
             this.logInit('Initializing lighthouse services', this.lighthouseService.init()),
             this.logInit('Initializing notifications', this.notificationService.init()),
-            this.logInit('Initializing frame limiting', this.frameLimiterService.init()),
             this.logInit('Initializing sleep preparation', this.sleepPreparationService.init()),
             this.logInit('Initializing Pulsoid', this.pulsoidService.init()),
             this.logInit('Initializing quitting with VR', this.quitWithVRService.init()),

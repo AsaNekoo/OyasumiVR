@@ -1,17 +1,10 @@
 import { Injectable } from '@angular/core';
 import { FrameLimitConfigOption } from '../models/automations';
-import { AutomationConfigService } from './automation-config.service';
 import {
   BehaviorSubject,
-  distinctUntilChanged,
-  interval,
-  map,
-  startWith,
-  switchMap,
-  filter,
   firstValueFrom,
 } from 'rxjs';
-import { isEqual, omit } from 'lodash';
+import { omit } from 'lodash';
 import { invoke } from '@tauri-apps/api/core';
 import { VRService } from './openvr.service';
 
@@ -49,42 +42,41 @@ export class FrameLimiterService {
   public readonly activeFrameLimits = this._activeFrameLimits.asObservable();
 
   constructor(
-    private automationConfig: AutomationConfigService,
     private openvr: VRService
   ) {}
 
-  public async init() {
-    this.automationConfig.configs
-      .pipe(
-        map((configs) => configs.FRAME_LIMIT_AUTOMATIONS),
-        map((config) => config.configs.map((c) => c.appId)),
-        distinctUntilChanged((a, b) => isEqual(a, b)),
-        switchMap((appIds) =>
-          interval(1000).pipe(
-            startWith(null),
-            switchMap(() => this.openvr.status),
-            filter((status) => status === 'INITIALIZED'),
-            switchMap(() =>
-              Promise.all(appIds.map((appId) => this.getActiveFrameLimitForAppId(appId)))
-            ),
-            map((frameLimits) =>
-              frameLimits.reduce(
-                (acc, curr, index) => {
-                  acc[appIds[index]] = curr;
-                  return acc;
-                },
-                {} as {
-                  [appId: number]: FrameLimitConfigOption | null;
-                }
-              )
-            )
-          )
-        )
-      )
-      .subscribe((appFrameLimits) => {
-        this._activeFrameLimits.next(appFrameLimits);
-      });
-  }
+  // public async init() {
+  //   this.automationConfig.configs
+  //     .pipe(
+  //       map((configs) => configs.FRAME_LIMIT_AUTOMATIONS),
+  //       map((config) => config.configs.map((c) => c.appId)),
+  //       distinctUntilChanged((a, b) => isEqual(a, b)),
+  //       switchMap((appIds) =>
+  //         interval(1000).pipe(
+  //           startWith(null),
+  //           switchMap(() => this.openvr.status),
+  //           filter((status) => status === 'INITIALIZED'),
+  //           switchMap(() =>
+  //             Promise.all(appIds.map((appId) => this.getActiveFrameLimitForAppId(appId)))
+  //           ),
+  //           map((frameLimits) =>
+  //             frameLimits.reduce(
+  //               (acc, curr, index) => {
+  //                 acc[appIds[index]] = curr;
+  //                 return acc;
+  //               },
+  //               {} as {
+  //                 [appId: number]: FrameLimitConfigOption | null;
+  //               }
+  //             )
+  //           )
+  //         )
+  //       )
+  //     )
+  //     .subscribe((appFrameLimits) => {
+  //       this._activeFrameLimits.next(appFrameLimits);
+  //     });
+  // }
 
   public async setFrameLimitForAppId(appId: number, value: FrameLimitConfigOption) {
     const status = await firstValueFrom(this.openvr.status);
@@ -123,20 +115,20 @@ export class FrameLimiterService {
     }
   }
 
-  private async getActiveFrameLimitForAppId(appId: number): Promise<FrameLimitConfigOption | null> {
-    const status = await firstValueFrom(this.openvr.status);
-    if (status !== 'INITIALIZED') return null;
-    try {
-      const result = await invoke<{
-        additionalFramesToPredict: number;
-        framesToThrottle: number;
-      } | null>('vr_get_app_framelimit', {
-        appId,
-      });
-      if (result === null) return 'AUTO';
-      return Math.max(result.framesToThrottle, result.additionalFramesToPredict);
-    } catch {
-      return null;
-    }
-  }
+  // private async getActiveFrameLimitForAppId(appId: number): Promise<FrameLimitConfigOption | null> {
+  //   const status = await firstValueFrom(this.openvr.status);
+  //   if (status !== 'INITIALIZED') return null;
+  //   try {
+  //     const result = await invoke<{
+  //       additionalFramesToPredict: number;
+  //       framesToThrottle: number;
+  //     } | null>('vr_get_app_framelimit', {
+  //       appId,
+  //     });
+  //     if (result === null) return 'AUTO';
+  //     return Math.max(result.framesToThrottle, result.additionalFramesToPredict);
+  //   } catch {
+  //     return null;
+  //   }
+  // }
 }
