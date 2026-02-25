@@ -15,6 +15,7 @@ use std::fs::File;
 use std::io::{Cursor, Read};
 use std::path::PathBuf;
 use std::sync::{Arc, LazyLock};
+use std::time::Duration;
 use tokio::sync::Mutex;
 use tokio::sync::mpsc::Sender;
 
@@ -172,12 +173,14 @@ pub async fn init_sound_playback() {
                 }
             }
         });
+        tokio::time::sleep(Duration::from_millis(200)).await;
+        stream_handle.pause();
         // Initialize output stream
         let player = rodio::Player::connect_new(stream_handle.mixer());
         // Play sounds when requested
         while let Some((sound, volume)) = tokio_rx.recv().await {
-            stream_handle.play();
             if let Some(source) = sounds.lock().await.get(&sound) {
+                stream_handle.play();
                 // Play sound
                 let decoder = rodio::Decoder::new(Cursor::new(source.clone())).unwrap();
                 decoder.total_duration();

@@ -1,6 +1,6 @@
 import { LazyStore } from '@tauri-apps/plugin-store';
 import { FLAVOUR } from '../build';
-export const SPLASH_MIN_DURATION = 3000;
+export const SPLASH_MIN_DURATION = 300;
 export const SETTINGS_KEY_AUTOMATION_CONFIGS = 'AUTOMATION_CONFIGS';
 export const SETTINGS_KEY_VRCHAT_API = 'VRCHAT_API';
 export const SETTINGS_KEY_DEVICE_MANAGER = 'DEVICE_MANAGER';
