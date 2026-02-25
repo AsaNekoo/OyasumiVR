@@ -8,7 +8,7 @@
 	import ColorTempSlider from '$lib/components/ColorTempSlider.svelte';
 	import ipc from '$lib/services/ipc.service';
 	import { get, writable, derived } from 'svelte/store';
-	import { createEventDispatcher, onDestroy } from 'svelte';
+	import { beforeUpdate, createEventDispatcher, onDestroy } from 'svelte';
 	import { t } from '$lib/translations';
 	import Clickable from '$lib/components/Clickable.svelte';
 	import throttle from 'just-throttle';
@@ -21,18 +21,22 @@
 	let animationSpeed = 300;
 	let staggerOffset = 50;
 	let flyYTransform = 30;
-
 	let time = new Date();
-	function update_time() {
-		// console.debug('time update');
-		window.current_time = new Date();
-		time = window.current_time;
-		let left = 60000 - (time.getTime() % 60000);
-		setTimeout(() => update_time(), left + 10);
-	}
-	if (!window.current_time) {
-		update_time();
-	}
+	var interval: NodeJS.Timeout | null = null;
+	let left = 60000 - (time.getTime() % 60000);
+	setTimeout(() => {
+		time = new Date();
+		interval = setInterval(() => {
+			time = new Date();
+		}, 60000);
+	}, left);
+	onDestroy(() => {
+		if (interval) {
+			clearInterval(interval);
+		}
+	});
+
+	// onInterval
 	$: timeHours = time.getHours().toString().padStart(2, '0');
 	$: timeMinutes = time.getMinutes().toString().padStart(2, '0');
 
