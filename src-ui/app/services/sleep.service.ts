@@ -11,8 +11,6 @@ import { SleepModeStatusChangeReason, SleepState } from '../models/sleep-mode';
 import { SETTINGS_KEY_SLEEP_MODE, SETTINGS_STORE } from '../globals';
 import { SleepingPose } from '../models/sleeping-pose';
 import { VRDevicePose } from '../models/ovr-device';
-import { SleepingPoseDetector } from '../utils/sleeping-pose-detector';
-import * as THREE from 'three';
 import { info } from '@tauri-apps/plugin-log';
 import { NotificationService } from './notification.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -31,7 +29,6 @@ export class SleepService {
     filter((v) => v !== null),
     map((v) => v as boolean)
   );
-  private poseDetector: SleepingPoseDetector = new SleepingPoseDetector();
   private forcePose$: Subject<SleepingPose> = new Subject<SleepingPose>();
 
   private readonly _onSleepModeChange = new Subject<{
@@ -110,9 +107,6 @@ export class SleepService {
     this.forcePose$.next(pose);
   }
 
-  getPoseDetectorScene(): THREE.Scene {
-    return this.poseDetector.getScene();
-  }
 
   async enableSleepMode(reason: SleepModeStatusChangeReason) {
     if (this._mode.value) return;
@@ -153,9 +147,4 @@ export class SleepService {
     }
   }
 
-  private getSleepingPoseForDevicePose(pose: VRDevicePose): SleepingPose {
-    if (!pose) return this.poseDetector.sleepingPose;
-    this.poseDetector.processOrientation(pose.quaternion);
-    return this.poseDetector.sleepingPose;
-  }
 }
