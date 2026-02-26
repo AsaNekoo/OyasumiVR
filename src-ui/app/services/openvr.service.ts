@@ -54,21 +54,6 @@ export class VRService {
         this.onDeviceUpdate(event.payload.device)
       ),
       listen<VRStatus>('VR_STATUS_UPDATE', (event) => this.onStatusUpdate(event.payload)),
-      listen<any>('OVR_POSE_UPDATE', (event) => {
-        // const poses = structuredClone(this._devicePoses.value);
-        const {
-          // index,
-          quaternion,
-          position,
-        }: {
-          // index: number;
-          quaternion: [number, number, number, number];
-          position: [number, number, number];
-        } = event.payload;
-        let pose = { quaternion, position };
-        this._hmd_pose.next(pose);
-        this.appRef.tick();
-      }),
     ]);
 
   }
@@ -124,7 +109,6 @@ export class VRService {
       case 'INACTIVE':
       case 'INITIALIZING':
         this._devices.next([]);
-        this._hmd_pose.next({quaternion:[0,0,0,0],position:[0,0,0]});
         break;
       case 'INITIALIZED':
         break;

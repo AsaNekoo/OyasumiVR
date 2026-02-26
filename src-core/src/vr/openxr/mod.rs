@@ -3,7 +3,10 @@ use std::{
     time::Duration,
 };
 mod input;
+use glam::{Quat, Vec3A};
 use log::{debug, info};
+use serde::Serialize;
+use serde_repr::Serialize_repr;
 use tauri::async_runtime::spawn_blocking;
 use tokio::{spawn, sync::Mutex};
 use xr_overlay::{
@@ -12,7 +15,7 @@ use xr_overlay::{
     model::AppContext,
     openxr::{Posef, Vector3f},
     runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent},
-    utils::VecFExt,
+    utils::{QuaternionfExt, VecFExt},
     xr::ReferenceSpaceT,
 };
 
@@ -130,11 +133,10 @@ pub async fn init() {
         });
 
         tokio::task::spawn(async move {
+            let mut last_pose = SIDE::Front;
             loop {
                 let pose = get_pose("sleep", &mut *OXR_HANDLE.wait().lock().await).await;
                 if let Some(pose) = pose {
-                    let o = pose.orientation;
-                    let p = pose.position;
                     #[allow(clippy::collapsible_if)] //no????
                     if unsafe { SLEEP_DETECTION_ENABLED && SLEEP_STATE != SleepState::Sleeping } {
                         SLEEP_DETECTOR
@@ -143,15 +145,11 @@ pub async fn init() {
                             .log_pose(pose.position.to_vec3a().to_vec3())
                             .await;
                     }
-                    send_event(
-                        "OVR_POSE_UPDATE",
-                        VRDevicePose {
-                            index: 0,
-                            quaternion: [o.x, o.y, o.z, o.w],
-                            position: [p.x, p.y, p.z],
-                        },
-                    )
-                    .await;
+                    let c_pose = get_side(pose.orientation.to_quat());
+                    if c_pose != last_pose {
+                        last_pose = c_pose;
+                        send_event("POSE", c_pose).await;
+                    }
                     tokio::time::sleep(SLEEP_DETECTOR_PERIOD).await;
                 }
             }
@@ -159,6 +157,31 @@ pub async fn init() {
         debug!("[Init] openxr start (2)");
         update_status(VRStatus::Initialized).await;
     });
+}
+#[derive(Debug, Clone, Copy, PartialEq, Serialize_repr)]
+#[repr(u8)]
+pub enum SIDE {
+    Back = 0,
+    Left = 1,
+    Right = 2,
+    Front = 3,
+}
+#[inline]
+fn get_side(quat: Quat) -> SIDE {
+    if !{ quat.mul_vec3a(Vec3A::Y).dot(Vec3A::Y).abs() < 0.62 } {
+        SIDE::Front
+    } else {
+        let side = quat.mul_vec3a(Vec3A::X).dot(Vec3A::Y);
+        if side.abs() > 0.62 {
+            match side.is_sign_negative() {
+                true => SIDE::Right,
+                false => SIDE::Left,
+            }
+        } else {
+            //oyasumi doesn't distunguish between laying face down and up
+            SIDE::Back
+        }
+    }
 }
 #[inline]
 async fn get_pose(src: &'static str, ctx: &mut AppRunner) -> Option<Posef> {
