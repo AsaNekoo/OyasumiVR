@@ -1,15 +1,16 @@
-use std::{net::SocketAddr, str::FromStr, sync::Arc, time::Duration};
 use log::debug;
-use vrchat_osc::rosc::{OscMessage, OscPacket, OscType};
+use std::{net::SocketAddr, str::FromStr, sync::Arc, time::Duration};
 use tokio::{spawn, sync::Mutex};
+use vrchat_osc::rosc::{OscMessage, OscPacket, OscType};
 use vrchat_osc::{
-    models::{OscNode, OscRootNode},
     VRChatOSC,
+    models::{OscNode, OscRootNode},
 };
 
 use crate::{
     osc::models::{OSCMessage, OSCMethod, OSCValue, SupportedOscType},
-    utils::{self, send_event}, warn_unimplemented,
+    utils::{self, send_event},
+    warn_unimplemented,
 };
 static VRCHAT_OSC_ADDR: std::sync::Mutex<Option<SocketAddr>> = std::sync::Mutex::new(None);
 static VRCHAT_OSCQUERY_ADDR: std::sync::Mutex<Option<SocketAddr>> = std::sync::Mutex::new(None);
@@ -58,11 +59,11 @@ pub async fn start_osc_server() -> Option<(String, String)> {
 #[allow(static_mut_refs)]
 pub async fn add_osc_method(method: OSCMethod) {
     //its called only "few" times at the start so cloning string is fine
-    if !unsafe{WHITELIST.contains(&method.address.clone().into())} {
+    if !unsafe { WHITELIST.contains(&method.address.clone().into()) } {
         #[cfg(debug_assertions)]
         panic!("{:?}", method);
         #[cfg(not(debug_assertions))]
-        warn_unimplemented!("not on the whitelist: {:?}",method);
+        warn_unimplemented!("not on the whitelist: {:?}", method);
     }
 }
 
@@ -119,14 +120,20 @@ static mut WHITELIST: Vec<Box<str>> = Vec::new();
 #[allow(static_mut_refs)]
 pub async fn set_osc_receive_address_whitelist(whitelist: Vec<String>) {
     let mut server_guard = OSC_SERVER.lock().await;
-     debug!("starting osc server with paths:{:?}", whitelist);
+    debug!("starting osc server with paths:{:?}", whitelist);
     unsafe {
-        for s in &whitelist{
+        for s in &whitelist {
             WHITELIST.push(s.clone().into_boxed_str());
         }
     }
-   
-    let vrchat_osc = VRChatOSC::new(None).await.unwrap();
+
+    let vrchat_osc = match VRChatOSC::new(None).await {
+        Ok(v) => v,
+        Err(err) => {
+            log::error!("[osc] Failed to start osc server:{:?}", err);
+            return;
+        }
+    };
     let mut root_node = OscRootNode::new();
     for path in whitelist {
         root_node = root_node.add_node(OscNode {
@@ -134,27 +141,33 @@ pub async fn set_osc_receive_address_whitelist(whitelist: Vec<String>) {
             ..Default::default()
         })
     }
-    vrchat_osc.on_connect(|service|{
-        match service{
-            vrchat_osc::ServiceType::Osc(name, socket_addr) => {if name.starts_with("VRChat-Client-"){
-                log::debug!("new osc service {}:{}",name,socket_addr);
-                spawn(send_event("VRC_OSC_ADDRESS_CHANGED", socket_addr.to_string()));
-                 VRCHAT_OSC_ADDR.lock().unwrap().replace(socket_addr);
-            }},
+    vrchat_osc
+        .on_connect(|service| match service {
+            vrchat_osc::ServiceType::Osc(name, socket_addr) => {
+                if name.starts_with("VRChat-Client-") {
+                    log::debug!("new osc service {}:{}", name, socket_addr);
+                    spawn(send_event(
+                        "VRC_OSC_ADDRESS_CHANGED",
+                        socket_addr.to_string(),
+                    ));
+                    VRCHAT_OSC_ADDR.lock().unwrap().replace(socket_addr);
+                }
+            }
             vrchat_osc::ServiceType::OscQuery(name, socket_addr) => {
-                log::debug!("new osc query service {}:{}",name,socket_addr);
-                spawn(send_event("VRC_OSCQUERY_ADDRESS_CHANGED", socket_addr.to_string()));
+                log::debug!("new osc query service {}:{}", name, socket_addr);
+                spawn(send_event(
+                    "VRC_OSCQUERY_ADDRESS_CHANGED",
+                    socket_addr.to_string(),
+                ));
                 VRCHAT_OSCQUERY_ADDR.lock().unwrap().replace(socket_addr);
-
-            },
-        }
-        
-    }).await;
+            }
+        })
+        .await;
     vrchat_osc
         .register("OyasumiVR", root_node, |msg| match msg {
             OscPacket::Message(osc_message) => {
                 // println!("{:?}",osc_message);
-                if !unsafe{WHITELIST.iter().any(|s|**s==*osc_message.addr.as_str())}{
+                if !unsafe { WHITELIST.iter().any(|s| **s == *osc_message.addr.as_str()) } {
                     //vrchat seems to be sending more then requested
                     return;
                 }
