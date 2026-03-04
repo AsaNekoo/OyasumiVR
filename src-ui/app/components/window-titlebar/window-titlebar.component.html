@@ -22,15 +22,18 @@
     [tooltipMode]="'bottom'"
     (click)="messageCenter.toggle()"
   >
-  
     <i
       class="material-symbols-outlined icon-filled"
-      [class.wiggle]="(messageCenter.messages | async)?.length && (messageCenter.animate| async)"
+      [class.wiggle]="(messageCenter.messages | async)?.length && (messageCenter.animate | async)"
       >mode_comment</i
     >
     @if ((messageCenter.messages | async)?.length) {
       <div class="message-center-badge-bg" @fade>
-        <div class="message-center-badge"></div>
+        @if (messageCenter.animate | async) {
+          <div class="message-center-badge"></div>
+        } @else {
+          <div class="message-center-badge-still"></div>
+        }
       </div>
     }
   </button>

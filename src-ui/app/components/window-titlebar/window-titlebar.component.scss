@@ -171,3 +171,9 @@
     }
   }
 }
+.message-center-badge-still {
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background-color: #{materialColors.$md-orange-800};
+}
