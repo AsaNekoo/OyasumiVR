@@ -21,6 +21,8 @@ mod vr;
 mod vrc_log_parser;
 mod vrcx;
 
+use std::process::Command;
+
 use config::Config;
 pub use flavour::BUILD_FLAVOUR;
 pub use grpc::models as Models;
@@ -32,6 +34,7 @@ use oyasumi_shared::get_log_path;
 use tauri::{Manager, Wry, plugin::TauriPlugin};
 use tauri_plugin_cli::CliExt;
 use tauri_plugin_log::RotationStrategy;
+use xr_overlay::vulkano;
 
 #[macro_export]
 macro_rules! warn_unimplemented {
@@ -154,6 +157,7 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
     let mut builder = tauri_plugin_log::Builder::new()
         .clear_targets()
         .format(move |out, message, record| {
+           
             let format = time::format_description::parse(
                 "[[[year]-[month]-[day]][[[hour]:[minute]:[second]]",
             )
@@ -194,6 +198,53 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
 }
 
 async fn app_setup(app_handle: tauri::AppHandle) {
+    fn get_gpu() -> Option<String> {
+        match Command::new("glxinfo").output() {
+            Ok(v) => {
+                let s = String::from_utf8_lossy(&v.stdout).to_string();
+                for l in s.lines() {
+                    if l.starts_with("OpenGL renderer string: ") {
+                        return Some(
+                            l.chars()
+                                .skip("OpenGL renderer string: ".len())
+                                .collect::<String>(),
+                        );
+                    }
+                }
+            }
+            Err(_) => {
+                if let Ok(v) = Command::new("lspci").arg("-nn").output() {
+                    let s = String::from_utf8_lossy(&v.stdout).to_string();
+                    for l in s.lines() {
+                        if l.contains("VGA compatible controller") {
+                            let mut l = l
+                                .split(":")
+                                .nth(2)?
+                                .chars()
+                                .skip_while(|x| *x != '[')
+                                .collect::<String>()
+                                .split(" ")
+                                .map(|s| s.to_string())
+                                .collect::<Vec<String>>();
+                            l.pop();
+                            let l = l.into_iter().map(|s| format!("{} ", s)).collect::<String>();
+                            return Some(l);
+                        }
+                    }
+                }
+            }
+        };
+        None
+    }
+    let release = os_release::OS_RELEASE
+        .as_ref()
+        .map(|r| format!("{} {}", r.name, r.version_id))
+        .unwrap_or("Unknown".into());
+    info!(
+        "[Core] Specs:\n Distro: {}\n Gpu: {}",
+        release,
+        get_gpu().unwrap_or("Unknown".into())
+    );
     info!(
         "[Core] Starting OyasumiVR in {} mode",
         crate::utils::cli_core_mode().await
