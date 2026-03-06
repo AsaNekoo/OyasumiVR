@@ -829,7 +829,7 @@ export class AppModule {
             done: true,
           });
         })(),
-        SPLASH_MIN_DURATION
+        0
       );
     } catch (e) {
       if (
