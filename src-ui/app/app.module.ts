@@ -1,4 +1,4 @@
-import { enableProdMode, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';

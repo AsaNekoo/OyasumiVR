@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { VRService } from './services/openvr.service';
 import { routeAnimations } from './app-routing.module';
 import { TranslateService } from '@ngx-translate/core';
@@ -14,7 +14,6 @@ import { isHolidaysEventActive } from './utils/event-utils';
   styleUrls: ['./app.component.scss'],
   animations: [routeAnimations, fade()],
   standalone: false,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   showSnowverlay = false;
