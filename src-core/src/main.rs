@@ -157,14 +157,16 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
     let mut builder = tauri_plugin_log::Builder::new()
         .clear_targets()
         .format(move |out, message, record| {
-           
             let format = time::format_description::parse(
                 "[[[year]-[month]-[day]][[[hour]:[minute]:[second]]",
             )
             .unwrap();
             out.finish(format_args!(
                 "{}[{}] {}",
-                time::OffsetDateTime::now_utc().format(&format).unwrap(),
+                time::OffsetDateTime::now_local()
+                    .unwrap_or_else(|_| time::OffsetDateTime::now_utc())
+                    .format(&format)
+                    .unwrap(),
                 record.level(),
                 message
             ))
