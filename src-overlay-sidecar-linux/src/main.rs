@@ -15,7 +15,16 @@ use xr_overlay_cef::{
 };
 
 use crate::{
-    config::{DEFAULT_OVERLAY_CONFIG, OverlayConfig}, core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient}, globals::CORE_GRPC_DEV_PORT, grpc::{start_grpc_server, start_grpc_web_server}, overlay_ipc::start_websocket_server, ui::serve_ui, vr::{DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard, start_vr}
+    config::{DEFAULT_OVERLAY_CONFIG, OverlayConfig},
+    core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
+    globals::CORE_GRPC_DEV_PORT,
+    grpc::{start_grpc_server, start_grpc_web_server},
+    overlay_ipc::start_websocket_server,
+    ui::serve_ui,
+    vr::{
+        CACHE_PATH, DEFAULT_BINDINGS_CONFIG, NOTIFICATION_OVERLAY, OVERLAY, show_dashboard,
+        start_vr,
+    },
 };
 
 pub mod config;
@@ -148,7 +157,8 @@ fn main() {
     trace!("cef shutdown");
     runtime.shutdown_timeout(Duration::from_millis(100));
     trace!("runtime exited");
-    std::thread::sleep(Duration::from_millis(10)); //just in case
+    //clean up cef cache
+    fs::remove_dir(CACHE_PATH.clone()).ok();
 }
 static HANDLES: LazyLock<Mutex<Vec<tokio::task::JoinHandle<()>>>> = LazyLock::new(Mutex::default);
 

@@ -1,6 +1,7 @@
 use std::{
     fs,
-    sync::{Arc, OnceLock, RwLock},
+    path::{Path, PathBuf},
+    sync::{Arc, LazyLock, OnceLock, RwLock},
     thread::JoinHandle,
     time::Duration,
 };
@@ -15,7 +16,8 @@ use xr_overlay::{
     },
 };
 use xr_overlay_cef::{CefOverlayCreateInfo, create_cef_overlay};
-
+pub static CACHE_PATH: LazyLock<PathBuf> =
+    LazyLock::new(|| PathBuf::from("/tmp/oyasumi_sidecard_cef"));
 pub const DEFAULT_BINDINGS_CONFIG: &str = include_str!("../../bindings_config.toml");
 use crate::{
     CONFIG, KILL, config::OverlayConfig, globals::textures, input::get_controller_create_info,
@@ -26,6 +28,12 @@ pub static NOTIFICATION_OVERLAY: OnceLock<Overlay> = OnceLock::new();
 pub static MIC_MUTE_OVERLAY: OnceLock<OverlayHandle> = OnceLock::new();
 pub static XR_CTX: OnceLock<Arc<RwLock<AppRunner>>> = OnceLock::new();
 pub fn start_vr() -> Option<JoinHandle<()>> {
+    if CACHE_PATH.exists() {
+        log::info!("deleting /tmp cache:{:#?}", CACHE_PATH);
+        fs::remove_dir(CACHE_PATH.clone()).unwrap();
+    }else {
+        info!("/tmp/ cache doesn't exist yet");
+    }
     trace!("start_vr");
     let ctx = loop {
         if killed() {
@@ -91,6 +99,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             name: Some("oyasumi".into()),
             disable_dragging: true,
             reference_space: Some(config.main_overlay.reference_space),
+            cache_path: Some(CACHE_PATH.clone()),
             ..Default::default()
         },
     );
@@ -110,6 +119,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             resolution: config.notification_overlay.resolution,
             name: Some("notifications".into()),
             reference_space: Some(config.notification_overlay.reference_space),
+            cache_path: Some(CACHE_PATH.clone()),
             ..Default::default()
         },
     );
