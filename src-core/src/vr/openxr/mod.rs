@@ -5,9 +5,7 @@ use std::{
 mod input;
 use glam::{Quat, Vec3A};
 use log::{debug, info};
-use serde::Serialize;
 use serde_repr::Serialize_repr;
-use tauri::async_runtime::spawn_blocking;
 use tokio::{spawn, sync::Mutex};
 use xr_overlay::{
     RgbaTexture,
@@ -25,7 +23,7 @@ use crate::{
         SLEEP_DETECTION_ENABLED,
         commands::SLEEP_STATE,
         gesture_detector::GestureDetector,
-        model::{SleepState, VRDevicePose, VRStatus},
+        model::{SleepState, VRStatus},
         openxr::input::{INPUT_CONTEXT, check_user_activity},
         sleep_detector::{SLEEP_DETECTOR_PERIOD, SleepDetector},
     },
@@ -39,7 +37,7 @@ async fn get_ctx() -> AppContext<xr_overlay::openxr::Vulkan> {
         let ctx = xr_overlay::xr::Init::default()
             .disable_hand_tracking()
             .sort_order(u16::MAX as u32)
-            .user_presence_support(false)
+            .user_presence_support(true)
             .with_app_name("Oyasumi VR");
         // if let Some(ref app)=app{
         //     ctx=ctx.with_instance(&unsafe { app.get_ctx() }.xr.instance);
@@ -150,8 +148,8 @@ pub async fn init() {
                         last_pose = c_pose;
                         send_event("POSE", c_pose).await;
                     }
-                    tokio::time::sleep(SLEEP_DETECTOR_PERIOD).await;
                 }
+                tokio::time::sleep(SLEEP_DETECTOR_PERIOD).await;
             }
         });
         debug!("[Init] openxr start (2)");
@@ -185,6 +183,10 @@ fn get_side(quat: Quat) -> SIDE {
 }
 #[inline]
 async fn get_pose(src: &'static str, ctx: &mut AppRunner) -> Option<Posef> {
+    if !ctx.is_user_present() {
+        tokio::time::sleep(Duration::from_secs(1)).await;
+        return None;
+    }
     let res = ctx.get_hmd_posef(ReferenceSpaceT::STAGE);
     if let Ok(posef) = res {
         return Some(posef);
@@ -199,9 +201,13 @@ async fn get_pose(src: &'static str, ctx: &mut AppRunner) -> Option<Posef> {
             }
             _ => (),
         };
-        println!("{}",ctx.is_runtime_active());
+        if !ctx.is_runtime_active() {
+            let _ = ctx.run();
+            tokio::time::sleep(Duration::from_secs(1)).await;
+            return None;
+        }
         if err == LocateError::LocationEmpty {
-            info!("[Core] Failed to get hmd Posef,{}:{:?}", src, err);
+            debug!("[Core] Failed to get hmd Posef,{}:{:?}", src, err);
         }
     }
     None
@@ -241,9 +247,9 @@ fn openxr_callback(event: AppEvent) {
                 unsafe { RESTARTING = true };
 
                 log::debug!("[core] openxr disconnected");
-                spawn_blocking(move || async {
-                    INPUT_CONTEXT.lock().await.take();
+                spawn(async {
                     update_status(VRStatus::Inactive).await;
+                    INPUT_CONTEXT.lock().await.take();
                     unsafe { OXR_HANDLE.get().as_ref().unwrap().lock().await.drop_ctx() };
                     OXR_BRIGHTNES_OVERLAY_HANDLE.lock().await.take();
                     tokio::task::spawn(session_restart());
@@ -256,27 +262,6 @@ fn openxr_callback(event: AppEvent) {
         }
         _ => (),
     }
-    // spawn_blocking(move || match event {
-    //     AppEvent::SessionEnded | AppEvent::Killed => {
-    //         if !unsafe { RESTARTING } {
-    //             unsafe { RESTARTING = true };
-
-    //             log::debug!("[core] openxr disconnected");
-    //             spawn(async {
-    //                 INPUT_CONTEXT.lock().await.take();
-    //                 update_status(VRStatus::Inactive).await;
-    //                 unsafe { OXR_HANDLE.get().as_ref().unwrap().lock().await.drop_ctx() };
-    //                 OXR_BRIGHTNES_OVERLAY_HANDLE.lock().await.take();
-    //                 tokio::task::spawn(session_restart());
-    //             });
-    //         }
-    //     }
-    //     AppEvent::Started => {
-    //         log::debug!("[core] openxr ready");
-    //         spawn(update_status(VRStatus::Initialized));
-    //     }
-    //     _ => (),
-    // });
 }
 async fn update_status(new_status: VRStatus) {
     info!("[core] updating openxr status:{:?}", new_status);
