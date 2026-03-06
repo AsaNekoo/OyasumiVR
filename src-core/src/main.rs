@@ -162,16 +162,17 @@ fn configure_tauri_plugin_log() -> TauriPlugin<Wry> {
             )
             .unwrap();
             out.finish(format_args!(
-                "{}[{}] {}",
+                "{}[{}][{}] {}",
                 time::OffsetDateTime::now_local()
                     .unwrap_or_else(|_| time::OffsetDateTime::now_utc())
                     .format(&format)
                     .unwrap(),
                 record.level(),
+                record.module_path().unwrap_or_default(),
                 message
             ))
         })
-        .rotation_strategy(RotationStrategy::KeepAll);
+        .rotation_strategy(RotationStrategy::KeepSome(100));
 
     builder = builder
         //also set in Cargo.toml
