@@ -199,7 +199,8 @@ async fn get_pose(src: &'static str, ctx: &mut AppRunner) -> Option<Posef> {
             }
             _ => (),
         };
-        if err != LocateError::LocationEmpty {
+        println!("{}",ctx.is_runtime_active());
+        if err == LocateError::LocationEmpty {
             info!("[Core] Failed to get hmd Posef,{}:{:?}", src, err);
         }
     }

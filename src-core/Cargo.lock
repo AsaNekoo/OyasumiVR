@@ -3880,6 +3880,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "libloading"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "754ca22de805bb5744484a5b151a9e1a8e837d5dc232c2d7d8c2e3492edc8b60"
+dependencies = [
+ "cfg-if",
+ "windows-link 0.2.1",
+]
+
+[[package]]
 name = "libm"
 version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4004,7 +4014,7 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=d993958f0c5d5def12da9a8869c306ee36da4a17#d993958f0c5d5def12da9a8869c306ee36da4a17"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=1cc53428d8d61dbe167ebd1fd512937c3de2345b#1cc53428d8d61dbe167ebd1fd512937c3de2345b"
 
 [[package]]
 name = "markup5ever"
@@ -4829,7 +4839,7 @@ checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 [[package]]
 name = "one_or_many_thin"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/one_or_many_thin?rev=02c164739d0de2c56d4037b4c7d47000bd0619f6#02c164739d0de2c56d4037b4c7d47000bd0619f6"
+source = "git+https://codeberg.org/sofoxe1/one_or_many_thin?rev=8a348a574b7fcb88f567f5fe8e498d1dc64ab636#8a348a574b7fcb88f567f5fe8e498d1dc64ab636"
 dependencies = [
  "thin-vec",
 ]
@@ -4892,19 +4902,19 @@ dependencies = [
 
 [[package]]
 name = "openxr"
-version = "0.19.0"
-source = "git+https://github.com/Ralith/openxrs?rev=e9a0135872e6d7a2a44d39baa4af7ad011a82ec6#e9a0135872e6d7a2a44d39baa4af7ad011a82ec6"
+version = "0.21.1"
+source = "git+https://github.com/sofoxe1/openxrs?rev=c8067b32cae0be14389a93cc3a482342425a13dc#c8067b32cae0be14389a93cc3a482342425a13dc"
 dependencies = [
  "libc",
- "libloading 0.8.9",
+ "libloading 0.9.0",
  "ndk-context",
  "openxr-sys",
 ]
 
 [[package]]
 name = "openxr-sys"
-version = "0.11.0"
-source = "git+https://github.com/Ralith/openxrs?rev=e9a0135872e6d7a2a44d39baa4af7ad011a82ec6#e9a0135872e6d7a2a44d39baa4af7ad011a82ec6"
+version = "0.13.1"
+source = "git+https://github.com/sofoxe1/openxrs?rev=c8067b32cae0be14389a93cc3a482342425a13dc#c8067b32cae0be14389a93cc3a482342425a13dc"
 dependencies = [
  "libc",
 ]
@@ -10142,7 +10152,7 @@ checksum = "3ae8337f8a065cfc972643663ea4279e04e7256de865aa66fe25cec5fb912d3f"
 [[package]]
 name = "xr_input"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=d993958f0c5d5def12da9a8869c306ee36da4a17#d993958f0c5d5def12da9a8869c306ee36da4a17"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=1cc53428d8d61dbe167ebd1fd512937c3de2345b#1cc53428d8d61dbe167ebd1fd512937c3de2345b"
 dependencies = [
  "log",
  "macros",
@@ -10151,7 +10161,7 @@ dependencies = [
 [[package]]
 name = "xr_overlay"
 version = "0.1.0"
-source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=d993958f0c5d5def12da9a8869c306ee36da4a17#d993958f0c5d5def12da9a8869c306ee36da4a17"
+source = "git+https://codeberg.org/sofoxe1/xr_overlay?rev=1cc53428d8d61dbe167ebd1fd512937c3de2345b#1cc53428d8d61dbe167ebd1fd512937c3de2345b"
 dependencies = [
  "ash",
  "bitmask-enum",
