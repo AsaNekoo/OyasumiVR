@@ -30,7 +30,7 @@ pub static XR_CTX: OnceLock<Arc<RwLock<AppRunner>>> = OnceLock::new();
 pub fn start_vr() -> Option<JoinHandle<()>> {
     if CACHE_PATH.exists() {
         log::info!("deleting /tmp cache:{:#?}", CACHE_PATH);
-        fs::remove_dir(CACHE_PATH.clone()).unwrap();
+        fs::remove_dir_all(CACHE_PATH.clone()).unwrap();
     }else {
         info!("/tmp/ cache doesn't exist yet");
     }
