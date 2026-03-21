@@ -60,7 +60,7 @@ export interface OverlayMenuOpenRequest {
   /**
    * @generated from protobuf field: OyasumiOverlaySidecar.OyasumiSidecarControllerRole controller_role = 1;
    */
-  controllerRole: OyasumiSidecarControllerRole;
+  controllerRole: OyasumiSidecarControllerRole|number;
 }
 /**
  * @generated from protobuf message OyasumiOverlaySidecar.SetMicrophoneActiveRequest

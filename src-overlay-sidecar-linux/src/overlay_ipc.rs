@@ -48,10 +48,12 @@ impl Overlay {
     }
     #[inline]
     pub fn hide_dashboard(&self) {
+        log::info!("hiding overlay");
         self.execute_js("window.OyasumiIPCIn.hideDashboard();");
     }
     #[inline]
     pub fn show_dashboard(&self) {
+        log::info!("showing overlay");
         self.execute_js("window.OyasumiIPCIn.showDashboard();");
     }
     pub fn show_tool_tip(&self, string: Option<&str>) {

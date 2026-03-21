@@ -2151,6 +2151,8 @@
           "description": "This can be turned off if you want to disable OyasumiVR's overlay menu completely.",
           "title": "Enable overlay menu"
         },
+        "show": "Show",
+        "hide": "Hide",
         "title": "Overlay"
       },
       "sleepMode": {

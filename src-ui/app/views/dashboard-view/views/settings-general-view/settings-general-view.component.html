@@ -101,6 +101,22 @@
                 <span class="switch-toggle-slider"></span>
               </label>
             </div>
+            <button
+              class="btn btn-secondary"
+              [disabled]="!appSettings.overlayMenuEnabled"
+              (click)="overlayToggle(true)"
+              translate
+            >
+              settings.general.overlay.show
+            </button>
+            <button
+              class="btn btn-secondary"
+              [disabled]="!appSettings.overlayMenuEnabled"
+              (click)="overlayToggle(false)"
+              translate
+            >
+              settings.general.overlay.hide
+            </button>
           </div>
           <!-- @if(is_windows){
           <div class="setting-row">

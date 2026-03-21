@@ -4,6 +4,9 @@ use log::{error, info};
 use tonic::transport::Server;
 use tonic_web::GrpcWebLayer;
 use tower_http::cors::{AllowHeaders, AllowOrigin};
+use xr_overlay::{
+    glam::Quat, openxr::{Posef, Quaternionf, Vector3f}, runner::DeviceRole, utils::QuatExt
+};
 
 use crate::{
     ARGS, HANDLES,
@@ -16,7 +19,7 @@ use crate::{
     },
     overlay_ipc::OverlayIPCAddNotification,
     vr::{
-        DASBOARD_VISIBLE, NOTIFICATION_OVERLAY, OVERLAY, hide_dashboard, set_mic_active,
+        DASBOARD_VISIBLE, NOTIFICATION_OVERLAY, OVERLAY, XR_CTX, hide_dashboard, set_mic_active,
         show_dashboard,
     },
 };
@@ -75,7 +78,30 @@ impl OyasumiOverlaySidecar for GrpcServer {
         &self,
         request: tonic::Request<OverlayMenuOpenRequest>,
     ) -> Result<tonic::Response<Empty>, tonic::Status> {
-        show_dashboard();
+        if let Some(ctx) = XR_CTX.get()
+            && let Some(overlay) = OVERLAY.get()
+        {
+            ctx.write()
+                .unwrap()
+                .set_posef_relative(
+                    DeviceRole::Hmd,
+                    overlay.xr_handle,
+                    Posef {
+                        orientation: Quaternionf::IDENTITY,
+                        position: Vector3f {
+                            x: 0.0,
+                            y: 0.0,
+                            z: -0.3,
+                        },
+                    },
+                    true,
+                )
+                .unwrap();
+            show_dashboard();
+        } else {
+            log::warn!("vr not ready");
+        }
+
         Ok(Empty {}.into())
     }
 

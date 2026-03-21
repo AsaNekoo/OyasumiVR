@@ -21,7 +21,7 @@ async function main() {
     await unlinkSync('/tmp/Oyasumi_build/Oyasumi/resources/input');
   } catch {}
   console.log('packaging');
-  await execPromise('ZSTD_CLEVEL=19 nice -n20 tar -I zstd -cvpf oyasumi-linux.tar.zst Oyasumi/');
+  await execPromise('ZSTD_CLEVEL=1 nice -n20 tar -I zstd -cvpf oyasumi-linux.tar.zst Oyasumi/');
   await rimraf('bin/');
   await rimraf('/tmp/Oyasumi_build/Oyasumi/');
   await execPromise('sha512sum oyasumi-linux.tar.zst >> oyasumi-linux.tar.zst.checksum');

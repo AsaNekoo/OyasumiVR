@@ -1,5 +1,5 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, firstValueFrom, Subject } from 'rxjs';
 import { open as openFile } from '@tauri-apps/plugin-dialog';
 import {
   APP_SETTINGS_DEFAULT,
@@ -18,6 +18,7 @@ import { ModalService } from 'src-ui/app/services/modal.service';
 import { LANGUAGES } from '../../../../globals';
 import { vshrink } from '../../../../utils/animations';
 import { OVRInputEventAction } from 'src-ui/app/models/ovr-input-event';
+import { IPCService } from 'src-ui/app/services/ipc.service';
 
 @Component({
   selector: 'app-settings-general-view',
@@ -85,6 +86,7 @@ export class SettingsGeneralViewComponent implements OnInit {
   stopWithVROption: SelectBoxItem | undefined;
 
   constructor(
+    private ipcService: IPCService,
     private lighthouse: LighthouseConsoleService,
     private modalService: ModalService,
     private destroyRef: DestroyRef,
@@ -113,12 +115,23 @@ export class SettingsGeneralViewComponent implements OnInit {
         this.sleepModeStartupBehaviourOption = this.sleepModeStartupBehaviourOptions.find(
           (o) => o.id === settings.sleepModeStartupBehaviour
         );
-        this.stopWithVROption = this.stopWithVROptions.find(
-          (o) => o.id === settings.quitWithVR
-        );
+        this.stopWithVROption = this.stopWithVROptions.find((o) => o.id === settings.quitWithVR);
       });
   }
 
+  async overlayToggle(v: boolean) {
+    const client = await firstValueFrom(this.ipcService.overlaySidecarClient);
+    if (!client) return;
+    if (v) {
+      client.openOverlayMenu({
+        controllerRole: -1,
+      });
+    } else {
+      client.closeOverlayMenu({
+        controllerRole: -1,
+      });
+    }
+  }
   setUserLanguage(languageCode: string) {
     this.settingsService.updateSettings({ userLanguage: languageCode });
   }
@@ -164,8 +177,6 @@ export class SettingsGeneralViewComponent implements OnInit {
   setAskForAdminOnStart(enabled: boolean) {
     this.settingsService.updateSettings({ askForAdminOnStart: enabled });
   }
-
-
 
   setExitInSystemTray(exitInSystemTray: boolean) {
     this.settingsService.updateSettings({ exitInSystemTray });
