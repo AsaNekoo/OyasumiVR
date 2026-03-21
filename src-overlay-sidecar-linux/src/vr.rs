@@ -1,6 +1,6 @@
 use std::{
     fs,
-    path::{Path, PathBuf},
+    path::PathBuf,
     sync::{Arc, LazyLock, OnceLock, RwLock},
     thread::JoinHandle,
     time::Duration,
@@ -31,7 +31,7 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
     if CACHE_PATH.exists() {
         log::info!("deleting /tmp cache:{:#?}", CACHE_PATH);
         fs::remove_dir_all(CACHE_PATH.clone()).unwrap();
-    }else {
+    } else {
         info!("/tmp/ cache doesn't exist yet");
     }
     trace!("start_vr");
@@ -211,6 +211,11 @@ fn openxr_callback(event: AppEvent) {
         AppEvent::OverlayVisibilityChanged { handle: _, visible } => {
             if visible {
                 OVERLAY.get().as_ref().unwrap().show_dashboard();
+            }
+            if visible {
+                log::info!("overlay showed");
+            } else {
+                log::info!("overlay hidden");
             }
         }
         AppEvent::OverlayHiding {

@@ -28,6 +28,7 @@ portpicker = "0.1.1"
 image = { version = "0.25.9", default-features = false, features = ["png"] }
 oyasumi_shared = { version = "0.1.0", path = "../src-shared-rust" }
 toml = "0.9.11"
+chrono = "0.4.44"
 # xr_overlay_cef = {  path="../../xr_overlay/cef_app/" }
 [build-dependencies]
 tonic-prost-build = "*"

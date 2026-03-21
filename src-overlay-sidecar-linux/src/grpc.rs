@@ -5,7 +5,7 @@ use tonic::transport::Server;
 use tonic_web::GrpcWebLayer;
 use tower_http::cors::{AllowHeaders, AllowOrigin};
 use xr_overlay::{
-    glam::Quat, openxr::{Posef, Quaternionf, Vector3f}, runner::DeviceRole, utils::QuatExt
+    openxr::{Posef, Quaternionf, Vector3f}, runner::DeviceRole
 };
 
 use crate::{

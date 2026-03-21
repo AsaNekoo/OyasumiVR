@@ -1,5 +1,5 @@
 use std::{
-    fs,
+    fs::{self, File},
     net::TcpStream,
     path::PathBuf,
     sync::{LazyLock, Mutex, OnceLock},
@@ -19,6 +19,7 @@ use crate::{
     core_grpc::{Empty, OverlaySidecarStartArgs, oyasumi_core_client::OyasumiCoreClient},
     globals::CORE_GRPC_DEV_PORT,
     grpc::{start_grpc_server, start_grpc_web_server},
+    logger::{Writter, get_o_log_path},
     overlay_ipc::start_websocket_server,
     ui::serve_ui,
     vr::{
@@ -26,11 +27,11 @@ use crate::{
         start_vr,
     },
 };
-
 pub mod config;
 pub mod globals;
 pub mod grpc;
 pub mod input;
+mod logger;
 pub mod model;
 pub mod overlay_ipc;
 pub mod ui;
@@ -64,23 +65,25 @@ fn main() {
     let hook = std::panic::take_hook();
     let panic_log_path = get_log_path().join("overlay_panic.log");
     std::panic::set_hook(Box::new(move |e| {
-        std::fs::write(
-            panic_log_path.join(PathBuf::from(format!(
-                "overlay_panic_{}_{:?}.log",
-                std::process::id(),
-                std::thread::current().id()
-            ))),
-            format!("{:?}", e),
-        )
-        .ok();
-        println!(
-            "Writing panic log to {:#?} open an issue https://github.com/sofoxe1/OyasumiVR/issues and inclue all files starting with 'overlay_panic'",
-            panic_log_path
+        let path = format!(
+            "overlay_panic_{}_{:?}.log",
+            std::process::id(),
+            std::thread::current().id()
         );
+
+        std::fs::write(panic_log_path.join(PathBuf::from(&path)), format!("{:?}", &e)).ok();
+        println!(
+            "Writing panic log to {:#?} open an issue https://github.com/sofoxe1/OyasumiVR/issues and inclue {:#?} ",
+            panic_log_path,
+            oyasumi_shared::get_log_path().join("overlay.log")
+        );
+        log::error!("PANIC: {:?}",e);
         hook(e);
     }));
+    
     let mut binding = env_logger::Builder::new();
     let mut logger = binding.filter_level(log::LevelFilter::Trace);
+    static mut MAIN: bool = false;
     #[cfg(debug_assertions)]
     {
         logger = logger
@@ -89,7 +92,14 @@ fn main() {
             .filter_module("tokio_tungstenite", log::LevelFilter::Warn)
             .filter_module("tungstenite", log::LevelFilter::Warn);
     }
-    logger.parse_default_env().init();
+
+    let w = Writter::default();
+    let f_ = w.file.clone();
+
+    logger
+        .target(env_logger::Target::Pipe(Box::new(w)))
+        .parse_default_env()
+        .init();
 
     if !OVERLAY_CONFIG_PATH.exists() {
         fs::write(&*OVERLAY_CONFIG_PATH, DEFAULT_OVERLAY_CONFIG).unwrap();
@@ -101,8 +111,13 @@ fn main() {
         std::thread::current().id(),
         std::process::id()
     );
+
     fs::write("/proc/self/oom_score_adj", "1000").ok();
     pointless_cef_thread_spawner();
+    let f = File::create(get_o_log_path()).unwrap();
+    f_.lock().unwrap().replace(f);
+   
+    unsafe { MAIN = true };
 
     trace!(
         "main thread_id:{:?},pid:{:?}",
@@ -186,6 +201,7 @@ async fn tokio_main() {
     .await
     .unwrap();
     CORE_CLIENT.set(core_client.clone().into()).unwrap();
+    log::info!("connected to core");
     let http_port = core_client
         .get_http_server_port(Empty {})
         .await
@@ -205,6 +221,7 @@ async fn tokio_main() {
         }
         false => serve_ui().await,
     };
+    log::info!("ui port:{}", ui_port);
     let url = format!(
         "http://localhost:{}/dashboard?corePort={}",
         ui_port, http_port
@@ -216,6 +233,7 @@ async fn tokio_main() {
     // let url_noti="https://google.com".to_string();
     trace!("navigating to:{}", url);
     let ws_port = start_websocket_server().await;
+    log::info!("ws port:{}", ws_port);
     OVERLAY
         .get()
         .as_ref()
@@ -229,6 +247,11 @@ async fn tokio_main() {
 
     let grpc_server_port = start_grpc_server().await;
     let grpc_web_server_pos = start_grpc_web_server().await;
+    log::info!(
+        "grpc:{}, grpc_web:{}",
+        grpc_server_port,
+        grpc_web_server_pos
+    );
     core_client
         .on_overlay_sidecar_start(OverlaySidecarStartArgs {
             pid: std::process::id(),
@@ -237,10 +260,12 @@ async fn tokio_main() {
         })
         .await
         .unwrap();
+    log::info!("sent onstart");
     assert_ne!(grpc_web_server_pos, 0);
     assert_ne!(grpc_server_port, 0);
 
     show_dashboard();
+    log::info!("initial overlay show");
     tokio::time::sleep(Duration::from_millis(400)).await;
     NOTIFICATION_OVERLAY
         .get()
@@ -251,6 +276,7 @@ async fn tokio_main() {
         .unwrap()
         .load_url(Some(&(url_noti.as_str()).into()));
     NOTIFICATION_OVERLAY.wait().inject_ipc(ws_port);
+    log::info!("overlays ready");
     tokio::time::sleep(Duration::from_secs(2)).await;
     if let Some(no_vr) = NO_VR.get()
         && *no_vr
