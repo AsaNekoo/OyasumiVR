@@ -5,7 +5,7 @@ import { VRChatService } from '../../../../services/vrchat-api/vrchat.service';
 import { getVersion } from '../../../../utils/app-utils';
 import { BUILD_ID, FLAVOUR } from 'src-ui/build';
 import { OscService } from '../../../../services/osc.service';
-import { ElevatedSidecarService } from '../../../../services/elevated-sidecar.service';
+// import { ElevatedSidecarService } from '../../../../services/elevated-sidecar.service';
 import { OverlayService } from '../../../../services/overlay/overlay.service';
 import { VRService } from '../../../../services/openvr.service';
 import { FontLoaderService } from '../../../../services/font-loader.service';
@@ -36,7 +36,7 @@ export class SettingsStatusInfoViewComponent {
   constructor(
     vrchat: VRChatService,
     osc: OscService,
-    elevatedSidecar: ElevatedSidecarService,
+    // elevatedSidecar: ElevatedSidecarService,
     overlaySidecar: OverlayService,
     openvr: VRService,
     fontLoader: FontLoaderService,
@@ -48,14 +48,14 @@ export class SettingsStatusInfoViewComponent {
         entries: [
           { key: 'Version', value: from(getVersion().then((v) => v + '-' + FLAVOUR)) },
           { key: 'Build ID', value: of(BUILD_ID) },
-          {
-            key: 'Elevated Sidecar',
-            value: elevatedSidecar.sidecarStarted.pipe(
-              map((s) => {
-                return s ? 'Running' : 'Not running';
-              })
-            ),
-          },
+          // {
+          //   key: 'Elevated Sidecar',
+          //   value: elevatedSidecar.sidecarStarted.pipe(
+          //     map((s) => {
+          //       return s ? 'Running' : 'Not running';
+          //     })
+          //   ),
+          // },
           {
             key: 'Overlay Sidecar',
             value: overlaySidecar.sidecarStarted.pipe(
@@ -171,28 +171,28 @@ export class SettingsStatusInfoViewComponent {
               )
             ),
           },
-          {
-            key: 'Elevated Sidecar gRPC Port',
-            value: interval(1000).pipe(
-              startWith(void 0),
-              switchMap(
-                async () =>
-                  ((await invoke<number | null>('elevated_sidecar_get_grpc_port')) ?? 'Unknown') +
-                  ''
-              )
-            ),
-          },
-          {
-            key: 'Elevated Sidecar gRPC Web Port',
-            value: interval(1000).pipe(
-              startWith(void 0),
-              switchMap(
-                async () =>
-                  ((await invoke<number | null>('elevated_sidecar_get_grpc_web_port')) ??
-                    'Unknown') + ''
-              )
-            ),
-          },
+          // {
+          //   key: 'Elevated Sidecar gRPC Port',
+          //   value: interval(1000).pipe(
+          //     startWith(void 0),
+          //     switchMap(
+          //       async () =>
+          //         ((await invoke<number | null>('elevated_sidecar_get_grpc_port')) ?? 'Unknown') +
+          //         ''
+          //     )
+          //   ),
+          // },
+          // {
+          //   key: 'Elevated Sidecar gRPC Web Port',
+          //   value: interval(1000).pipe(
+          //     startWith(void 0),
+          //     switchMap(
+          //       async () =>
+          //         ((await invoke<number | null>('elevated_sidecar_get_grpc_web_port')) ??
+          //           'Unknown') + ''
+          //     )
+          //   ),
+          // },
           {
             key: 'Overlay Sidecar gRPC Port',
             value: interval(1000).pipe(

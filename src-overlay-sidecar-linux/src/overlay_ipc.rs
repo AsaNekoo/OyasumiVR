@@ -37,6 +37,9 @@ fn get_ipc_script(port: u16) -> String {
 impl Overlay {
     #[inline]
     pub fn execute_js(&self, js: &str) {
+        if self.browser.main_frame().is_none(){
+            log::error!("")
+        }
         log::trace!("running javascript:\n {}", js);
         self.browser
             .main_frame()
