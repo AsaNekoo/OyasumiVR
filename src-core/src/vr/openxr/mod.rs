@@ -1,6 +1,6 @@
 use std::{
     sync::{LazyLock, OnceLock},
-    time::Duration,
+    time::{Duration, Instant},
 };
 mod input;
 use glam::{Quat, Vec3A};
@@ -8,12 +8,13 @@ use log::{debug, info};
 use serde_repr::Serialize_repr;
 use tokio::{spawn, sync::Mutex};
 use xr_overlay::{
-    RgbaTexture,
+    Texture,
     error::LocateError,
     model::AppContext,
     openxr::{Posef, Vector3f},
     runner::{AppRunner, AppRunnerCreateInfo, OverlayCreateInfo, OverlayHandle, events::AppEvent},
     utils::{QuaternionfExt, VecFExt},
+    vulkano::format::Format,
     xr::ReferenceSpaceT,
 };
 
@@ -23,7 +24,7 @@ use crate::{
         SLEEP_DETECTION_ENABLED,
         commands::SLEEP_STATE,
         gesture_detector::GestureDetector,
-        model::{SleepState, VRStatus},
+        model::{SleepState, VRDevicePose, VRStatus},
         openxr::input::{INPUT_CONTEXT, check_user_activity},
         sleep_detector::{SLEEP_DETECTOR_PERIOD, SleepDetector},
     },
@@ -31,13 +32,17 @@ use crate::{
 pub static OXR_HANDLE: OnceLock<Mutex<AppRunner>> = OnceLock::new();
 pub static OXR_BRIGHTNES_OVERLAY_HANDLE: Mutex<Option<OverlayHandle>> = Mutex::const_new(None);
 pub static OXR_STATE: Mutex<VRStatus> = Mutex::const_new(VRStatus::Inactive);
+const POSE_LOG_INTERVAL: Duration = Duration::from_secs(1);
+static NEXT_POSE_LOG: Mutex<Option<Instant>> = Mutex::const_new(None);
 
 async fn get_ctx() -> AppContext<xr_overlay::openxr::Vulkan> {
     let ctx = loop {
         let ctx = xr_overlay::xr::Init::default()
             .disable_hand_tracking()
             .sort_order(u16::MAX as u32)
-            .user_presence_support(true)
+            // WiVRn reports the user as not present even while the HMD is worn and tracked,
+            // which would stop the sleep/gesture detectors from ever getting a pose
+            .user_presence_support(false)
             .with_app_name("Oyasumi VR");
         // if let Some(ref app)=app{
         //     ctx=ctx.with_instance(&unsafe { app.get_ctx() }.xr.instance);
@@ -131,7 +136,6 @@ pub async fn init() {
         });
 
         tokio::task::spawn(async move {
-            let mut last_pose = SIDE::Front;
             loop {
                 let pose = get_pose("sleep", &mut *OXR_HANDLE.wait().lock().await).await;
                 if let Some(pose) = pose {
@@ -143,11 +147,17 @@ pub async fn init() {
                             .log_pose(pose.position.to_vec3a().to_vec3())
                             .await;
                     }
-                    let c_pose = get_side(pose.orientation.to_quat());
-                    if c_pose != last_pose {
-                        last_pose = c_pose;
-                        send_event("POSE", c_pose).await;
-                    }
+                    // The UI determines the sleeping pose from this, like it does with SteamVR on Windows
+                    let (p, o) = (pose.position, pose.orientation);
+                    send_event(
+                        "HMD_POSE_UPDATE",
+                        VRDevicePose {
+                            index: 0,
+                            quaternion: [o.x, o.y, o.z, o.w],
+                            position: [p.x, p.y, p.z],
+                        },
+                    )
+                    .await;
                 }
                 tokio::time::sleep(SLEEP_DETECTOR_PERIOD).await;
             }
@@ -181,14 +191,52 @@ fn get_side(quat: Quat) -> SIDE {
         }
     }
 }
+async fn should_log_pose() -> bool {
+    let mut next_pose_log = NEXT_POSE_LOG.lock().await;
+    if next_pose_log.is_some_and(|t| Instant::now() < t) {
+        return false;
+    }
+    *next_pose_log = Some(Instant::now() + POSE_LOG_INTERVAL);
+    true
+}
+async fn log_pose(src: &'static str, posef: &Posef, user_present: bool) {
+    if !should_log_pose().await {
+        return;
+    }
+    let (p, o) = (posef.position, posef.orientation);
+    debug!(
+        "[Core] HMD pose ({}{}): pos=({:.3}, {:.3}, {:.3}) rot=({:.3}, {:.3}, {:.3}, {:.3}) side={:?}",
+        src,
+        if user_present { "" } else { ", user not present" },
+        p.x,
+        p.y,
+        p.z,
+        o.x,
+        o.y,
+        o.z,
+        o.w,
+        get_side(o.to_quat())
+    );
+}
 #[inline]
 async fn get_pose(src: &'static str, ctx: &mut AppRunner) -> Option<Posef> {
     if !ctx.is_user_present() {
+        // Still log where the HMD is in debug builds, the pose is not used for detection
+        #[cfg(debug_assertions)]
+        match ctx.get_hmd_posef(ReferenceSpaceT::STAGE) {
+            Ok(posef) => log_pose(src, &posef, false).await,
+            Err(err) => {
+                if should_log_pose().await {
+                    debug!("[Core] HMD pose ({}, user not present): {:?}", src, err);
+                }
+            }
+        }
         tokio::time::sleep(Duration::from_secs(1)).await;
         return None;
     }
     let res = ctx.get_hmd_posef(ReferenceSpaceT::STAGE);
     if let Ok(posef) = res {
+        log_pose(src, &posef, true).await;
         return Some(posef);
     } else if let Err(err) = res {
         match err {
@@ -342,8 +390,8 @@ pub async fn set_brightness(brightness: f64, perceived_brightness_adjustment_gam
 
     ctx.set_raw_texture(
         overlay_handle.unwrap(),
-        // RgbaTexture::new(1, 1, [brightness, 0, 0, 255].to_vec()),
-        RgbaTexture::new(1, 1, [0, 0, 0, brightness].to_vec()),
+        // Texture::new(1, 1, [brightness, 0, 0, 255].to_vec(), Format::R8G8B8A8_UNORM),
+        Texture::new(1, 1, [0, 0, 0, brightness].to_vec(), Format::R8G8B8A8_UNORM),
         false,
     );
     let _ = ctx.run();

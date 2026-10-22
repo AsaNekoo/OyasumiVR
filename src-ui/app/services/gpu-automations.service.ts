@@ -7,6 +7,7 @@ import {
   firstValueFrom,
   map,
   Observable,
+  of,
   pairwise,
   skip,
   startWith,
@@ -60,9 +61,9 @@ export class GpuAutomationsService {
   }
 
   isEnabled(): Observable<boolean> {
-    return this.automationConfig.configs.pipe(
-      map((configs) => configs.MSI_AFTERBURNER.enabled)
-    );
+    // The LACT pane has no enable toggle (unlike the Windows MSI Afterburner pane), so the
+    // stored `enabled` flag can never be turned on. Choosing profiles there is what enables it.
+    return of(true);
   }
 
   async enable() {

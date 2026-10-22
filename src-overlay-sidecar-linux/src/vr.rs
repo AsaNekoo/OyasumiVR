@@ -12,7 +12,7 @@ use xr_overlay::{
     openxr::Vector3f,
     runner::{
         AppRunner, AppRunnerCreateInfo, AppRunnerCreateInfoInput, DeviceRole, OverlayCreateInfo,
-        OverlayHandle, ShowMode, events::AppEvent,
+        OverlayHandle, PointerTexture, ShowMode, events::AppEvent,
     },
 };
 use xr_overlay_cef::{CefOverlayCreateInfo, create_cef_overlay};
@@ -41,7 +41,9 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
         }
         match xr_overlay::xr::Init::default()
             .enable_drm_support()
-            .user_presence_support(true)
+            // WiVRn reports the user as not present even while the HMD is worn and tracked,
+            // which would stop the overlays from ever rendering
+            .user_presence_support(false)
             .sort_order(4089)
             .with_app_name("Oyasumi VR Overlay")
             .init_overlay()
@@ -71,6 +73,11 @@ pub fn start_vr() -> Option<JoinHandle<()>> {
             controllers: get_controller_create_info(),
             draw_pointers_only_when_hit: config.pointers.draw_only_when_on_overlay,
             overlay_move_speed: config.pointers.overlay_move_speed,
+            // a pointer where the controller points at the overlay instead of a beam, like on windows
+            pointer_texture: Some(PointerTexture {
+                texture: textures::POINTER.clone(),
+                size: 0.02,
+            }),
         }),
     });
 

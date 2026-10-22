@@ -106,13 +106,6 @@ pub async fn init_sound_playback() {
         // Load sound files
         let sounds: Arc<Mutex<HashMap<String, Box<[u8]>>>> =
             Arc::new(Mutex::new(HashMap::new()));
-        let stream_handle = match DeviceSinkBuilder::open_default_sink() {
-            Ok(sink) => sink,
-            Err(e) => {
-                error!("[Core] Failed to initialize audio output stream: {}", e);
-                return;
-            }
-        };
         process_new_sound_files(
             &sounds,
             RESOURCES_PATH
@@ -174,13 +167,19 @@ pub async fn init_sound_playback() {
             }
         });
         tokio::time::sleep(Duration::from_millis(200)).await;
-        stream_handle.pause();
-        // Initialize output stream
-        let player = rodio::Player::connect_new(stream_handle.mixer());
         // Play sounds when requested
         while let Some((sound, volume)) = tokio_rx.recv().await {
             if let Some(source) = sounds.lock().await.get(&sound) {
-                stream_handle.play();
+                // Open the output stream only while a sound is playing, so the device can idle in between
+                let mut stream_handle = match DeviceSinkBuilder::open_default_sink() {
+                    Ok(sink) => sink,
+                    Err(e) => {
+                        error!("[Core] Failed to initialize audio output stream: {}", e);
+                        continue;
+                    }
+                };
+                stream_handle.log_on_drop(false);
+                let player = rodio::Player::connect_new(stream_handle.mixer());
                 // Play sound
                 let decoder = rodio::Decoder::new(Cursor::new(source.clone())).unwrap();
                 decoder.total_duration();
@@ -188,7 +187,6 @@ pub async fn init_sound_playback() {
 
                 player.set_volume(volume);
                 player.sleep_until_end();
-                stream_handle.pause();
             } else {
                 error!("[Core] Sound not found: {}", sound);
             }

@@ -54,6 +54,7 @@ export class VRService {
         this.onDeviceUpdate(event.payload.device)
       ),
       listen<VRStatus>('VR_STATUS_UPDATE', (event) => this.onStatusUpdate(event.payload)),
+      listen<VRDevicePose>('HMD_POSE_UPDATE', (event) => this._hmd_pose.next(event.payload)),
     ]);
 
   }

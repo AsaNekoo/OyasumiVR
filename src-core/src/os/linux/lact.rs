@@ -6,7 +6,23 @@ use crate::{utils::send_event, Models::elevated_sidecar::GpuProfileError};
 pub async fn init() {
     send_event("ELEVATED_SIDECAR_STARTED", 0).await;
 }
-//fixme: fix this attrocity
+// lact_client::DaemonClient is not Send, so run it on its own thread with a current-thread runtime
+async fn run_local<F, Fut, T>(f: F) -> Result<T, GpuProfileError>
+where
+    F: FnOnce() -> Fut + Send + 'static,
+    Fut: std::future::Future<Output = Result<T, GpuProfileError>>,
+    T: Send + 'static,
+{
+    tokio::task::spawn_blocking(move || {
+        tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .map_err(|_| GpuProfileError::UnknownError)?
+            .block_on(f())
+    })
+    .await
+    .map_err(|_| GpuProfileError::UnknownError)?
+}
 pub async fn set_lact_profile(profile: String) -> Result<bool, GpuProfileError> {
     async fn inner(profile: String) -> Result<bool, GpuProfileError> {
             match DaemonClient::connect().await {
@@ -36,9 +52,8 @@ pub async fn set_lact_profile(profile: String) -> Result<bool, GpuProfileError> 
                     Err(GpuProfileError::ExeCannotExecute)
                 }
             }
-        // })
     }
-    inner(profile).await
+    run_local(move || inner(profile)).await
 }
 pub async fn get_lact_profiles() -> Result<Vec<String>, GpuProfileError> {
     async fn inner() -> Result<Vec<String>, GpuProfileError> {
@@ -61,5 +76,5 @@ pub async fn get_lact_profiles() -> Result<Vec<String>, GpuProfileError> {
                 }
             }
     }
-        inner().await
+    run_local(inner).await
 }
